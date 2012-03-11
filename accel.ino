@@ -28,137 +28,56 @@ void accelInit(void)
   writeReg(MMA7660addr, MMA7660_PDET, 0x00);
   //writeReg(MMA7660addr, MMA7660_PDET, 0xE1);
 
-  //writeReg(MMA7660addr, MMA7660_PD, 0x01);
+  writeReg(MMA7660addr, MMA7660_PD, 0x04);
  
   debug("--> Set back to normal operation mode");
   writeReg(MMA7660addr, MMA7660_MODE, 0x01);
-
-  /*pinMode(ACC_INT_PIN, OUTPUT);*/
-  /*digitalWrite(ACC_INT_PIN, HIGH);*/
-  /*pinMode(ACC_INT_PIN, INPUT);*/
 }
 
-void MMA7660ReadRegistry(char * vals)
+void MMA7660ReadData(char * val)
 {
-  int bailout = 3;
-  int count = 4;
   int i;
+  int size = 4;
 
   Wire.beginTransmission(MMA7660addr);
   Wire.write(byte(MMA7660_X));
   Wire.endTransmission();
 
-  Wire.requestFrom(MMA7660addr, count);
+  Wire.requestFrom(MMA7660addr, size);
   if (Wire.available())
   {
-    /*if (count < 3)*/
-    /*{*/
-      /*while ( val[count] > 63) // Values above 63 are incorrect*/
-      /*{*/
-        /*val[count] = Wire.read();*/
-        /*if (bailout < 0)*/
-        /*{*/
-          /*debug("BAILOUT");*/
-          /*break;*/
-        /*} else {*/
-          /*bailout--;*/
-        /*}*/
-      /*}*/
-      /*bailout = 3;*/
-      /*count++;*/
-    /*}*/
-    for (i = 0; i < count; i++)
+    for (i = 0; i < size; i++)
     {
-      vals[count] = ((char)(Wire.read()<<2))/4;
+      val[i] = ((char)(Wire.read()<<2))/4;
     }
   }
 }
 
 void accelerationUpdate(struct Acceleration *acc)
 {
-  unsigned char val[4] = { 64, 64, 64, 64 };
-  char count = 0;
-  int bailout = 3;
+  char val[4] = { 64, 64, 64 };
 
   if (Interrupted)
   {
     Interrupted = false;
 
-    Wire.beginTransmission(MMA7660addr);
-    Wire.write(byte(MMA7660_X));
-    Wire.endTransmission();
-
-    // Request 3 bytes: X,Y,Z
-    Wire.requestFrom(MMA7660addr, 4);
-    if (Wire.available())
-    {
-      /*if (count < 3)*/
-      /*{*/
-        /*while ( val[count] > 63) // Values above 63 are incorrect*/
-        /*{*/
-          /*val[count] = Wire.read();*/
-          /*if (bailout < 0)*/
-          /*{*/
-            /*debug("BAILOUT");*/
-            /*break;*/
-          /*} else {*/
-            /*bailout--;*/
-          /*}*/
-        /*}*/
-        /*bailout = 3;*/
-        /*count++;*/
-      /*}*/
-      for (count = 0; count < 3; count++)
-      {
-        val[count] = Wire.read();
-      }
-    }
-    acc->x = ((char)(val[0]<<2))/4 - acc->x_old;
-    acc->y = ((char)(val[1]<<2))/4 - acc->y_old;
-    acc->z = ((char)(val[2]<<2))/4 - acc->z_old;
-    acc->x_old = ((char)(val[0]<<2))/4;
-    acc->y_old = ((char)(val[1]<<2))/4;
-    acc->z_old = ((char)(val[2]<<2))/4;
+    MMA7660ReadData(val);
+    acc->x = val[0] - acc->x_old;
+    acc->y = val[1] - acc->y_old;
+    acc->z = val[2] - acc->z_old;
+    acc->x_old = val[0];
+    acc->y_old = val[1];
+    acc->z_old = val[2];
   }
 }
 
 void orientationUpdate(struct Orientation *ori)
 {
-  unsigned char val[4] = { 64, 64, 64, 64 };
-  char count = 0;
-  int bailout = 3;
-  boolean interrupt = false;
+  char val[4] = { 64, 64, 64, 64 };
 
-  Wire.beginTransmission(MMA7660addr);
-  Wire.write(byte(MMA7660_X));
-  Wire.endTransmission();
-
-  Wire.requestFrom(MMA7660addr, 4);
-  if (Wire.available())
-  {
-    /*if (count < 3)*/
-    /*{*/
-      /*while ( val[count] > 63) // Values above 63 are incorrect*/
-      /*{*/
-        /*val[count] = Wire.read();*/
-        /*if (bailout < 0)*/
-        /*{*/
-          /*debug("BAILOUT");*/
-          /*break;*/
-        /*} else {*/
-          /*bailout--;*/
-        /*}*/
-      /*}*/
-      /*bailout = 3;*/
-      /*count++;*/
-    /*}*/
-    for (count = 0; count < 4; count++)
-    {
-      val[count] = Wire.read();
-    }
-  }
-  ori->x = ((char)(val[0]<<2))/4;
-  ori->y = ((char)(val[1]<<2))/4;
-  ori->z = ((char)(val[2]<<2))/4;
-  ori->tilt = ((char)(val[3]<<2))/4;
+  MMA7660ReadData(val);
+  ori->x = val[0];
+  ori->y = val[1];
+  ori->z = val[2];
+  ori->tilt = val[3];
 }

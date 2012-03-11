@@ -33,10 +33,10 @@ struct Rotation
   char z;
 };
 
-void accelerationUpdate(struct Acceleration);
 void accelInit(void);
 void gyroInit(void);
-void gyroUpdate(struct Rotation *);
+void accelerationUpdate(struct Acceleration);
+void rotationUpdate(struct Rotation *);
 Acceleration Acc;
 Rotation Rot;
 Orientation Ori;
@@ -65,6 +65,33 @@ void setInterrupt(void)
   Interrupted = true;
 }
 
+void serialPrintSensorValues(
+  struct Acceleration *acc,
+  struct Orientation *ori,
+  struct Rotation *rot)
+{
+  //Serial.println("acc(x,y,z), ori(x,y,z), rot(x,y,z)");
+  /*Serial.print(Acc.x, DEC);*/
+  /*Serial.print(", ");*/
+  /*Serial.print(Acc.y, DEC);*/
+  /*Serial.print(", ");*/
+  /*Serial.print(Acc.z, DEC);*/
+  /*Serial.println("   |    ");*/
+
+  /*Serial.print(Ori.x, DEC);*/
+  /*Serial.print(", ");*/
+  /*Serial.print(Ori.y, DEC);*/
+  /*Serial.print(", ");*/
+  /*Serial.print(Ori.z, DEC);*/
+  /*Serial.print("   |    ");*/
+
+  Serial.print(Rot.x, DEC);
+  Serial.print(", ");
+  Serial.print(Rot.y, DEC);
+  Serial.print(", ");
+  Serial.println(Rot.z, DEC);
+}
+
 void setup()
 {
   debug("Starting setup");
@@ -81,22 +108,10 @@ void setup()
 
 void loop()
 {
-  //debug("***************");
   accelerationUpdate(&Acc);
-  //orientationUpdate(&Ori);
-  Serial.print(Acc.x, DEC);
-  Serial.print(", ");
-  Serial.print(Acc.y, DEC);
-  Serial.print(", ");
-  Serial.println(Acc.z, DEC);
-
   orientationUpdate(&Ori);
+  rotationUpdate(&Rot);
 
-  Serial.print(Ori.x, DEC);
-  Serial.print(", ");
-  Serial.print(Ori.y, DEC);
-  Serial.print(", ");
-  Serial.println(Ori.z, DEC);
-
-  delay(50);
+  serialPrintSensorValues(&Acc, &Ori, &Rot);
+  delay(100);
 }
