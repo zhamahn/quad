@@ -1,0 +1,43 @@
+// Arduino libraries
+#include <Wire.h>
+
+// Pin definitions
+#define PING_PIN 7
+#define ACC_INT_PIN 6
+
+struct Accel
+{
+  char x;
+  char y;
+  char z;
+  char tilt_x;
+  char tilt_y;
+  char tilt_z;
+};
+
+struct Gyro
+{
+  char temp;
+  char gx;
+  char gy;
+  char gz;
+};
+
+void setup()
+{
+  Serial.begin(9600);
+  //accelInit();
+  gyroInit();
+}
+
+Accel ACC;
+Gyro GYRO;
+void loop()
+{
+  Serial.println("************************");
+  //gyroUpdate(&GYRO);
+  //Serial.println(GYRO.gx, DEC);
+  //accelUpdate(&ACC);
+  //Serial.println(ACC.x, DEC);
+  delay(200);
+}
