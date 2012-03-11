@@ -34,34 +34,35 @@ void accelInit(void)
   writeReg(MMA7660addr, MMA7660_MODE, 0x01);
 }
 
-void MMA7660ReadData(char * val)
+char * MMA7660ReadData(byte addr, int count)
 {
   int i;
-  int size = 4;
+  char val[count+1];
 
   Wire.beginTransmission(MMA7660addr);
-  Wire.write(byte(MMA7660_X));
+  Wire.write(addr);
   Wire.endTransmission();
 
-  Wire.requestFrom(MMA7660addr, size);
+  Wire.requestFrom(MMA7660addr, count);
   if (Wire.available())
   {
-    for (i = 0; i < size; i++)
+    for (i = 0; i < count; i++)
     {
       val[i] = ((char)(Wire.read()<<2))/4;
     }
   }
+  return val;
 }
 
 void accelerationUpdate(struct Acceleration *acc)
 {
-  char val[4] = { 64, 64, 64 };
+  char *val;
 
   if (Interrupted)
   {
     Interrupted = false;
 
-    MMA7660ReadData(val);
+    val = MMA7660ReadData(MMA7660_X, 3);
     acc->x = val[0] - acc->x_old;
     acc->y = val[1] - acc->y_old;
     acc->z = val[2] - acc->z_old;
@@ -73,9 +74,9 @@ void accelerationUpdate(struct Acceleration *acc)
 
 void orientationUpdate(struct Orientation *ori)
 {
-  char val[4] = { 64, 64, 64, 64 };
+  char *val;
 
-  MMA7660ReadData(val);
+  val = MMA7660ReadData(:MA7660_X, 4);
   ori->x = val[0];
   ori->y = val[1];
   ori->z = val[2];
