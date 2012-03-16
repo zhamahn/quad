@@ -44,6 +44,6 @@ class Distance
     int cm;
 
   private:
-    int pin;
+    int _pin;
     int microsecondsToCentimeters(long microseconds);
-}
+};
