@@ -28,7 +28,7 @@ void gyroInit(void)
   writeReg(ITG3200addr, ITG3200_DLPF, 0x18);
 }
 
-void ITG3200ReadData(char * val)
+void ITG3200ReadData(char data[])
 {
   int i;
   int size = 8;
@@ -43,38 +43,35 @@ void ITG3200ReadData(char * val)
     for (i = 0; i < size; i++)
     {
       if (i%2 == 0)
-        val[i/2] = Wire.read();
+        data[i/2] = Wire.read();
       else
-        val[1/2] |= Wire.read()<<8;
+        data[1/2] |= Wire.read()<<8;
     }
   }
 }
 
-char gyroRead(byte addr)
+void gyroRead(char * data, byte addr)
 {
-  char data;
- 
   Wire.beginTransmission(ITG3200addr);
   Wire.write(addr);
   Wire.endTransmission();
   Wire.requestFrom(ITG3200addr,2);
   if (Wire.available()>0)
   {
-    data = Wire.read();
-    data |= Wire.read()<<8;
+    *data = Wire.read();
+    *data |= Wire.read()<<8;
   }
-  return data;
 }
 
 void rotationUpdate(struct Rotation *rot)
 {
-  char val[4];
-  ITG3200ReadData(val);
+  char data[4];
+  ITG3200ReadData(data);
 
   /*gyro->x = gyroRead(ITG3200_GX_H);*/
   /*gyro->y = gyroRead(ITG3200_GY_H);*/
   /*gyro->z = gyroRead(ITG3200_GZ_H);*/
-  rot->x = val[0];
-  rot->y = val[1];
-  rot->z = val[2];
+  rot->x = data[0];
+  rot->y = data[1];
+  rot->z = data[2];
 }
