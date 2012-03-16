@@ -35,3 +35,15 @@ class Esc
   private:
   int pin;
 };
+
+class Distance
+{
+  public:
+    void init(int);
+    int measure(void);
+    int cm;
+
+  private:
+    int pin;
+    int microsecondsToCentimeters(long microseconds);
+}

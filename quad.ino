@@ -1,5 +1,6 @@
 // Arduino libraries
 #include <Wire.h>
+#include <PID_v1.h>
 
 // Other libraries
 #include "struct.h"
