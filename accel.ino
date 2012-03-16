@@ -76,7 +76,7 @@ void orientationUpdate(struct Orientation *ori)
 {
   char *val;
 
-  val = MMA7660ReadData(:MA7660_X, 4);
+  val = MMA7660ReadData(MMA7660_X, 4);
   ori->x = val[0];
   ori->y = val[1];
   ori->z = val[2];
