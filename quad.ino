@@ -1,21 +1,27 @@
 // Arduino libraries
 #include <Wire.h>
 #include <PID_v1.h>
+#include <Servo.h>
 
 // Other libraries
-#include "struct.h"
-#include "helpers.h"
+#include "classes.h"
 
 // Pin definitions
 #define LED 13
 #define PING_PIN 7
 #define ACC_INT_PIN 6
 
+#define ESC_N 6
+#define ESC_E 7
+#define ESC_S 8
+#define ESC_W 9
+
 #define DEBUG
 
 Acceleration Acc;
 Rotation Rot;
 Orientation Ori;
+Distance Dis(PING_PIN);
 volatile boolean Interrupted = false;
 
 void setup()

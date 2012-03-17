@@ -26,24 +26,29 @@ struct Rotation
 class Esc
 {
   public:
-  void init(int);
-  void setSpeed(int);
+    Esc(int, double, double, double, int);
 
-  int desired_throttle;
-  int throttle;
+    double input;
+    double output;
+    double setpoint;
+    //void loopFunc(void);
+
+    PID *pid;
 
   private:
-  int pin;
+    int pin;
+
+    //void setOutput(void);
 };
 
 class Distance
 {
   public:
-    void init(int);
+    Distance(int);
     int measure(void);
     int cm;
 
   private:
-    int _pin;
+    int pin;
     int microsecondsToCentimeters(long microseconds);
 };
