@@ -26,19 +26,19 @@ struct Rotation
 class Esc
 {
   public:
-    Esc(int, double, double, double, int);
+    void init(PID *, Servo *);
 
     double input;
     double output;
     double setpoint;
-    //void loopFunc(void);
-
+    void loopFunc(void);
     PID *pid;
+    Servo *servo;
 
   private:
+    void setOutput(double);
+    void init(void);
     int pin;
-
-    //void setOutput(void);
 };
 
 class Distance
