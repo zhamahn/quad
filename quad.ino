@@ -4,22 +4,17 @@
 #include <PID_v1.h>
 
 // Other libraries
-#include "classes.h"
+#include "headers.h"
 
 // Pin definitions
 #define LED 13
 #define PING_PIN 7
 #define ACC_INT_PIN 6
 
-#define ESC_N_PIN 10
-#define ESC_E_PIN 5
-#define ESC_S_PIN 8
-#define ESC_W_PIN 9
-
-#define ESC_N 0
-#define ESC_E 1
-#define ESC_S 2
-#define ESC_W 3
+#define ESC_0_PIN 10
+#define ESC_1_PIN 5
+#define ESC_2_PIN 8
+#define ESC_3_PIN 9
 
 #define ESC_PWM_MIN 1180
 #define ESC_PWM_MAX 1710
@@ -33,63 +28,43 @@
 
 Acceleration Acc;
 Rotation Rot;
-Orientation Ori;
-Distance Dis(PING_PIN);
+int distance;
 
-// ESC N
-Esc EscN;
-Servo EscNServo;
-PID EscNPID(&EscN.input, &EscN.output, &EscN.setpoint, KP, KI, KD, AUTOMATIC);
+// Motor 0 (N)
+double esc_0_input, esc_0_output, esc_0_setpoint;
+Servo esc_0_servo;
+PID esc_0_pid(&esc_0_input, &esc_0_output, &esc_0_setpoint, KP, KI, KD, AUTOMATIC);
 
-// ESC E
-Esc EscE;
-Servo EscEServo;
-PID EscEPID(&EscE.input, &EscE.output, &EscE.setpoint, KP, KI, KD, AUTOMATIC);
+// Motor 1 (E)
+double esc_1_input, esc_1_output, esc_1_setpoint;
+Servo esc_1_servo;
+PID esc_1_pid(&esc_1_input, &esc_1_output, &esc_1_setpoint, KP, KI, KD, AUTOMATIC);
 
-// ESC S
-Esc EscS;
-Servo EscSServo;
-PID EscSPID(&EscS.input, &EscS.output, &EscS.setpoint, KP, KI, KD, AUTOMATIC);
+// Motor 2 (S)
+double esc_2_input, esc_2_output, esc_2_setpoint;
+Servo esc_2_servo;
+PID esc_2_pid(&esc_2_input, &esc_2_output, &esc_2_setpoint, KP, KI, KD, AUTOMATIC);
 
-// ESC W
-Esc EscW;
-Servo EscWServo;
-PID EscWPID(&EscW.input, &EscW.output, &EscW.setpoint, KP, KI, KD, AUTOMATIC);
-
-Esc *Escs[4];
+// Motor 3 (W)
+double esc_3_input, esc_3_output, esc_3_setpoint;
+Servo esc_3_servo;
+PID esc_3_pid(&esc_3_input, &esc_3_output, &esc_3_setpoint, KP, KI, KD, AUTOMATIC);
 
 volatile boolean Interrupted = false;
-double pulseWidth = ESC_PWM_MIN;
-int CurrentEsc;
 
 void setup()
 {
   debug("Starting setup");
   Serial.begin(9600);
   Wire.begin();
-  //accelInit();
-  //gyroInit();
-  EscNServo.attach(ESC_N_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  EscN.init(&EscNPID, &EscNServo);
+  accelInit();
+  gyroInit();
 
-  EscEServo.attach(ESC_E_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  EscE.init(&EscEPID, &EscEServo);
+  esc_0_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
+  esc_1_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
+  esc_2_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
+  esc_3_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
 
-  EscSServo.attach(ESC_S_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  EscS.init(&EscSPID, &EscSServo);
-
-  EscWServo.attach(ESC_W_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  EscW.init(&EscWPID, &EscWServo);
-
-  Escs[ESC_N] = &EscN;
-  Escs[ESC_E] = &EscE;
-  Escs[ESC_S] = &EscS;
-  Escs[ESC_W] = &EscW;
-
-  CurrentEsc = ESC_N;
-
-  pinMode(ACC_INT_PIN, INPUT);
-  attachInterrupt(0, setInterrupt, CHANGE);
   debug("Entering main loop");
 }
 
