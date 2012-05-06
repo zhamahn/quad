@@ -15,6 +15,7 @@
 #define ESC_1_PIN 5
 #define ESC_2_PIN 8
 #define ESC_3_PIN 9
+
 #define MOTORS_N 4
 #define MOTORS_ALL -1
 
@@ -22,11 +23,15 @@
 #define ESC_PWM_MAX 1710
 #define ESC_SPEEDSTEP_PCT 1
 #define ESC_SPEEDSTEP_PWM 10
+#define PRE_FLIGHT_MAX_OUTPUT 15
 
-// PID calibration values
+// Calibration values
+// PID
 #define KP 2
 #define KI 5
 #define KD 1
+
+#define BALANCE_THRESHOLD 2
 
 #define DEBUG
 
@@ -35,6 +40,7 @@ Acceleration acceleration;
 Rotation rotation;
 int distance;
 int i;
+double speed;
 
 // Motor 0 (N)
 double esc_0_input, esc_0_output, esc_0_setpoint;
@@ -58,19 +64,19 @@ PID esc_3_pid(&esc_3_input, &esc_3_output, &esc_3_setpoint, KP, KI, KD, AUTOMATI
 
 Servo *servos[MOTORS_N] =
 {
-  &esc_0_servo;
-  &esc_1_servo;
-  &esc_2_servo;
-  &esc_3_servo;
-}
+  &esc_0_servo,
+  &esc_1_servo,
+  &esc_2_servo,
+  &esc_3_servo
+};
 
-int *outputs[MOTORS_N] =
+double *outputs[MOTORS_N] =
 {
-  &esc_0_output;
-  &esc_1_output;
-  &esc_2_output;
-  &esc_3_output;
-}
+  &esc_0_output,
+  &esc_1_output,
+  &esc_2_output,
+  &esc_3_output
+};
 
 // }}}
 // {{{ Funtions
@@ -91,55 +97,99 @@ void debug(const char *msg)
     Serial.println(msg);
   #endif
 }
-// {{{ Speed settings
-int getSpeed(char esc, bool pwm = false)
+// {{{ Speed functions
+double getSpeed(int esc, bool pwm = false)
 {
   if (pwm)
-    servos[esc]->readMicroseconds();
+    speed = servos[esc]->readMicroseconds();
   else
-    map(servos[esc]->readMicroseconds(), ESC_PWM_MIN, ESC_PWM_MAX, 0, 100);
+    speed = map(servos[esc]->readMicroseconds(), ESC_PWM_MIN, ESC_PWM_MAX, 0, 100);
+
+  return speed;
 }
-int setSpeed(char esc, int speed)
+double getAvgSpeed(bool pwm = false)
+{
+  double speeds = 0;
+  for (i=0; i<MOTORS_N; i++)
+    speeds += getSpeed(i, pwm);
+  return speeds / MOTORS_N;
+}
+double setSpeed(int esc, double new_speed)
 {
   // Normalize speed for incorrect input
   if (speed <= 0)
-    speed = 0;
-  else if (speed >= 100 && speed <= 200)
-    speed = 100;
-  else if (speed > 200 && speed < ESC_PWM_MIN )
-    speed = ESC_PWM_MIN;
-  else if (speed >= ESC_PWM_MAX)
-    speed = ESC_PWM_MAX;
+    new_speed = 0;
+  else if (new_speed >= 100 && new_speed <= 200)
+    new_speed = 100;
+  else if (new_speed > 200 && new_speed < ESC_PWM_MIN )
+    new_speed = ESC_PWM_MIN;
+  else if (new_speed >= ESC_PWM_MAX)
+    new_speed = ESC_PWM_MAX;
     
-  // Write speed to esc
-  if (0 <= speed && speed <= 100)
-    servos[esc]->writeMicroseconds(map(speed, 0, 100, ESC_PWM_MIN, ESC_PWM_MAX));
-  else if ( ESC_PWM_MIN <= speed && speed <= ESC_PWM_MAX )
-    servos[esc]->writeMicroseconds(speed);
+  // Write new_speed to esc
+  if (0 <= new_speed && new_speed <= 100)
+    servos[esc]->writeMicroseconds(map(new_speed, 0, 100, ESC_PWM_MIN, ESC_PWM_MAX));
+  else if ( ESC_PWM_MIN <= new_speed && new_speed <= ESC_PWM_MAX )
+    servos[esc]->writeMicroseconds(new_speed);
 
-  outputs[esc] = speed;
+  *outputs[esc] = new_speed;
+  return new_speed;
+}
+double decreaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
+{
+  if (esc == MOTORS_ALL)
+    for(i=0; i<MOTORS_N; i++)
+      speed = setSpeed(i, getSpeed(i) - amount);
+  else
+    speed = setSpeed(esc, getSpeed(esc) - amount);
+
   return speed;
 }
-int decreaseSpeed(Servo *servo, bool pwm = false; int amount = ESC_SPEEDSTEP_PCT)
+double increaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
 {
-  setSpeed(servo, getSpeed(servo) - amount);
+  if (esc == MOTORS_ALL)
+    for(i=0; i<MOTORS_N; i++)
+      speed = setSpeed(i, getSpeed(i) + amount);
+  else
+    speed = setSpeed(esc, getSpeed(esc) + amount);
+
+  return speed;
 }
-int increaseSpeed(Servo *servo, bool pwm = false; int amount = ESC_SPEEDSTEP_PCT)
+// }}}
+// {{{ Mid-flight
+void balance(void)
 {
-  setSpeed(servo, getSpeed(servo) + amount);
+  readSensors();
+  while (acceleration.y < -BALANCE_THRESHOLD || acceleration.y > BALANCE_THRESHOLD) {
+    if (acceleration.y > 0)
+      increaseSpeed(0, true, ESC_SPEEDSTEP_PWM);
+    else if (acceleration.y < 0)
+      increaseSpeed(2, true, ESC_SPEEDSTEP_PWM);
+
+    readSensors();
+  }
+  while (acceleration.z < -BALANCE_THRESHOLD || acceleration.z > BALANCE_THRESHOLD) {
+    if (acceleration.z > 0)
+      increaseSpeed(1, true, ESC_SPEEDSTEP_PWM);
+    else if (acceleration.z < 0)
+      increaseSpeed(3, true, ESC_SPEEDSTEP_PWM);
+
+    readSensors();
+  }
 }
 // }}}
 // {{{ Pre-flight
 
-void pre_flight_halt(void)
+void preFlightHalt(void)
 {
-  int speed;
+  debug("Something went wrong!, running pre_flight_halt");
+
   bool motors_running = true;
   // Halt all motors
   while (motors_running) {
     motors_running = false;
-    for (i=0; i++; i<MOTORS_N) {
-      speed = decreaseSpeed(servos[i]);
+    for (i=0; i<MOTORS_N; i++) {
+      speed = decreaseSpeed(i);
       if (speed > 0)
         motors_running = true;
     }
@@ -148,41 +198,50 @@ void pre_flight_halt(void)
 
   // Enter infinite blocking loop
   while (true) {
-    debug("Something went wrong, inside pre_flight abort block loop");
     delay(1000);
   }
 }
 
-char pre_flight_hover(void)
+char preFlightHover(void)
 {
   bool do_loop = true;
+  char exit_code = 0;
   // Slowly increase all motor speeds until one side lifts up
   // then increase the motor speed on the side with lowest altitude
   while (do_loop) {
-    for (i=0; i++; i<MOTORS_N) {
+    for (i=0; i<MOTORS_N; i++) {
       increaseSpeed(i, true, 1);
     }
-    readSensors()
-    if (acceleration.y != 0 || acceleration.z != 0) {
+    if (getAvgSpeed() > PRE_FLIGHT_MAX_OUTPUT) {
+      do_loop = false;
+      exit_code++;
+      break;
     }
+    balance();
+    readSensors();
+    if (distance > 10)
+      do_loop = false;
+
+    delay(200);
   }
+
+  return exit_code;
 }
 
 // Pre-flight sequence
-void pre_flight(void)
+void preFlight(void)
 {
-  bool loop_do = true;
   char return_codes = 0;
   debug("Running pre-flight setup");
 
   // Set all motor speeds to 0
-  for (i=0; i++; i<MOTORS_N) {
+  for (i=0; i<MOTORS_N; i++) {
     setSpeed(i, 0);
   }
-  return_codes += pre_flight_hover();
+  return_codes += preFlightHover();
 
   if (return_codes > 0)
-    pre_flight_halt();
+    preFlightHalt();
 }
 // }}}
 // }}}
@@ -195,12 +254,12 @@ void setup()
   accelInit();
   gyroInit();
 
-  esc_0_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
-  esc_1_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
-  esc_2_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
-  esc_3_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
+  esc_0_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_1_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_2_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_3_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
 
-  pre_flight();
+  preFlight();
 
   debug("Entering main loop");
 }
@@ -210,9 +269,9 @@ void loop()
   int input;
 
   readSensors();
-  readInput();
-  computePID();
-  setOutputs();
+  //readInput();
+  //computePID();
+  //setOutputs();
 
   if (Serial.available() > 0) {
     input = Serial.read();
