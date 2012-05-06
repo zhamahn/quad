@@ -15,9 +15,13 @@
 #define ESC_1_PIN 5
 #define ESC_2_PIN 8
 #define ESC_3_PIN 9
+#define MOTORS_N 4
+#define MOTORS_ALL -1
 
 #define ESC_PWM_MIN 1180
 #define ESC_PWM_MAX 1710
+#define ESC_SPEEDSTEP_PCT 1
+#define ESC_SPEEDSTEP_PWM 10
 
 // PID calibration values
 #define KP 2
@@ -26,9 +30,11 @@
 
 #define DEBUG
 
-Acceleration Acc;
-Rotation Rot;
+// {{{ Global variables
+Acceleration acceleration;
+Rotation rotation;
 int distance;
+int i;
 
 // Motor 0 (N)
 double esc_0_input, esc_0_output, esc_0_setpoint;
@@ -50,7 +56,136 @@ double esc_3_input, esc_3_output, esc_3_setpoint;
 Servo esc_3_servo;
 PID esc_3_pid(&esc_3_input, &esc_3_output, &esc_3_setpoint, KP, KI, KD, AUTOMATIC);
 
-volatile boolean Interrupted = false;
+Servo *servos[MOTORS_N] =
+{
+  &esc_0_servo;
+  &esc_1_servo;
+  &esc_2_servo;
+  &esc_3_servo;
+}
+
+int *outputs[MOTORS_N] =
+{
+  &esc_0_output;
+  &esc_1_output;
+  &esc_2_output;
+  &esc_3_output;
+}
+
+// }}}
+// {{{ Funtions
+void writeReg(byte dev, byte reg, byte val)
+{
+  Wire.beginTransmission(dev);
+  delay(100);
+  Wire.write(reg);
+  delay(10);
+  Wire.write(val);
+  delay(10);
+  Wire.endTransmission();
+}
+
+void debug(const char *msg)
+{
+  #ifdef DEBUG
+    Serial.println(msg);
+  #endif
+}
+// {{{ Speed settings
+int getSpeed(char esc, bool pwm = false)
+{
+  if (pwm)
+    servos[esc]->readMicroseconds();
+  else
+    map(servos[esc]->readMicroseconds(), ESC_PWM_MIN, ESC_PWM_MAX, 0, 100);
+}
+int setSpeed(char esc, int speed)
+{
+  // Normalize speed for incorrect input
+  if (speed <= 0)
+    speed = 0;
+  else if (speed >= 100 && speed <= 200)
+    speed = 100;
+  else if (speed > 200 && speed < ESC_PWM_MIN )
+    speed = ESC_PWM_MIN;
+  else if (speed >= ESC_PWM_MAX)
+    speed = ESC_PWM_MAX;
+    
+  // Write speed to esc
+  if (0 <= speed && speed <= 100)
+    servos[esc]->writeMicroseconds(map(speed, 0, 100, ESC_PWM_MIN, ESC_PWM_MAX));
+  else if ( ESC_PWM_MIN <= speed && speed <= ESC_PWM_MAX )
+    servos[esc]->writeMicroseconds(speed);
+
+  outputs[esc] = speed;
+  return speed;
+}
+int decreaseSpeed(Servo *servo, bool pwm = false; int amount = ESC_SPEEDSTEP_PCT)
+{
+  setSpeed(servo, getSpeed(servo) - amount);
+}
+int increaseSpeed(Servo *servo, bool pwm = false; int amount = ESC_SPEEDSTEP_PCT)
+{
+  setSpeed(servo, getSpeed(servo) + amount);
+}
+// }}}
+// {{{ Pre-flight
+
+void pre_flight_halt(void)
+{
+  int speed;
+  bool motors_running = true;
+  // Halt all motors
+  while (motors_running) {
+    motors_running = false;
+    for (i=0; i++; i<MOTORS_N) {
+      speed = decreaseSpeed(servos[i]);
+      if (speed > 0)
+        motors_running = true;
+    }
+    delay(200);
+  }
+
+  // Enter infinite blocking loop
+  while (true) {
+    debug("Something went wrong, inside pre_flight abort block loop");
+    delay(1000);
+  }
+}
+
+char pre_flight_hover(void)
+{
+  bool do_loop = true;
+  // Slowly increase all motor speeds until one side lifts up
+  // then increase the motor speed on the side with lowest altitude
+  while (do_loop) {
+    for (i=0; i++; i<MOTORS_N) {
+      increaseSpeed(i, true, 1);
+    }
+    readSensors()
+    if (acceleration.y != 0 || acceleration.z != 0) {
+    }
+  }
+}
+
+// Pre-flight sequence
+void pre_flight(void)
+{
+  bool loop_do = true;
+  char return_codes = 0;
+  debug("Running pre-flight setup");
+
+  // Set all motor speeds to 0
+  for (i=0; i++; i<MOTORS_N) {
+    setSpeed(i, 0);
+  }
+  return_codes += pre_flight_hover();
+
+  if (return_codes > 0)
+    pre_flight_halt();
+}
+// }}}
+// }}}
 
 void setup()
 {
@@ -65,6 +200,8 @@ void setup()
   esc_2_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
   esc_3_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX)
 
+  pre_flight();
+
   debug("Entering main loop");
 }
 
@@ -72,40 +209,16 @@ void loop()
 {
   int input;
 
+  readSensors();
+  readInput();
+  computePID();
+  setOutputs();
+
   if (Serial.available() > 0) {
     input = Serial.read();
     switch (input) {
-      case 49: CurrentEsc = ESC_N; break;
-      case 50: CurrentEsc = ESC_E; break;
-      case 51: CurrentEsc = ESC_S; break;
-      case 52: CurrentEsc = ESC_W; break;
-      //case 108: Escs[CurrentEsc]->input += 10; break;
-      //case 115: Escs[CurrentEsc]->input -= 10; break;
-      case 108: pulseWidth += 10; break;
-      case 115: pulseWidth -= 10; break;
       default: Serial.print("Input: "); Serial.println(input); break;
     }
-
-    //Serial.println(Escs[CurrentEsc]->input);
-
-    Serial.println(CurrentEsc, DEC);
-    //Escs[CurrentEsc]->loopFunc();
-    Escs[CurrentEsc]->servo->writeMicroseconds(pulseWidth);
-    Serial.println(Escs[CurrentEsc]->servo->readMicroseconds(), DEC);
-    //Serial.println(EscNServo.readMicroseconds());
   }
-
-  //Serial.println(input, DEC);
-
-  //Serial.print(EscN.input, DEC);
-  //Serial.print(", ");
-  //EscN.loopFunc();
-  //Serial.println(EscN.setpoint, DEC);
-
-  //accelerationUpdate(&Acc);
-  //orientationUpdate(&Ori);
-  //rotationUpdate(&Rot);
-
-  //serialPrintSensorValues(&Acc, &Ori, &Rot);
   delay(100);
 }

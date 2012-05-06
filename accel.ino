@@ -18,8 +18,8 @@ void accelInit(void)
   debug("--> Set to standby mode.");
   writeReg(MMA7660addr, MMA7660_MODE, 0x00);
 
-  debug("--> Set to generate automatic interrupt after every measurement");
-  writeReg(MMA7660addr, MMA7660_INTSU, 0x03);
+  //debug("--> Set to generate automatic interrupt after every measurement");
+  //writeReg(MMA7660addr, MMA7660_INTSU, 0x03);
 
   debug("--> Set sample rate.");
   writeReg(MMA7660addr, MMA7660_SR, 0x00);
@@ -52,31 +52,15 @@ void MMA7660ReadData(char data[], int count, byte addr)
   }
 }
 
-void accelerationUpdate(struct Acceleration *acc)
+void readAccel(struct Acceleration *acc)
 {
   char data[3];
 
-  if (Interrupted)
-  {
-    Interrupted = false;
-
-    MMA7660ReadData(data, 3, MMA7660_X);
-    acc->x = data[0] - acc->x_old;
-    acc->y = data[1] - acc->y_old;
-    acc->z = data[2] - acc->z_old;
-    acc->x_old = data[0];
-    acc->y_old = data[1];
-    acc->z_old = data[2];
-  }
-}
-
-void orientationUpdate(struct Orientation *ori)
-{
-  char data[4];
-
-  MMA7660ReadData(data, 4, MMA7660_X);
-  ori->x = data[0];
-  ori->y = data[1];
-  ori->z = data[2];
-  ori->tilt = data[3];
+  MMA7660ReadData(data, 3, MMA7660_X);
+  acc->x = data[0] - acc->x_old;
+  acc->y = data[1] - acc->y_old;
+  acc->z = data[2] - acc->z_old;
+  acc->x_old = data[0];
+  acc->y_old = data[1];
+  acc->z_old = data[2];
 }

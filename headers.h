@@ -1,6 +1,11 @@
 // Function prototypes
 int ping(int);
 
+void readSensors(void);
+void readInput(void);
+void computePID(void);
+void setOutputs(void);
+
 // Class definitions
 struct Acceleration
 {
