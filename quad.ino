@@ -133,6 +133,12 @@ double setSpeed(int esc, double new_speed)
     servos[esc]->writeMicroseconds(new_speed);
 
   *outputs[esc] = new_speed;
+  #ifdef DEBUG
+    Serial.print("Setting ");
+    Serial.print(esc, DEC);
+    Serial.print(" speed to: ");
+    Serial.println(new_speed, DEC);
+  #endif
   return new_speed;
 }
 double decreaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
@@ -160,6 +166,7 @@ double increaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
 void balance(void)
 {
   readSensors();
+  Serial.println(acceleration.y, DEC);
   while (acceleration.y < -BALANCE_THRESHOLD || acceleration.y > BALANCE_THRESHOLD) {
     if (acceleration.y > 0)
       increaseSpeed(0, true, ESC_SPEEDSTEP_PWM);
@@ -168,6 +175,7 @@ void balance(void)
 
     readSensors();
   }
+  Serial.println(acceleration.z, DEC);
   while (acceleration.z < -BALANCE_THRESHOLD || acceleration.z > BALANCE_THRESHOLD) {
     if (acceleration.z > 0)
       increaseSpeed(1, true, ESC_SPEEDSTEP_PWM);
@@ -204,11 +212,14 @@ void preFlightHalt(void)
 
 char preFlightHover(void)
 {
+  debug("Entering pre flight hovering");
+
   bool do_loop = true;
+  int counter = 0;
   char exit_code = 0;
   // Slowly increase all motor speeds until one side lifts up
   // then increase the motor speed on the side with lowest altitude
-  while (do_loop) {
+  while (counter < 4) {
     for (i=0; i<MOTORS_N; i++) {
       increaseSpeed(i, true, 1);
     }
@@ -219,9 +230,11 @@ char preFlightHover(void)
     }
     balance();
     readSensors();
-    if (distance > 10)
-      do_loop = false;
+    /*if (distance > 10)*/
+      /*do_loop = false;*/
 
+    counter++;
+    Serial.println("asd");
     delay(200);
   }
 
@@ -259,7 +272,7 @@ void setup()
   esc_2_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
   esc_3_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
 
-  preFlight();
+  //preFlight();
 
   debug("Entering main loop");
 }
@@ -279,5 +292,9 @@ void loop()
       default: Serial.print("Input: "); Serial.println(input); break;
     }
   }
+
+  /*Serial.println(acceleration.x, DEC);*/
+  /*Serial.println(acceleration.y, DEC);*/
+  /*Serial.println(acceleration.z, DEC);*/
   delay(100);
 }

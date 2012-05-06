@@ -34,10 +34,8 @@ void accelInit(void)
   writeReg(MMA7660addr, MMA7660_MODE, 0x01);
 }
 
-void MMA7660ReadData(char data[], int count, byte addr)
+void MMA7660ReadData(char val[], char count, byte addr)
 {
-  int i;
-
   Wire.beginTransmission(MMA7660addr);
   Wire.write(addr);
   Wire.endTransmission();
@@ -47,20 +45,32 @@ void MMA7660ReadData(char data[], int count, byte addr)
   {
     for (i = 0; i < count; i++)
     {
-      data[i] = ((char)(Wire.read()<<2))/4;
+      val[i] = 64;
+      while ( val[i] > 63 ) // Values above 63 are invalid
+      {
+        val[i] = Wire.read();
+      }
     }
   }
 }
 
-void readAccel(struct Acceleration *acc)
+void readAccel(void)
 {
-  char data[3];
+  char val[3];
 
-  MMA7660ReadData(data, 3, MMA7660_X);
-  acc->x = data[0] - acc->x_old;
-  acc->y = data[1] - acc->y_old;
-  acc->z = data[2] - acc->z_old;
-  acc->x_old = data[0];
-  acc->y_old = data[1];
-  acc->z_old = data[2];
+  MMA7660ReadData(val, 3, MMA7660_X);
+  // transform the 7 bit signed number into an 8 bit signed number.
+  for (i=0; i < 3; i++)
+    //val[i] = ((char)(val[i]<<2))/4;
+    val[i] = ((char)(val[i]<<2));
+
+  acceleration.x = val[0];
+  acceleration.y = val[1];
+  acceleration.z = val[2];
+  acceleration.delta_x = val[0] - acceleration.x_old;
+  acceleration.delta_y = val[1] - acceleration.y_old;
+  acceleration.delta_z = val[2] - acceleration.z_old;
+  acceleration.x_old = val[0];
+  acceleration.y_old = val[1];
+  acceleration.z_old = val[2];
 }
