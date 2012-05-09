@@ -1,11 +1,9 @@
-// Arduino libraries
+// {{{ Includes
 #include <Wire.h>
 #include <Servo.h>
 #include <PID_v1.h>
-
-// Other libraries
-#include "headers.h"
-
+// }}}
+// {{{ Defines
 // Pin definitions
 #define LED 13
 #define PING_PIN 7
@@ -35,10 +33,57 @@
 
 #define DEBUG
 
+#define MMA7660addr   0x4c
+#define MMA7660_X     0x00
+#define MMA7660_Y     0x01
+#define MMA7660_Z     0x02
+#define MMA7660_TILT  0x03
+#define MMA7660_SRST  0x04
+#define MMA7660_SPCNT 0x05
+#define MMA7660_INTSU 0x06
+#define MMA7660_MODE  0x07
+#define MMA7660_SR    0x08
+#define MMA7660_PDET  0x09
+#define MMA7660_PD    0x0A
+
+#define ITG3200addr   0x68
+#define ITG3200_WHO 	0x00
+#define ITG3200_SMPL	0x15
+#define ITG3200_DLPF	0x16
+#define ITG3200_INT_C	0x17
+#define ITG3200_INT_S	0x1A
+#define ITG3200_TEMP_H	0x1B
+#define ITG3200_TEMP_L	0x1C
+#define ITG3200_GX_H	0x1D
+#define ITG3200_GX_L	0x1E
+#define ITG3200_GY_H	0x1F
+#define ITG3200_GY_L	0x20
+#define ITG3200_GZ_H	0x21
+#define ITG3200_GZ_L	0x22
+#define ITG3200_PWR_M	0x3E
+// }}}
+// {{{ Classes
+struct ACC
+{
+  char x;
+  char y;
+  char z;
+  char delta_x;
+  char delta_y;
+  char delta_z;
+};
+
+struct ROT
+{
+  int x;
+  int y;
+  int z;
+};
+// }}}
 // {{{ Global variables
-Acceleration acceleration;
-Rotation rotation;
-int distance;
+ACC Acc;
+ROT Rot;
+int Alt;
 int i;
 double speed;
 
@@ -84,10 +129,16 @@ PID *pids[MOTORS_N] =
   &esc_1_pid,
   &esc_2_pid,
   &esc_3_pid
-}
+};
 
 // }}}
-// {{{ Funtions
+// {{{ Helpers
+void debug(const char *msg)
+{
+  #ifdef DEBUG
+    Serial.println(msg);
+  #endif
+}
 void writeReg(byte dev, byte reg, byte val)
 {
   Wire.beginTransmission(dev);
@@ -99,12 +150,152 @@ void writeReg(byte dev, byte reg, byte val)
   Wire.endTransmission();
 }
 
-void debug(const char *msg)
+void readReg(int dev, int reg, int count)
 {
-  #ifdef DEBUG
-    Serial.println(msg);
-  #endif
+  Wire.beginTransmission(dev);
+  Wire.write(reg);
+  Wire.endTransmission();
+  
+  Wire.requestFrom(dev, count);
 }
+// }}}
+// {{{ MMA7660
+void accelInit(void)
+{
+  debug("Initializing accelerometer.");
+
+  debug("--> Set to standby mode.");
+  writeReg(MMA7660addr, MMA7660_MODE, 0x00);
+
+  //debug("--> Set to generate automatic interrupt after every measurement");
+  //writeReg(MMA7660addr, MMA7660_INTSU, 0x03);
+
+  debug("--> Set sample rate.");
+  writeReg(MMA7660addr, MMA7660_SR, 0x00);
+
+  debug("--> Set pulse detection.");
+  writeReg(MMA7660addr, MMA7660_PDET, 0x00);
+  //writeReg(MMA7660addr, MMA7660_PDET, 0xE1);
+
+  writeReg(MMA7660addr, MMA7660_PD, 0x04);
+ 
+  debug("--> Set back to normal operation mode");
+  writeReg(MMA7660addr, MMA7660_MODE, 0x01);
+}
+
+void readAcc(void)
+{
+  char data[3] = { 64, 64, 64 };
+  readReg(MMA7660addr, MMA7660_X, 3);
+
+  if (Wire.available())
+  {
+    for (i = 0; i < 3; i++)
+    {
+      while ( data[i] > 63 ) // Values above 63 are invalid
+      {
+        // transform the 7 bit signed number into an 8 bit signed number.
+        data[i] = ((char)(Wire.read()<<2));
+      }
+    }
+  }
+
+  Acc.delta_x = data[0] - Acc.x;
+  Acc.delta_y = data[1] - Acc.y;
+  Acc.delta_z = data[2] - Acc.z;
+  Acc.x = data[0];
+  Acc.y = data[1];
+  Acc.z = data[2];
+}
+// }}}
+// {{{ ITG3200
+void gyroInit(void)
+{
+  debug("Initializing gyroscope.");
+
+  debug("--> reset.");
+  writeReg(ITG3200addr, ITG3200_PWR_M, 0x80);
+ 
+  debug("--> set sample rate divider.");
+  writeReg(ITG3200addr, ITG3200_SMPL, 0x00);
+ 
+  debug("--> set measurement accuracy.");
+  writeReg(ITG3200addr, ITG3200_DLPF, 0x18);
+}
+
+void readRot(void)
+{
+  readReg(ITG3200addr, ITG3200_GX_L, 6);
+
+  if (Wire.available())
+  {
+    for (i = 0; i < 6; i++)
+    {
+      switch (i) {
+        case 0: Rot.x  = Wire.read();    break;
+        case 1: Rot.x |= Wire.read()<<8; break;
+        case 2: Rot.y  = Wire.read();    break;
+        case 3: Rot.y |= Wire.read()<<8; break;
+        case 4: Rot.z  = Wire.read();    break;
+        case 5: Rot.z |= Wire.read()<<8; break;
+      }
+    }
+  }
+}
+// }}}
+// {{{ IR Ping
+int ping(int pin)
+{
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pin, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(pin, LOW);
+
+  return pulseIn(pin, HIGH) / 29 / 2;
+}
+
+void readAlt(void)
+{
+  Alt = ping(PING_PIN);
+}
+// }}}
+// {{{ Sensors
+void readSensors(void)
+{
+  readAlt();
+  readRot();
+  readAcc();
+}
+
+void printAcc(void)
+{
+  Serial.print("Acceleration: ");
+  Serial.print("X: "); Serial.print(Acc.x, DEC);
+  Serial.print(", DELTA_X: "); Serial.print(Acc.delta_x, DEC);
+  Serial.print(", Y: "); Serial.print(Acc.y, DEC);
+  Serial.print(", DELTA_Y: "); Serial.print(Acc.delta_y, DEC);
+  Serial.print(", Z: "); Serial.print(Acc.z, DEC);
+  Serial.print(", DELTA_z: "); Serial.print(Acc.delta_z, DEC);
+  Serial.println("");
+}
+
+void printRot(void)
+{
+  Serial.print("Rotation: ");
+  Serial.print("X: "); Serial.print(Rot.x, DEC);
+  Serial.print(", Y: "); Serial.print(Rot.y, DEC);
+  Serial.print(", Z: "); Serial.print(Rot.z, DEC);
+  Serial.println("");
+}
+
+void printAlt(void)
+{
+  Serial.print("Altitude: "); Serial.print(Alt, DEC);
+  Serial.println("");
+}
+// }}}
 // {{{ Speed functions
 double getSpeed(int esc, bool pwm = false)
 {
@@ -174,20 +365,20 @@ double increaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
 void balance(void)
 {
   readSensors();
-  Serial.println(acceleration.y, DEC);
-  while (acceleration.y < -BALANCE_THRESHOLD || acceleration.y > BALANCE_THRESHOLD) {
-    if (acceleration.y > 0)
+  Serial.println(Acc.y, DEC);
+  while (Acc.y < -BALANCE_THRESHOLD || Acc.y > BALANCE_THRESHOLD) {
+    if (Acc.y > 0)
       increaseSpeed(0, true, ESC_SPEEDSTEP_PWM);
-    else if (acceleration.y < 0)
+    else if (Acc.y < 0)
       increaseSpeed(2, true, ESC_SPEEDSTEP_PWM);
 
     readSensors();
   }
-  Serial.println(acceleration.z, DEC);
-  while (acceleration.z < -BALANCE_THRESHOLD || acceleration.z > BALANCE_THRESHOLD) {
-    if (acceleration.z > 0)
+  Serial.println(Acc.z, DEC);
+  while (Acc.z < -BALANCE_THRESHOLD || Acc.z > BALANCE_THRESHOLD) {
+    if (Acc.z > 0)
       increaseSpeed(1, true, ESC_SPEEDSTEP_PWM);
-    else if (acceleration.z < 0)
+    else if (Acc.z < 0)
       increaseSpeed(3, true, ESC_SPEEDSTEP_PWM);
 
     readSensors();
@@ -265,7 +456,6 @@ void preFlight(void)
     preFlightHalt();
 }
 // }}}
-// }}}
 
 void setup()
 {
@@ -301,8 +491,5 @@ void loop()
     }
   }
 
-  /*Serial.println(acceleration.x, DEC);*/
-  /*Serial.println(acceleration.y, DEC);*/
-  /*Serial.println(acceleration.z, DEC);*/
-  delay(100);
+  printAcc();
 }
