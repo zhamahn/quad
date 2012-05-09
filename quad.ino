@@ -185,18 +185,20 @@ void accelInit(void)
 
 void readAcc(void)
 {
-  char data[3] = { 64, 64, 64 };
+  char val = 64;
+  char data[3];
   readReg(MMA7660addr, MMA7660_X, 3);
 
   if (Wire.available())
   {
     for (i = 0; i < 3; i++)
     {
-      while ( data[i] > 63 ) // Values above 63 are invalid
-      {
-        // transform the 7 bit signed number into an 8 bit signed number.
-        data[i] = ((char)(Wire.read()<<2));
-      }
+      while ( val > 63 ) // Values above 63 are invalid
+        val = Wire.read();
+
+      // transform the 7 bit signed number into an 8 bit signed number.
+      data[i] = ((char)(val<<2));
+      val = 64;
     }
   }
 
@@ -264,8 +266,8 @@ void readAlt(void)
 // {{{ Sensors
 void readSensors(void)
 {
-  readAlt();
-  readRot();
+  //readAlt();
+  //readRot();
   readAcc();
 }
 
@@ -456,7 +458,7 @@ void preFlight(void)
     preFlightHalt();
 }
 // }}}
-
+// {{{ Main
 void setup()
 {
   debug("Starting setup");
@@ -493,3 +495,4 @@ void loop()
 
   printAcc();
 }
+// }}}
