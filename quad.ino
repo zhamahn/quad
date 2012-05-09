@@ -78,6 +78,14 @@ double *outputs[MOTORS_N] =
   &esc_3_output
 };
 
+PID *pids[MOTORS_N] =
+{
+  &esc_0_pid,
+  &esc_1_pid,
+  &esc_2_pid,
+  &esc_3_pid
+}
+
 // }}}
 // {{{ Funtions
 void writeReg(byte dev, byte reg, byte val)
