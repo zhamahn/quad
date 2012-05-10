@@ -29,7 +29,7 @@
 #define KI 5
 #define KD 1
 
-#define BALANCE_THRESHOLD 2
+#define STABILITY_THRESHOLD 2
 
 #define DEBUG
 
@@ -405,7 +405,7 @@ char preFlightHover(void)
       exit_code++;
       break;
     }
-    balance();
+    stabilize();
     readSensors();
     /*if (distance > 10)*/
       /*do_loop = false;*/
@@ -435,11 +435,11 @@ void preFlight(void)
 }
 // }}}
 // {{{ Mid-flight
-void balance(void)
+void stabilize(void)
 {
   readSensors();
   Serial.println(Acc.y, DEC);
-  while (Acc.y < -BALANCE_THRESHOLD || Acc.y > BALANCE_THRESHOLD) {
+  while (Acc.y < -STABILITY_THRESHOLD || Acc.y > STABILITY_THRESHOLD) {
     if (Acc.y > 0)
       increaseSpeed(0, true, ESC_SPEEDSTEP_PWM);
     else if (Acc.y < 0)
@@ -448,7 +448,7 @@ void balance(void)
     readSensors();
   }
   Serial.println(Acc.z, DEC);
-  while (Acc.z < -BALANCE_THRESHOLD || Acc.z > BALANCE_THRESHOLD) {
+  while (Acc.z < -STABILITY_THRESHOLD || Acc.z > STABILITY_THRESHOLD) {
     if (Acc.z > 0)
       increaseSpeed(1, true, ESC_SPEEDSTEP_PWM);
     else if (Acc.z < 0)
