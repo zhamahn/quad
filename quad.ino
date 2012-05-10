@@ -368,16 +368,13 @@ void stabilize(void)
 {
   readSensors();
   Serial.println(Acc.y, DEC);
-  while (Acc.y < -STABILITY_THRESHOLD || Acc.y > STABILITY_THRESHOLD) {
+  while ((Acc.y < -STABILITY_THRESHOLD || Acc.y > STABILITY_THRESHOLD)
+      && (Acc.z < -STABILITY_THRESHOLD || Acc.z > STABILITY_THRESHOLD)) {
+
     if (Acc.y > 0)
       increaseSpeed(0, true, ESC_SPEEDSTEP_PWM);
     else if (Acc.y < 0)
       increaseSpeed(2, true, ESC_SPEEDSTEP_PWM);
-
-    readSensors();
-  }
-  Serial.println(Acc.z, DEC);
-  while (Acc.z < -STABILITY_THRESHOLD || Acc.z > STABILITY_THRESHOLD) {
     if (Acc.z > 0)
       increaseSpeed(1, true, ESC_SPEEDSTEP_PWM);
     else if (Acc.z < 0)
