@@ -7,7 +7,6 @@
 // Pin definitions
 #define LED 13
 #define PING_PIN 7
-#define ACC_INT_PIN 6
 
 #define ESC_0_PIN 10
 #define ESC_1_PIN 5
@@ -248,21 +247,17 @@ void readRot(void)
 }
 // }}}
 // {{{ IR Ping
-int ping(int pin)
-{
-  pinMode(pin, OUTPUT);
-  digitalWrite(pin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(pin, HIGH);
-  delayMicroseconds(5);
-  digitalWrite(pin, LOW);
-
-  return pulseIn(pin, HIGH) / 29 / 2;
-}
-
 void readAlt(void)
 {
-  Alt = ping(PING_PIN);
+  pinMode(PING_PIN, OUTPUT);
+  digitalWrite(PING_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(PING_PIN, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(PING_PIN, LOW);
+
+  pinMode(PING_PIN, INPUT);
+  Alt = pulseIn(PING_PIN, HIGH) / 29 / 2;
 }
 // }}}
 // {{{ Sensors
