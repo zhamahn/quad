@@ -31,6 +31,8 @@
 
 #define STABILITY_THRESHOLD 2
 
+#define ULTRASONIC_MAX_RANGE 400
+
 #define DEBUG
 
 #define MMA7660addr   0x4c
@@ -385,10 +387,9 @@ void stabilize(void)
 }
 // }}}
 // {{{ Pre-flight
-
 void preFlightHalt(void)
 {
-  debug("Something went wrong!, running pre_flight_halt");
+  debug("Something went wrong!, running preFlightHalt");
 
   bool motors_running = true;
   // Halt all motors
@@ -410,7 +411,7 @@ void preFlightHalt(void)
 
 char preFlightHover(void)
 {
-  debug("Entering pre flight hovering");
+  debug("Entering preFlightHovering");
 
   bool do_loop = true;
   int counter = 0;
