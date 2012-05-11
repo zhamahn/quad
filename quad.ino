@@ -74,8 +74,7 @@
 #define ITG3200_PWR_M	0x3E
 // }}}
 // {{{ Classes
-struct ACC
-{
+struct ACC {
   char x;
   char y;
   char z;
@@ -84,8 +83,7 @@ struct ACC
   char delta_z;
 };
 
-struct ROT
-{
+struct ROT {
   int x;
   int y;
   int z;
@@ -123,62 +121,55 @@ PID esc_3_pid(&esc_3_input, &esc_3_output, &esc_3_setpoint, KP, KI, KD, AUTOMATI
 int esc_3_correction;
 // }}}
 // {{{ Arrays
-Servo *escs[MOTORS_N] =
-{
+Servo *escs[MOTORS_N] = {
   &esc_0_servo,
   &esc_1_servo,
   &esc_2_servo,
   &esc_3_servo
 };
 
-double *outputs[MOTORS_N] =
-{
+double *outputs[MOTORS_N] = {
   &esc_0_output,
   &esc_1_output,
   &esc_2_output,
   &esc_3_output
 };
-double *inputs[MOTORS_N] =
-{
+double *inputs[MOTORS_N] = {
   &esc_0_input,
   &esc_1_input,
   &esc_2_input,
   &esc_3_input
 };
-double *setpoints[MOTORS_N] =
-{
+double *setpoints[MOTORS_N] = {
   &esc_0_setpoint,
   &esc_1_setpoint,
   &esc_2_setpoint,
   &esc_3_setpoint
 };
 
-PID *pids[MOTORS_N] =
-{
+PID *pids[MOTORS_N] = {
   &esc_0_pid,
   &esc_1_pid,
   &esc_2_pid,
   &esc_3_pid
 };
 
-int *corrections[MOTORS_N] =
-{
+int *corrections[MOTORS_N] = {
   &esc_0_correction,
   &esc_1_correction,
   &esc_2_correction,
   &esc_3_correction
 };
+float angles[2];
 // }}}
 // }}}
 // {{{ Helpers
-void debug(const char *msg)
-{
+void debug(const char *msg) {
   #ifdef DEBUG
     Serial.println(msg);
   #endif
 }
-void writeReg(byte dev, byte reg, byte val)
-{
+void writeReg(byte dev, byte reg, byte val) {
   Wire.beginTransmission(dev);
   delay(100);
   Wire.write(reg);
@@ -188,8 +179,7 @@ void writeReg(byte dev, byte reg, byte val)
   Wire.endTransmission();
 }
 
-void readReg(int dev, int reg, int count)
-{
+void readReg(int dev, int reg, int count) {
   Wire.beginTransmission(dev);
   Wire.write(reg);
   Wire.endTransmission();
@@ -198,8 +188,7 @@ void readReg(int dev, int reg, int count)
 }
 // }}}
 // {{{ MMA7660
-void accelInit(void)
-{
+void accelInit(void) {
   debug("Initializing accelerometer.");
 
   debug("--> Set to standby mode.");
@@ -221,16 +210,13 @@ void accelInit(void)
   writeReg(MMA7660addr, MMA7660_MODE, 0x01);
 }
 
-void readAcc(void)
-{
+void readAcc(void) {
   char val = 64;
   char data[3];
   readReg(MMA7660addr, MMA7660_X, 3);
 
-  if (Wire.available())
-  {
-    for (i = 0; i < 3; i++)
-    {
+  if (Wire.available()) {
+    for (i = 0; i < 3; i++) {
       while ( val > 63 ) // Values above 63 are invalid
         val = Wire.read();
 
@@ -249,8 +235,7 @@ void readAcc(void)
 }
 // }}}
 // {{{ ITG3200
-void gyroInit(void)
-{
+void gyroInit(void) {
   debug("Initializing gyroscope.");
 
   debug("--> reset.");
@@ -263,14 +248,11 @@ void gyroInit(void)
   writeReg(ITG3200addr, ITG3200_DLPF, 0x18);
 }
 
-void readRot(void)
-{
+void readRot(void) {
   readReg(ITG3200addr, ITG3200_GX_L, 6);
 
-  if (Wire.available())
-  {
-    for (i = 0; i < 6; i++)
-    {
+  if (Wire.available()) {
+    for (i = 0; i < 6; i++) {
       switch (i) {
         case 0: Rot.x  = Wire.read();    break;
         case 1: Rot.x |= Wire.read()<<8; break;
@@ -284,8 +266,7 @@ void readRot(void)
 }
 // }}}
 // {{{ IR Ping
-void readAlt(void)
-{
+void readAlt(void) {
   pinMode(PING_PIN, OUTPUT);
   digitalWrite(PING_PIN, LOW);
   delayMicroseconds(2);
@@ -298,8 +279,7 @@ void readAlt(void)
 }
 // }}}
 // {{{ Sensors
-void printAcc(void)
-{
+void printAcc(void) {
   Serial.print("Acceleration: ");
   Serial.print("X: "); Serial.print(Acc.x, DEC);
   Serial.print(", DELTA_X: "); Serial.print(Acc.delta_x, DEC);
@@ -310,8 +290,7 @@ void printAcc(void)
   Serial.println("");
 }
 
-void printRot(void)
-{
+void printRot(void) {
   Serial.print("Rotation: ");
   Serial.print("X: "); Serial.print(Rot.x, DEC);
   Serial.print(", Y: "); Serial.print(Rot.y, DEC);
@@ -319,15 +298,13 @@ void printRot(void)
   Serial.println("");
 }
 
-void printAlt(void)
-{
+void printAlt(void) {
   Serial.print("Altitude: "); Serial.print(Alt, DEC);
   Serial.println("");
 }
 // }}}
 // {{{ Speed functions
-double getSpeed(int esc, bool pwm = false)
-{
+double getSpeed(int esc, bool pwm = false) {
   if (pwm)
     speed = escs[esc]->readMicroseconds();
   else
@@ -335,22 +312,19 @@ double getSpeed(int esc, bool pwm = false)
 
   return speed;
 }
-int getAvgSpeed(bool pwm = false)
-{
+int getAvgSpeed(bool pwm = false) {
   double speeds = 0;
   for (i=0; i<MOTORS_N; i++)
     speeds += getSpeed(i, pwm);
   return speeds / MOTORS_N;
 }
-void _setSpeed(int esc, double speed)
-{
+void _setSpeed(int esc, double speed) {
   if (0 <= speed && speed <= 100)
     escs[esc]->writeMicroseconds(map(speed, 0, 100, ESC_PWM_MIN, ESC_PWM_MAX));
   else if ( ESC_PWM_MIN <= speed && speed <= ESC_PWM_MAX )
     escs[esc]->writeMicroseconds(speed);
 }
-double setSpeed(int esc, double new_speed)
-{
+double setSpeed(int esc, double new_speed) {
   // Normalize speed for incorrect input
   if (speed <= 0)
     new_speed = 0;
@@ -377,8 +351,7 @@ double setSpeed(int esc, double new_speed)
   #endif
   return new_speed;
 }
-double decreaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
-{
+double decreaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT) {
   if (esc == MOTORS_ALL)
     for(i=0; i<MOTORS_N; i++)
       speed = setSpeed(i, getSpeed(i) - amount);
@@ -387,8 +360,7 @@ double decreaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
 
   return speed;
 }
-double increaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
-{
+double increaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT) {
   if (esc == MOTORS_ALL)
     for(i=0; i<MOTORS_N; i++)
       speed = setSpeed(i, getSpeed(i) + amount);
@@ -427,16 +399,14 @@ void stabilize(void)
 }
 // }}}
 // {{{ Pre-flight
-void setCorrections(void)
-{
+void setCorrections(void) {
   int avg;
 
   avg = getAvgSpeed(true);
   for (i=0; i<MOTORS_N; i++)
     *corrections[i] = (escs[i]->readMicroseconds() - avg);
 }
-void preFlightHalt(void)
-{
+void preFlightHalt(void) {
   debug("Something went wrong!, running preFlightHalt");
 
   bool motors_running = true;
@@ -457,8 +427,7 @@ void preFlightHalt(void)
   }
 }
 
-char preFlightHover(void)
-{
+char preFlightHover(void) {
   debug("Entering preFlightHovering");
 
   bool do_loop = true;
@@ -489,8 +458,7 @@ char preFlightHover(void)
 }
 
 // Pre-flight sequence
-void preFlight(void)
-{
+void preFlight(void) {
   char return_codes = 0;
   debug("Running pre-flight setup");
 
@@ -507,20 +475,17 @@ void preFlight(void)
 }
 // }}}
 // {{{ Control functions
-void computePIDs(void)
-{
+void computePIDs(void) {
   for (i=0; i<MOTORS_N; i++)
     pids[i]->Compute();
 }
-void setOutputs(void)
-{
+void setOutputs(void) {
   for (i=0; i<MOTORS_N; i++)
     setSpeed(i, *outputs[i] + *corrections[i]);
 }
 // }}}
 // {{{ Main
-void setup()
-{
+void setup() {
   debug("Starting setup");
   Serial.begin(9600);
   Wire.begin();
@@ -537,8 +502,7 @@ void setup()
   debug("Entering main loop");
 }
 
-void loop()
-{
+void loop() {
   int input;
 
   readSensors();
