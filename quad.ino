@@ -497,7 +497,7 @@ void preFlight(void)
 }
 // }}}
 // {{{ Control functions
-void computePID(void)
+void computePIDs(void)
 {
   for (i=0; i<MOTORS_N; i++)
     pids[i]->Compute();
@@ -533,7 +533,7 @@ void loop()
 
   readSensors();
   //readInput();
-  //computePID();
+  //computePIDs();
   //setOutputs();
 
   if (Serial.available() > 0) {
