@@ -92,21 +92,25 @@ double speed;
 double esc_0_input, esc_0_output, esc_0_setpoint;
 Servo esc_0_servo;
 PID esc_0_pid(&esc_0_input, &esc_0_output, &esc_0_setpoint, KP, KI, KD, AUTOMATIC);
+int esc_0_correction;
 
 // Motor 1 (E)
 double esc_1_input, esc_1_output, esc_1_setpoint;
 Servo esc_1_servo;
 PID esc_1_pid(&esc_1_input, &esc_1_output, &esc_1_setpoint, KP, KI, KD, AUTOMATIC);
+int esc_1_correction;
 
 // Motor 2 (S)
 double esc_2_input, esc_2_output, esc_2_setpoint;
 Servo esc_2_servo;
 PID esc_2_pid(&esc_2_input, &esc_2_output, &esc_2_setpoint, KP, KI, KD, AUTOMATIC);
+int esc_2_correction;
 
 // Motor 3 (W)
 double esc_3_input, esc_3_output, esc_3_setpoint;
 Servo esc_3_servo;
 PID esc_3_pid(&esc_3_input, &esc_3_output, &esc_3_setpoint, KP, KI, KD, AUTOMATIC);
+int esc_3_correction;
 
 Servo *servos[MOTORS_N] =
 {
@@ -123,6 +127,20 @@ double *outputs[MOTORS_N] =
   &esc_2_output,
   &esc_3_output
 };
+double *inputs[MOTORS_N] =
+{
+  &esc_0_input,
+  &esc_1_input,
+  &esc_2_input,
+  &esc_3_input
+};
+double *setpoints[MOTORS_N] =
+{
+  &esc_0_setpoint,
+  &esc_1_setpoint,
+  &esc_2_setpoint,
+  &esc_3_setpoint
+};
 
 PID *pids[MOTORS_N] =
 {
@@ -132,6 +150,14 @@ PID *pids[MOTORS_N] =
   &esc_3_pid
 };
 
+int *corrections[MOTORS_N] =
+{
+  &esc_0_correction,
+  &esc_1_correction,
+  &esc_2_correction,
+  &esc_3_correction
+};
+// }}}
 // }}}
 // {{{ Helpers
 void debug(const char *msg)
