@@ -87,7 +87,7 @@ ROT Rot;
 int Alt;
 int i;
 double speed;
-
+// {{{ Per motor stuff
 // Motor 0 (N)
 double esc_0_input, esc_0_output, esc_0_setpoint;
 Servo esc_0_servo;
@@ -112,6 +112,8 @@ Servo esc_3_servo;
 PID esc_3_pid(&esc_3_input, &esc_3_output, &esc_3_setpoint, KP, KI, KD, AUTOMATIC);
 int esc_3_correction;
 
+// }}}
+// {{{ Arrays
 Servo *servos[MOTORS_N] =
 {
   &esc_0_servo,
