@@ -111,10 +111,9 @@ double esc_3_input, esc_3_output, esc_3_setpoint;
 Servo esc_3_servo;
 PID esc_3_pid(&esc_3_input, &esc_3_output, &esc_3_setpoint, KP, KI, KD, AUTOMATIC);
 int esc_3_correction;
-
 // }}}
 // {{{ Arrays
-Servo *servos[MOTORS_N] =
+Servo *escs[MOTORS_N] =
 {
   &esc_0_servo,
   &esc_1_servo,
@@ -327,18 +326,25 @@ void printAlt(void)
 double getSpeed(int esc, bool pwm = false)
 {
   if (pwm)
-    speed = servos[esc]->readMicroseconds();
+    speed = escs[esc]->readMicroseconds();
   else
-    speed = map(servos[esc]->readMicroseconds(), ESC_PWM_MIN, ESC_PWM_MAX, 0, 100);
+    speed = map(escs[esc]->readMicroseconds(), ESC_PWM_MIN, ESC_PWM_MAX, 0, 100);
 
   return speed;
 }
-double getAvgSpeed(bool pwm = false)
+int getAvgSpeed(bool pwm = false)
 {
   double speeds = 0;
   for (i=0; i<MOTORS_N; i++)
     speeds += getSpeed(i, pwm);
   return speeds / MOTORS_N;
+}
+void _setSpeed(int esc, double speed)
+{
+  if (0 <= speed && speed <= 100)
+    escs[esc]->writeMicroseconds(map(speed, 0, 100, ESC_PWM_MIN, ESC_PWM_MAX));
+  else if ( ESC_PWM_MIN <= speed && speed <= ESC_PWM_MAX )
+    escs[esc]->writeMicroseconds(speed);
 }
 double setSpeed(int esc, double new_speed)
 {
@@ -353,10 +359,11 @@ double setSpeed(int esc, double new_speed)
     new_speed = ESC_PWM_MAX;
     
   // Write new_speed to esc
-  if (0 <= new_speed && new_speed <= 100)
-    servos[esc]->writeMicroseconds(map(new_speed, 0, 100, ESC_PWM_MIN, ESC_PWM_MAX));
-  else if ( ESC_PWM_MIN <= new_speed && new_speed <= ESC_PWM_MAX )
-    servos[esc]->writeMicroseconds(new_speed);
+  if (esc == MOTORS_ALL)
+    for (i=0; i<MOTORS_ALL; i++)
+      _setSpeed(i, new_speed);
+  else
+    _setSpeed(esc, new_speed);
 
   *outputs[esc] = new_speed;
   #ifdef DEBUG
@@ -405,11 +412,19 @@ void stabilize(void)
     else if (Acc.z < 0)
       increaseSpeed(3, true, ESC_SPEEDSTEP_PWM);
 
-    readSensors();
+    readAcc();
   }
 }
 // }}}
 // {{{ Pre-flight
+void setCorrections(void)
+{
+  int avg;
+
+  avg = getAvgSpeed(true);
+  for (i=0; i<MOTORS_N; i++)
+    *corrections[i] = (escs[i]->readMicroseconds() - avg);
+}
 void preFlightHalt(void)
 {
   debug("Something went wrong!, running preFlightHalt");
@@ -477,6 +492,18 @@ void preFlight(void)
 
   if (return_codes > 0)
     preFlightHalt();
+}
+// }}}
+// {{{ Control functions
+void computePID(void)
+{
+  for (i=0; i<MOTORS_N, i++)
+    PIDS[i]->Compute();
+}
+void setOutputs(void)
+{
+  for (i=0; i<MOTORS_N, i++)
+    setSpeed(i, outputs[i] + corrections[i]);
 }
 // }}}
 // {{{ Main
