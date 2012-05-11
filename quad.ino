@@ -282,11 +282,11 @@ void readAlt(void) {
 void printAcc(void) {
   Serial.print("Acceleration: ");
   Serial.print("X: "); Serial.print(Acc.x, DEC);
-  Serial.print(", DELTA_X: "); Serial.print(Acc.delta_x, DEC);
+  //Serial.print(", DELTA_X: "); Serial.print(Acc.delta_x, DEC);
   Serial.print(", Y: "); Serial.print(Acc.y, DEC);
-  Serial.print(", DELTA_Y: "); Serial.print(Acc.delta_y, DEC);
+  //Serial.print(", DELTA_Y: "); Serial.print(Acc.delta_y, DEC);
   Serial.print(", Z: "); Serial.print(Acc.z, DEC);
-  Serial.print(", DELTA_z: "); Serial.print(Acc.delta_z, DEC);
+  //Serial.print(", DELTA_z: "); Serial.print(Acc.delta_z, DEC);
   Serial.println("");
 }
 
@@ -371,19 +371,31 @@ double increaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT) 
 }
 // }}}
 // {{{ Mid-flight
-bool NSIsTilted(void)
-{
-  return (Acc.y < -STABILITY_THRESHOLD || Acc.y > STABILITY_THRESHOLD);
+char pointState(int point) {
+  int angle = 0;
+  switch (point) {
+    case 0: angle = Acc.y; break;
+    case 1: angle = Acc.x; break;
+    case 2: angle = -Acc.y; break;
+    case 3: angle = -Acc.x; break;
+  }
+
+  if ( angle < -STABILITY_THRESHOLD )
+    return POINT_LOWER;
+  else if ( angle > STABILITY_THRESHOLD )
+    return POINT_HIGHER;
+  else
+    return POINT_OK;
 }
-bool WSIsTilted(void)
-{
-  return (Acc.z < -STABILITY_THRESHOLD || Acc.z > STABILITY_THRESHOLD);
-}
-void stabilize(void)
-{
+bool altitudeIncreasing(void) { return (Acc.z > (MMA7660_1G + STABILITY_THRESHOLD)); }
+bool altitudeDecreasing(void) { return (Acc.z < (MMA7660_1G - STABILITY_THRESHOLD)); }
+bool NSIsTilted(void) { return (Acc.y < -STABILITY_THRESHOLD || Acc.y > STABILITY_THRESHOLD); }
+bool WEIsTilted(void) { return (Acc.z < -STABILITY_THRESHOLD || Acc.z > STABILITY_THRESHOLD); }
+bool isStable(void) { return (NSIsTilted && WEIsTilted); }
+void stabilize(void) {
   readAcc();
   Serial.println(Acc.y, DEC);
-  while (NSIsTilted || WSIsTilted) {
+  while (NSIsTilted || WEIsTilted) {
     printAcc();
     if (Acc.y > 0)
       increaseSpeed(0, true, ESC_SPEEDSTEP_PWM);
@@ -445,7 +457,8 @@ char preFlightHover(void) {
       break;
     }
     stabilize();
-    readSensors();
+    //readAlt();
+    //readAcc();
     /*if (distance > 10)*/
       /*do_loop = false;*/
 
@@ -483,6 +496,31 @@ void setOutputs(void) {
   for (i=0; i<MOTORS_N; i++)
     setSpeed(i, *outputs[i] + *corrections[i]);
 }
+void stabilizeInput(void) {
+  if (isStable()) {
+    for (i=0; i<MOTORS_N; i++) {
+      inputs[i] = setpoints[i];
+    }
+  } else {
+    for (i=0; i<MOTORS_N; i++) {
+      switch (pointState(i)) {
+        case POINT_OK: inputs[i] = setpoints[i]; break;
+        case POINT_HIGHER: inputs[i] = setpoints[i] - STABILITY_THRESHOLD; break;
+        case POINT_LOWER: inputs[i] = setpoints[i] + STABILITY_THRESHOLD; break;
+      }
+    }
+  }
+}
+void flightAutoStable(void) {
+  stabilizeInput();
+}
+// }}}
+// {{{ Input
+void getInput(void) {
+  switch (FLIGHT_MODE) {
+    case AUTO_STABLE: flightAutoStable(); break;
+  }
+}
 // }}}
 // {{{ Main
 void setup() {
@@ -505,8 +543,12 @@ void setup() {
 void loop() {
   int input;
 
-  readSensors();
-  //readInput();
+  //preFlight();
+  readAcc();
+  printAcc();
+  delay(100);
+
+  getInput();
   //computePIDs();
   //setOutputs();
 
@@ -517,6 +559,5 @@ void loop() {
     }
   }
 
-  printAcc();
 }
 // }}}
