@@ -396,13 +396,20 @@ double increaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT)
 }
 // }}}
 // {{{ Mid-flight
+bool NSIsTilted(void)
+{
+  return (Acc.y < -STABILITY_THRESHOLD || Acc.y > STABILITY_THRESHOLD);
+}
+bool WSIsTilted(void)
+{
+  return (Acc.z < -STABILITY_THRESHOLD || Acc.z > STABILITY_THRESHOLD);
+}
 void stabilize(void)
 {
-  readSensors();
+  readAcc();
   Serial.println(Acc.y, DEC);
-  while ((Acc.y < -STABILITY_THRESHOLD || Acc.y > STABILITY_THRESHOLD)
-      && (Acc.z < -STABILITY_THRESHOLD || Acc.z > STABILITY_THRESHOLD)) {
-
+  while (NSIsTilted || WSIsTilted) {
+    printAcc();
     if (Acc.y > 0)
       increaseSpeed(0, true, ESC_SPEEDSTEP_PWM);
     else if (Acc.y < 0)
