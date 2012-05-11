@@ -29,10 +29,20 @@
 #define KD 1
 
 #define STABILITY_THRESHOLD 2
+#define STABILIZATION_STEP 10
 
 #define ULTRASONIC_MAX_RANGE 400
+#define MMA7660_1G 40
 
 #define DEBUG
+
+// Flight modes
+#define FLIGHT_MODE 0
+#define AUTO_STABLE 0
+#define AUTO_STABLE_INPUT_LIMIT 20
+#define POINT_OK 0
+#define POINT_HIGHER 1
+#define POINT_LOWER 2
 
 #define MMA7660addr   0x4c
 #define MMA7660_X     0x00
