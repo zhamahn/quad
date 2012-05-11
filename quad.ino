@@ -492,18 +492,20 @@ void preFlight(void)
 
   if (return_codes > 0)
     preFlightHalt();
+
+  setCorrections();
 }
 // }}}
 // {{{ Control functions
 void computePID(void)
 {
-  for (i=0; i<MOTORS_N, i++)
-    PIDS[i]->Compute();
+  for (i=0; i<MOTORS_N; i++)
+    pids[i]->Compute();
 }
 void setOutputs(void)
 {
-  for (i=0; i<MOTORS_N, i++)
-    setSpeed(i, outputs[i] + corrections[i]);
+  for (i=0; i<MOTORS_N; i++)
+    setSpeed(i, *outputs[i] + *corrections[i]);
 }
 // }}}
 // {{{ Main
