@@ -523,9 +523,9 @@ void setup()
   gyroInit();
 
   esc_0_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  esc_1_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  esc_2_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  esc_3_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_1_servo.attach(ESC_1_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_2_servo.attach(ESC_2_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_3_servo.attach(ESC_3_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
 
   //preFlight();
 
