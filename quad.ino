@@ -288,13 +288,6 @@ void readAlt(void)
 }
 // }}}
 // {{{ Sensors
-void readSensors(void)
-{
-  //readAlt();
-  //readRot();
-  readAcc();
-}
-
 void printAcc(void)
 {
   Serial.print("Acceleration: ");
