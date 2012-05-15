@@ -297,7 +297,7 @@ void readAlt(void) {
   digitalWrite(PING_PIN, LOW);
 
   pinMode(PING_PIN, INPUT);
-  Alt = pulseIn(PING_PIN, HIGH) / 29 / 2;
+  alt = pulseIn(PING_PIN, HIGH) / 29 / 2;
 }
 // }}}
 // {{{ Sensors
@@ -321,7 +321,7 @@ void printRot(void) {
 }
 
 void printAlt(void) {
-  Serial.print("Altitude: "); Serial.print(Alt, DEC);
+  Serial.print("Altitude: "); Serial.print(alt, DEC);
   Serial.println("");
 }
 // }}}
