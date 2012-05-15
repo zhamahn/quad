@@ -7,6 +7,8 @@
 // Pin definitions
 #define LED 13
 #define PING_PIN 7
+#define PING_INT 0
+#define PING_INT_PIN 2
 
 #define ESC_0_PIN 10
 #define ESC_1_PIN 5
@@ -92,9 +94,10 @@ struct ROT {
 // {{{ Global variables
 ACC Acc;
 ROT Rot;
-int Alt;
 int i;
 double speed;
+volatile int alt;
+unsigned long ping_start;
 // {{{ Per motor stuff
 // Motor 0 (N)
 double esc_0_input, esc_0_output, esc_0_setpoint;
@@ -266,6 +269,25 @@ void readRot(void) {
 }
 // }}}
 // {{{ IR Ping
+void startPing(void) {
+  noInterrupts() // Disable interrupts, so interrupts wont trigger on the LOW-HIGH-LOW cycle
+
+  pinMode(PING_PIN, OUTPUT);
+  digitalWrite(PING_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(PING_PIN, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(PING_PIN, LOW);
+
+  interrupts() // Re-enable interrupts
+
+  ping_start = micros()
+}
+void measureAlt(void) {
+  alt = (micros() - ping_start) / 29 / 2;
+  if (alt > ULTRASONIC_MAX_RANGE)
+    alt = ULTRASONIC_MAX_RANGE;
+}
 void readAlt(void) {
   pinMode(PING_PIN, OUTPUT);
   digitalWrite(PING_PIN, LOW);
@@ -529,6 +551,8 @@ void setup() {
   Wire.begin();
   accelInit();
   gyroInit();
+
+  attachInterrupt(PING_INT, measureAlt, RISING);
 
   esc_0_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
   esc_1_servo.attach(ESC_1_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
