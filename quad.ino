@@ -97,7 +97,7 @@ ROT Rot;
 int i;
 double speed;
 volatile int alt;
-unsigned long ping_start = 0;
+volatile unsigned long ping_start = 0;
 // {{{ Per motor stuff
 // Motor 0 (N)
 double esc_0_input, esc_0_output, esc_0_setpoint;
@@ -284,16 +284,15 @@ void startPing(void) {
     pinMode(PING_PIN, INPUT);
     while (digitalRead(PING_PIN) == LOW);
 
-    ping_start = micros();
     interrupts(); // Re-enable interrupts
+    ping_start = micros();
   }
 }
-int microsecondsToCm(long ms) {
-  return ms / 29 / 2;
-}
 void measureAlt(void) {
-  alt = microsecondsToCm(micros() - ping_start);
-  ping_start = 0;
+  if (ping_start > 0) {
+    alt = (micros() - ping_start) / 29 / 2;
+    ping_start = 0;
+  }
   if (alt > ULTRASONIC_MAX_RANGE)
     alt = ULTRASONIC_MAX_RANGE;
 }
