@@ -270,7 +270,7 @@ void readRot(void) {
 // }}}
 // {{{ IR Ping
 void startPing(void) {
-  noInterrupts() // Disable interrupts, so interrupts wont trigger on the LOW-HIGH-LOW cycle
+  noInterrupts(); // Disable interrupts, so interrupts wont trigger on the LOW-HIGH-LOW cycle
 
   pinMode(PING_PIN, OUTPUT);
   digitalWrite(PING_PIN, LOW);
@@ -279,9 +279,9 @@ void startPing(void) {
   delayMicroseconds(5);
   digitalWrite(PING_PIN, LOW);
 
-  interrupts() // Re-enable interrupts
+  interrupts(); // Re-enable interrupts
 
-  ping_start = micros()
+  ping_start = micros();
 }
 void measureAlt(void) {
   alt = (micros() - ping_start) / 29 / 2;
