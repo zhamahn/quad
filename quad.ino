@@ -10,13 +10,13 @@
 #define PING_INT 0
 #define PING_INT_PIN 2
 
-#define ESC_0_PIN 10
-#define ESC_1_PIN 5
-#define ESC_2_PIN 8
-#define ESC_3_PIN 9
+#define ESC_X_PIN 10
+#define ESC_NX_PIN 5
+#define ESC_Y_PIN 8
+#define ESC_NY_PIN 9
 
-#define MOTORS_N 4
-#define MOTORS_ALL -1
+#define ESC_ALL -1
+#define ESC_N 4
 
 #define ESC_PWM_MIN 1180
 #define ESC_PWM_MAX 1710
@@ -99,69 +99,69 @@ double speed;
 volatile int alt;
 volatile unsigned long ping_start = 0;
 // {{{ Per motor stuff
-// Motor 0 (N)
-double esc_0_input, esc_0_output, esc_0_setpoint;
-Servo esc_0_servo;
-PID esc_0_pid(&esc_0_input, &esc_0_output, &esc_0_setpoint, KP, KI, KD, AUTOMATIC);
-int esc_0_correction;
+// Motor X
+double esc_x_input, esc_x_output, esc_x_setpoint;
+Servo esc_x;
+PID esc_x_pid(&esc_x_input, &esc_x_output, &esc_x_setpoint, KP, KI, KD, AUTOMATIC);
+int esc_x_correction;
 
-// Motor 1 (E)
-double esc_1_input, esc_1_output, esc_1_setpoint;
-Servo esc_1_servo;
-PID esc_1_pid(&esc_1_input, &esc_1_output, &esc_1_setpoint, KP, KI, KD, AUTOMATIC);
-int esc_1_correction;
+// Motor -X
+double esc_nx_input, esc_nx_output, esc_nx_setpoint;
+Servo esc_nx;
+PID esc_nx_pid(&esc_nx_input, &esc_nx_output, &esc_nx_setpoint, KP, KI, KD, AUTOMATIC);
+int esc_nx_correction;
 
-// Motor 2 (S)
-double esc_2_input, esc_2_output, esc_2_setpoint;
-Servo esc_2_servo;
-PID esc_2_pid(&esc_2_input, &esc_2_output, &esc_2_setpoint, KP, KI, KD, AUTOMATIC);
-int esc_2_correction;
+// Motor Y
+double esc_y_input, esc_y_output, esc_y_setpoint;
+Servo esc_y;
+PID esc_y_pid(&esc_y_input, &esc_y_output, &esc_y_setpoint, KP, KI, KD, AUTOMATIC);
+int esc_y_correction;
 
-// Motor 3 (W)
-double esc_3_input, esc_3_output, esc_3_setpoint;
-Servo esc_3_servo;
-PID esc_3_pid(&esc_3_input, &esc_3_output, &esc_3_setpoint, KP, KI, KD, AUTOMATIC);
-int esc_3_correction;
+// Motor ny
+double esc_ny_input, esc_ny_output, esc_ny_setpoint;
+Servo esc_ny;
+PID esc_ny_pid(&esc_ny_input, &esc_ny_output, &esc_ny_setpoint, KP, KI, KD, AUTOMATIC);
+int esc_ny_correction;
 // }}}
 // {{{ Arrays
-Servo *escs[MOTORS_N] = {
-  &esc_0_servo,
-  &esc_1_servo,
-  &esc_2_servo,
-  &esc_3_servo
+Servo *escs[ESC_N] = {
+  &esc_x,
+  &esc_nx,
+  &esc_y,
+  &esc_ny
 };
 
-double *outputs[MOTORS_N] = {
-  &esc_0_output,
-  &esc_1_output,
-  &esc_2_output,
-  &esc_3_output
+double *outputs[ESC_N] = {
+  &esc_x_output,
+  &esc_nx_output,
+  &esc_y_output,
+  &esc_ny_output
 };
-double *inputs[MOTORS_N] = {
-  &esc_0_input,
-  &esc_1_input,
-  &esc_2_input,
-  &esc_3_input
+double *inputs[ESC_N] = {
+  &esc_x_input,
+  &esc_nx_input,
+  &esc_y_input,
+  &esc_ny_input
 };
-double *setpoints[MOTORS_N] = {
-  &esc_0_setpoint,
-  &esc_1_setpoint,
-  &esc_2_setpoint,
-  &esc_3_setpoint
-};
-
-PID *pids[MOTORS_N] = {
-  &esc_0_pid,
-  &esc_1_pid,
-  &esc_2_pid,
-  &esc_3_pid
+double *setpoints[ESC_N] = {
+  &esc_x_setpoint,
+  &esc_nx_setpoint,
+  &esc_y_setpoint,
+  &esc_ny_setpoint
 };
 
-int *corrections[MOTORS_N] = {
-  &esc_0_correction,
-  &esc_1_correction,
-  &esc_2_correction,
-  &esc_3_correction
+PID *pids[ESC_N] = {
+  &esc_x_pid,
+  &esc_nx_pid,
+  &esc_y_pid,
+  &esc_ny_pid
+};
+
+int *corrections[ESC_N] = {
+  &esc_x_correction,
+  &esc_nx_correction,
+  &esc_y_correction,
+  &esc_ny_correction
 };
 float angles[2];
 // }}}
@@ -323,70 +323,70 @@ void printAlt(void) {
 }
 // }}}
 // {{{ Speed functions
-double getSpeed(int esc, bool pwm = false) {
+double getSpeed(Servo * esc, bool pwm = false) {
   if (pwm)
-    speed = escs[esc]->readMicroseconds();
+    speed = esc->readMicroseconds();
   else
-    speed = map(escs[esc]->readMicroseconds(), ESC_PWM_MIN, ESC_PWM_MAX, 0, 100);
+    speed = map(esc->readMicroseconds(), ESC_PWM_MIN, ESC_PWM_MAX, 0, 100);
 
   return speed;
 }
 int getAvgSpeed(bool pwm = false) {
   double speeds = 0;
-  for (i=0; i<MOTORS_N; i++)
-    speeds += getSpeed(i, pwm);
-  return speeds / MOTORS_N;
+  speeds += getSpeed(&esc_x, pwm);
+  speeds += getSpeed(&esc_nx, pwm);
+  speeds += getSpeed(&esc_y, pwm);
+  speeds += getSpeed(&esc_ny, pwm);
+  return speeds / ESC_N;
 }
-void _setSpeed(int esc, double speed) {
+void _setSpeed(Servo * esc, double speed) {
   if (0 <= speed && speed <= 100)
-    escs[esc]->writeMicroseconds(map(speed, 0, 100, ESC_PWM_MIN, ESC_PWM_MAX));
+    esc->writeMicroseconds(map(speed, 0, 100, ESC_PWM_MIN, ESC_PWM_MAX));
   else if ( ESC_PWM_MIN <= speed && speed <= ESC_PWM_MAX )
-    escs[esc]->writeMicroseconds(speed);
+    esc->writeMicroseconds(speed);
 }
-double setSpeed(int esc, double new_speed) {
-  // Normalize speed for incorrect input
+double normalizeSpeed(double speed) {
   if (speed <= 0)
-    new_speed = 0;
-  else if (new_speed >= 100 && new_speed <= 200)
-    new_speed = 100;
-  else if (new_speed > 200 && new_speed < ESC_PWM_MIN )
-    new_speed = ESC_PWM_MIN;
-  else if (new_speed >= ESC_PWM_MAX)
-    new_speed = ESC_PWM_MAX;
-    
-  // Write new_speed to esc
-  if (esc == MOTORS_ALL)
-    for (i=0; i<MOTORS_ALL; i++)
-      _setSpeed(i, new_speed);
-  else
-    _setSpeed(esc, new_speed);
+    speed = 0;
+  else if (speed >= 100 && speed <= 200)
+    speed = 100;
+  else if (speed > 200 && speed < ESC_PWM_MIN )
+    speed = ESC_PWM_MIN;
+  else if (speed >= ESC_PWM_MAX)
+    speed = ESC_PWM_MAX;
 
-  *outputs[esc] = new_speed;
-  #ifdef DEBUG
-    Serial.print("Setting ");
-    Serial.print(esc, DEC);
-    Serial.print(" speed to: ");
-    Serial.println(new_speed, DEC);
-  #endif
+  return speed;
+}
+double setSpeed(Servo * esc, double new_speed) {
+  new_speed = normalizeSpeed(new_speed);
+  _setSpeed(esc, new_speed);
   return new_speed;
 }
-double decreaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT) {
-  if (esc == MOTORS_ALL)
-    for(i=0; i<MOTORS_N; i++)
-      speed = setSpeed(i, getSpeed(i) - amount);
-  else
-    speed = setSpeed(esc, getSpeed(esc) - amount);
-
-  return speed;
+double setSpeed(double new_speed) {
+  new_speed = normalizeSpeed(new_speed);
+  _setSpeed(&esc_x, new_speed);
+  _setSpeed(&esc_nx, new_speed);
+  _setSpeed(&esc_y, new_speed);
+  _setSpeed(&esc_nx, new_speed);
+  return new_speed;
 }
-double increaseSpeed(int esc, bool pwm = false, int amount = ESC_SPEEDSTEP_PCT) {
-  if (esc == MOTORS_ALL)
-    for(i=0; i<MOTORS_N; i++)
-      speed = setSpeed(i, getSpeed(i) + amount);
-  else
-    speed = setSpeed(esc, getSpeed(esc) + amount);
-
-  return speed;
+void decreaseSpeed(Servo * esc, bool pwm = false, int step = ESC_SPEEDSTEP_PCT) {
+  setSpeed(esc, getSpeed(esc) - step);
+}
+void decreaseSpeed(bool pwm = false, int step = ESC_SPEEDSTEP_PCT) {
+  setSpeed(&esc_x, getSpeed(&esc_x) - step);
+  setSpeed(&esc_nx, getSpeed(&esc_nx) - step);
+  setSpeed(&esc_y, getSpeed(&esc_y) - step);
+  setSpeed(&esc_nx, getSpeed(&esc_ny) - step);
+}
+void increaseSpeed(Servo * esc, bool pwm = false, int step = ESC_SPEEDSTEP_PCT) {
+  setSpeed(esc, getSpeed(esc) + step);
+}
+void increaseSpeed(bool pwm = false, int step = ESC_SPEEDSTEP_PCT) {
+  setSpeed(&esc_x, getSpeed(&esc_x) + step);
+  setSpeed(&esc_nx, getSpeed(&esc_nx) + step);
+  setSpeed(&esc_y, getSpeed(&esc_y) + step);
+  setSpeed(&esc_nx, getSpeed(&esc_ny) + step);
 }
 // }}}
 // {{{ Mid-flight
@@ -417,13 +417,13 @@ void stabilize(void) {
   while (NSIsTilted || WEIsTilted) {
     printAcc();
     if (Acc.y > 0)
-      increaseSpeed(0, true, ESC_SPEEDSTEP_PWM);
+      increaseSpeed(&esc_ny, true, ESC_SPEEDSTEP_PWM);
     else if (Acc.y < 0)
-      increaseSpeed(2, true, ESC_SPEEDSTEP_PWM);
-    if (Acc.z > 0)
-      increaseSpeed(1, true, ESC_SPEEDSTEP_PWM);
-    else if (Acc.z < 0)
-      increaseSpeed(3, true, ESC_SPEEDSTEP_PWM);
+      increaseSpeed(&esc_y, true, ESC_SPEEDSTEP_PWM);
+    if (Acc.x > 0)
+      increaseSpeed(&esc_nx, true, ESC_SPEEDSTEP_PWM);
+    else if (Acc.x < 0)
+      increaseSpeed(&esc_x, true, ESC_SPEEDSTEP_PWM);
 
     readAcc();
   }
@@ -434,7 +434,7 @@ void setCorrections(void) {
   int avg;
 
   avg = getAvgSpeed(true);
-  for (i=0; i<MOTORS_N; i++)
+  for (i=0; i<ESC_N; i++)
     *corrections[i] = (escs[i]->readMicroseconds() - avg);
 }
 void preFlightHalt(void) {
@@ -444,11 +444,10 @@ void preFlightHalt(void) {
   // Halt all motors
   while (motors_running) {
     motors_running = false;
-    for (i=0; i<MOTORS_N; i++) {
-      speed = decreaseSpeed(i);
-      if (speed > 0)
-        motors_running = true;
-    }
+    decreaseSpeed();
+    speed = getAvgSpeed();
+    if (speed > 10)
+      motors_running = true;
     delay(200);
   }
 
@@ -467,9 +466,7 @@ char preFlightHover(void) {
   // Slowly increase all motor speeds until one side lifts up
   // then increase the motor speed on the side with lowest altitude
   while (counter < 4) {
-    for (i=0; i<MOTORS_N; i++) {
-      increaseSpeed(i, true, 1);
-    }
+    increaseSpeed(true, 1);
     if (getAvgSpeed() > PRE_FLIGHT_MAX_OUTPUT) {
       do_loop = false;
       exit_code++;
@@ -495,9 +492,7 @@ void preFlight(void) {
   debug("Running pre-flight setup");
 
   // Set all motor speeds to 0
-  for (i=0; i<MOTORS_N; i++) {
-    setSpeed(i, 0);
-  }
+  setSpeed(0);
   return_codes += preFlightHover();
 
   if (return_codes > 0)
@@ -508,27 +503,31 @@ void preFlight(void) {
 // }}}
 // {{{ Control functions
 void computePIDs(void) {
-  for (i=0; i<MOTORS_N; i++)
-    pids[i]->Compute();
+  esc_x_pid.Compute();
+  esc_nx_pid.Compute();
+  esc_y_pid.Compute();
+  esc_nx_pid.Compute();
 }
 void setOutputs(void) {
-  for (i=0; i<MOTORS_N; i++)
-    setSpeed(i, *outputs[i] + *corrections[i]);
+  setSpeed(&esc_x, esc_x_output);
+  setSpeed(&esc_nx, esc_nx_output);
+  setSpeed(&esc_y, esc_y_output);
+  setSpeed(&esc_ny, esc_ny_output);
 }
 void stabilizeInput(void) {
-  if (isStable()) {
-    for (i=0; i<MOTORS_N; i++) {
-      inputs[i] = setpoints[i];
-    }
-  } else {
-    for (i=0; i<MOTORS_N; i++) {
-      switch (pointState(i)) {
-        case POINT_OK: inputs[i] = setpoints[i]; break;
-        case POINT_HIGHER: inputs[i] = setpoints[i] - STABILITY_THRESHOLD; break;
-        case POINT_LOWER: inputs[i] = setpoints[i] + STABILITY_THRESHOLD; break;
-      }
-    }
-  }
+  /*if (isStable()) {*/
+    /*for (i=0; i<ESC_N; i++) {*/
+      /*inputs[i] = setpoints[i];*/
+    /*}*/
+  /*} else {*/
+    /*for (i=0; i<ESC_N; i++) {*/
+      /*switch (pointState(i)) {*/
+        /*case POINT_OK: inputs[i] = setpoints[i]; break;*/
+        /*case POINT_HIGHER: inputs[i] = setpoints[i] - STABILITY_THRESHOLD; break;*/
+        /*case POINT_LOWER: inputs[i] = setpoints[i] + STABILITY_THRESHOLD; break;*/
+      /*}*/
+    /*}*/
+  /*}*/
 }
 void flightAutoStable(void) {
   stabilizeInput();
@@ -551,10 +550,10 @@ void setup() {
 
   attachInterrupt(PING_INT, measureAlt, FALLING);
 
-  esc_0_servo.attach(ESC_0_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  esc_1_servo.attach(ESC_1_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  esc_2_servo.attach(ESC_2_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
-  esc_3_servo.attach(ESC_3_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_x.attach(ESC_X_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_nx.attach(ESC_NX_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_y.attach(ESC_Y_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
+  esc_ny.attach(ESC_NY_PIN, ESC_PWM_MIN, ESC_PWM_MAX);
 
   //preFlight();
 
