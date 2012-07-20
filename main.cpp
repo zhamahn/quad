@@ -60,22 +60,6 @@ void increaseOutputs(int step = ESC_STEP) {
 }
 // }}}
 // {{{ Mid-flight
-char pointState(int point) {
-  int angle = 0;
-  switch (point) {
-    case 0: angle = Acc.y; break;
-    case 1: angle = Acc.x; break;
-    case 2: angle = -Acc.y; break;
-    case 3: angle = -Acc.x; break;
-  }
-
-  if ( angle < -STABILITY_THRESHOLD )
-    return POINT_LOWER;
-  else if ( angle > STABILITY_THRESHOLD )
-    return POINT_HIGHER;
-  else
-    return POINT_OK;
-}
 void stabilize(void) {
   Acc.read();
   Acc.print();
