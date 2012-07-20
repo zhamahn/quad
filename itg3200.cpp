@@ -46,13 +46,13 @@ bool ITG3200::stable(void) {
 }
 
 bool ITG3200::stableX(void) {
-  return ( (x > ITG3200_STABILITY_THRESHOLD) || (x < ITG3200_STABILITY_THRESHOLD) );
+  return abs(x) > ITG3200_STABILITY_THRESHOLD;
 }
 
 bool ITG3200::stableY(void) {
-  return ( (y > ITG3200_STABILITY_THRESHOLD) || (y < ITG3200_STABILITY_THRESHOLD) );
+  return abs(y) > ITG3200_STABILITY_THRESHOLD;
 }
 
 bool ITG3200::stableZ(void) {
-  return ( (z > ITG3200_STABILITY_THRESHOLD) || (z < ITG3200_STABILITY_THRESHOLD) );
+  return abs(z) > ITG3200_STABILITY_THRESHOLD;
 }

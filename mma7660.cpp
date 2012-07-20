@@ -66,9 +66,9 @@ bool MMA7660::stable(void) {
 }
 
 bool MMA7660::stableX(void) {
-  return ( (x > MMA7660_STABILITY_THRESHOLD) || (x < MMA7660_STABILITY_THRESHOLD) );
+  return abs(x) > MMA7660_STABILITY_THRESHOLD;
 }
 
 bool MMA7660::stableY(void) {
-  return ( (y > MMA7660_STABILITY_THRESHOLD) || (y < MMA7660_STABILITY_THRESHOLD) );
+  return abs(y) > MMA7660_STABILITY_THRESHOLD;
 }
