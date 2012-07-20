@@ -78,9 +78,6 @@ char pointState(int point) {
 }
 bool altitudeIncreasing(void) { return (Acc.z > (MMA7660_1G + STABILITY_THRESHOLD)); }
 bool altitudeDecreasing(void) { return (Acc.z < (MMA7660_1G - STABILITY_THRESHOLD)); }
-bool XIsTilted(void) { return abs(Acc.x) > STABILITY_THRESHOLD; }
-bool YIsTilted(void) { return abs(Acc.y) > STABILITY_THRESHOLD; }
-bool isStable(void) { return (XIsTilted && YIsTilted); }
 void stabilize(void) {
   Acc.read();
   Acc.print();
