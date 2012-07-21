@@ -37,7 +37,9 @@ void MMA7660::read(void) {
         val = Wire.read();
 
       // transform the 7 bit signed number into an 8 bit signed number.
-      data[i] = ((char)(val<<2));
+      // Bit 5 is the sign; move if left 2 bits so it becomes 7th bit (sign) of 8 bit number.
+      // This multiplies the value by 4, so we need to divide it by 4
+      data[i] = (val<<2)/4;
       val = 64;
     }
   }
