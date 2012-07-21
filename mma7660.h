@@ -28,5 +28,7 @@ class MMA7660 {
   bool stable(void);
   bool stableY(void);
   bool stableX(void);
+  bool ascending(void);
+  bool descending(void);
 };
 #endif
