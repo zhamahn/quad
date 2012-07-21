@@ -4,6 +4,7 @@
 
 ESC::ESC(int _pin) {
   pid = new PID(&input, &output, &setpoint, KP, KI, KD, AUTOMATIC);
+  pid->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
   pin = _pin;
   correction = 0;
 }
