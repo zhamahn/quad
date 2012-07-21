@@ -1,2 +1,15 @@
 #! /bin/sh
-avr-g++ -o build/main.o -c -ffunction-sections -fdata-sections -fno-exceptions -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -Os -mmcu=atmega328p -DARDUINO=100 -DF_CPU=16000000L -Ibuild/core -I/home/zhamahn/sdk/arduino/hardware/arduino/variants/standard -Ibuild/lib_00/Wire -Ibuild/lib_00/Wire/utility -Ibuild/lib_01/PID_v1 main.cpp
+
+DIR=$(dirname $0)
+
+ARDUINO_HOME=$HOME/sdk/arduino
+ARDUINO_PORT=/dev/ttyACM0
+ARDUINO_BOARD=uno
+ARDUINO_BAUDRATE=9600
+EXTRA_LIB_DIR=$DIR/lib
+
+if [ "$1" == "console" ]; then
+  miniterm.py $ARDUINO_PORT $ARDUINO_BAUDRATE
+else
+  scons ARDUINO_HOME=$ARDUINO_HOME ARDUINO_PORT=$ARDUINO_PORT ARDUINO_BOARD=$ARDUINO_BOARD EXTRA_LIB=$EXTRA_LIB_DIR $*
+fi
