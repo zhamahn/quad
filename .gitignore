@@ -1,4 +1,5 @@
 build
+applet
 quad.elf
 quad.hex
 .sconsign.dblite
