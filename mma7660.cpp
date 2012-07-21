@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Wire.h>
+#include <Wire/Wire.h>
 #include "mma7660.h"
 #include "helpers.h"
 // {{{ Functions

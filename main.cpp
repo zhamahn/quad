@@ -5,7 +5,7 @@
 #include "itg3200.h"
 #include "mma7660.h"
 #include "ping.h"
-#include <Wire.h>
+#include <Wire/Wire.h>
 
 ITG3200 Gyro;
 MMA7660 Acc;
