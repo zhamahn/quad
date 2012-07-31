@@ -20,7 +20,7 @@ double ESC::set(double _output) {
   else if (_output > OUTPUT_MAX)
     output = OUTPUT_MAX;
   else
-    output = output;
+    output = _output;
 
   analogWrite(pin, output + correction);
   return output;
