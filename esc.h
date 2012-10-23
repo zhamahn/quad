@@ -19,6 +19,7 @@ class ESC {
   double increase(int);
   double decrease(void);
   double decrease(int);
+  bool stopped(void);
 };
 
 #endif

@@ -38,3 +38,6 @@ double ESC::decrease(void) {
 double ESC::decrease(int step = ESC_STEP) {
   return set(output - step);
 }
+bool ESC::stopped(void) {
+  return (output <= OUTPUT_MIN);
+}

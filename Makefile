@@ -93,6 +93,8 @@ $(CURDIR)/mma7660.cpp \
 $(CURDIR)/ping.cpp \
 $(CURDIR)/communication.cpp \
 $(CURDIR)/controller.cpp \
+$(CURDIR)/escs.cpp \
+$(CURDIR)/quad.cpp \
 $(PROJECT_LIB)/PID_v1/PID_v1.cpp \
 
 CXX_APP = main.cpp

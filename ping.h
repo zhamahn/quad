@@ -10,6 +10,7 @@ class Ping {
   void start(void);
   void measure(void);
   void print(void);
+  void interrupt(void);
   
   private:
   volatile unsigned long started_at;
