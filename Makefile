@@ -85,11 +85,14 @@ $(ARDUINO)/WString.cpp \
 $(ARDUINO)/main.cpp \
 $(ARDUINO_LIB)/EEPROM/EEPROM.cpp \
 $(ARDUINO_LIB)/Wire/Wire.cpp \
+$(ARDUINO_LIB)/SoftwareSerial/SoftwareSerial.cpp \
 $(CURDIR)/esc.cpp \
 $(CURDIR)/helpers.cpp \
 $(CURDIR)/itg3200.cpp \
 $(CURDIR)/mma7660.cpp \
 $(CURDIR)/ping.cpp \
+$(CURDIR)/communication.cpp \
+$(CURDIR)/controller.cpp \
 $(PROJECT_LIB)/PID_v1/PID_v1.cpp \
 
 CXX_APP = main.cpp
@@ -114,8 +117,8 @@ CDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 CXXDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 
 # Place -I options here
-CINCS = -I$(ARDUINO)  -I$(VARIANTS) -I$(ARDUINO_LIB) -I$(CURDIR)/lib -I$(ARDUINO_LIB)/Wire/utility -I$(PROJECT_LIB)/PID_v1
-CXXINCS = -I$(ARDUINO) -I$(VARIANTS) -I$(ARDUINO_LIB) -I$(CURDIR)/lib -I$(ARDUINO_LIB)/Wire/utility -I$(PROJECT_LIB)/PID_v1
+CINCS = -I$(ARDUINO)  -I$(VARIANTS) -I$(ARDUINO_LIB) -I$(CURDIR)/lib -I$(ARDUINO_LIB)/Wire/utility -I$(PROJECT_LIB)/PID_v1 -I$(ARDUINO_LIB)/SoftwareSerial
+CXXINCS = -I$(ARDUINO) -I$(VARIANTS) -I$(ARDUINO_LIB) -I$(CURDIR)/lib -I$(ARDUINO_LIB)/Wire/utility -I$(PROJECT_LIB)/PID_v1 -I$(ARDUINO_LIB)/SoftwareSerial
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C

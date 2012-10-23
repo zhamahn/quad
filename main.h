@@ -22,6 +22,9 @@
 
 #define MAX_TILT 10
 
+#define PIN_SERIAL_RX 2
+#define PIN_SERIAL_TX 4
+
 // Calibration values
 // PID
 #define KP 2

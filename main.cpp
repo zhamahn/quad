@@ -1,11 +1,14 @@
 #include <Arduino.h>
+#include <Wire/Wire.h>
+#include <SoftwareSerial.h>
 #include "main.h"
 #include "helpers.h"
 #include "esc.h"
 #include "itg3200.h"
 #include "mma7660.h"
 #include "ping.h"
-#include <Wire/Wire.h>
+#include "controller.h"
+#include "communication.h"
 
 ITG3200 Gyro;
 MMA7660 Acc;
@@ -14,6 +17,8 @@ ESC esc_x(ESC_X_PIN);
 ESC esc_nx(ESC_NX_PIN);
 ESC esc_y(ESC_Y_PIN);
 ESC esc_ny(ESC_NY_PIN);
+Controller controller;
+SoftwareSerial mySerial(PIN_SERIAL_RX, PIN_SERIAL_TX);
 int i;
 double output;
 float angles[2];
@@ -190,47 +195,54 @@ void pingInterrupt(void) {
 void setup() {
   debug("Starting setup");
   Serial.begin(9600);
-  Wire.begin();
 
-  Acc.init();
-  Gyro.init();
+  //Wire.begin();
 
-  attachInterrupt(PING_INT, pingInterrupt, FALLING);
+  //Acc.init();
+  //Gyro.init();
 
-  pinMode(ESC_X_PIN, OUTPUT);
-  pinMode(ESC_NX_PIN, OUTPUT);
-  pinMode(ESC_Y_PIN, OUTPUT);
-  pinMode(ESC_NY_PIN, OUTPUT);
+  //attachInterrupt(PING_INT, pingInterrupt, FALLING);
 
-  // Set all motor speeds to ESC min
-  setOutputs(OUTPUT_MIN);
+  //pinMode(ESC_X_PIN, OUTPUT);
+  //pinMode(ESC_NX_PIN, OUTPUT);
+  //pinMode(ESC_Y_PIN, OUTPUT);
+  //pinMode(ESC_NY_PIN, OUTPUT);
 
-  // Power on ESCs
-  // batteryOn();
-  // delay(ESC_STARTUP_DELAY);
+  //// Set all motor speeds to ESC min
+  //setOutputs(OUTPUT_MIN);
 
-  preFlight();
+  //// Power on ESCs
+  //// batteryOn();
+  //// delay(ESC_STARTUP_DELAY);
+
+  //preFlight();
 
   debug("Entering main loop");
 }
 
 void loop() {
-  int input;
-
-  Acc.read();
-  Acc.print();
-  delay(100);
-
-  getInput();
-  //computePIDs();
-  //setOutputs();
-
-  if (Serial.available() > 0) {
-    input = Serial.read();
-    switch (input) {
-      default: Serial.print("Input: "); Serial.println(input); break;
-    }
+  unsigned char data[8];
+  if (mySerial.available() > 0) {
+    if (readFrame(&mySerial, data) == FRAME_COMPLETE)
+      controller.updateFromDataArray(data);
+    controller.print(&Serial);
   }
+  //int input;
+
+  //Acc.read();
+  //Acc.print();
+  //delay(100);
+
+  //getInput();
+  ////computePIDs();
+  ////setOutputs();
+
+  //if (Serial.available() > 0) {
+    //input = Serial.read();
+    //switch (input) {
+      //default: Serial.print("Input: "); Serial.println(input); break;
+    //}
+  //}
 
 }
 // }}}
