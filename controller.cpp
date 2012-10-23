@@ -29,6 +29,7 @@ void Controller::updateFromDataArray(unsigned char data[]) {
   left_stick_x  = data[4];
   left_stick_y  = data[5];
 
+  updateDeltas();
   updateButtons(data[6]);
   updateDpad(data[7]);
 
@@ -59,4 +60,25 @@ void Controller::print(HardwareSerial *serial) {
     /*serial->print(down, DEC);*/
 
   serial->println("");
+}
+
+unsigned char Controller::axisDelta(unsigned char *axis) {
+  if (axis == &left_trigger
+      || axis == &right_trigger)
+    return constrain(TRIGGER_ZERO - *axis, 0, 255);
+  if (axis == &left_stick_y
+      || axis == &left_stick_x
+      || axis == &right_stick_y
+      || axis == &left_stick_x)
+    return STICK_ZERO - *axis;
+}
+
+void Controller::updateDeltas(void) {
+  right_trigger_delta = axisDelta(&right_trigger);
+  right_stick_x_delta = axisDelta(&right_stick_x);
+  right_stick_y_delta = axisDelta(&right_stick_y);
+
+  left_trigger_delta  = axisDelta(&left_trigger);
+  left_stick_x_delta  = axisDelta(&left_stick_x);
+  left_stick_y_delta  = axisDelta(&left_stick_y);
 }

@@ -225,7 +225,6 @@ void loop() {
   if (mySerial.available() > 0) {
     if (readFrame(&mySerial, data) == FRAME_COMPLETE)
       controller.updateFromDataArray(data);
-    controller.print(&Serial);
   }
   //int input;
 
@@ -234,15 +233,15 @@ void loop() {
   //delay(100);
 
   //getInput();
-  ////computePIDs();
-  ////setOutputs();
 
-  //if (Serial.available() > 0) {
-    //input = Serial.read();
-    //switch (input) {
-      //default: Serial.print("Input: "); Serial.println(input); break;
-    //}
-  //}
+  if (controller.right_trigger_delta > 50) {
+    increaseOutputs( (controller.right_trigger_delta - 50) / 6 );
+  } else if (controller.right_trigger_delta < 20) {
+    decreaseOutputs();
+  }
 
+  computePIDs();
+  setOutputs();
+  Serial.println(esc_x.output);
 }
 // }}}
