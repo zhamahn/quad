@@ -44,8 +44,9 @@
 TARGET = $(notdir $(CURDIR))
 # Change this to match your arduino installation directory
 INSTALL_DIR = $(HOME)/sdk/arduino
-PORT = /dev/ttyUSB0
-UPLOAD_RATE = 57600
+PORT = /dev/ttyACM0
+#UPLOAD_RATE = 57600
+UPLOAD_RATE = 115200
 AVRDUDE_PROGRAMMER = stk500v1
 MCU = atmega328p
 F_CPU = 16000000
