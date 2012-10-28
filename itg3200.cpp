@@ -17,17 +17,17 @@ void ITG3200::init(void) {
 
 void ITG3200::read(void) {
   char i;
-  readReg(ITG3200addr, ITG3200_GX_L, 6);
+  readReg(ITG3200addr, ITG3200_GX_H, 6);
 
   if (Wire.available()) {
     for (i = 0; i < 6; i++) {
       switch (i) {
-        case 0: x  = Wire.read();    break;
-        case 1: x |= Wire.read()<<8; break;
-        case 2: y  = Wire.read();    break;
-        case 3: y |= Wire.read()<<8; break;
-        case 4: z  = Wire.read();    break;
-        case 5: z |= Wire.read()<<8; break;
+        case 0: x  = Wire.read()<<8; break;
+        case 1: x |= Wire.read();    break;
+        case 2: y  = Wire.read()<<8; break;
+        case 3: y |= Wire.read();    break;
+        case 4: z  = Wire.read()<<8; break;
+        case 5: z |= Wire.read();    break;
       }
     }
   }
