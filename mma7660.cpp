@@ -27,29 +27,29 @@ void MMA7660::init(void) {
 
 void MMA7660::read(void) {
   unsigned char val = 64;
-  char data[3];
+  char data;
   char i;
+
   readReg(MMA7660addr, MMA7660_X, 3);
 
-  if (Wire.available()) {
+  if (Wire.available() > 0) {
     for (i = 0; i < 3; i++) {
-      while ( val > 63 ) // Values above 63 are invalid
-        val = Wire.read();
+      val = Wire.read();
+      if (val > 64) // Values above 63 are invalid, continue to next loop
+        continue;
 
       // transform the 7 bit signed number into an 8 bit signed number.
       // Bit 5 is the sign; move if left 2 bits so it becomes 7th bit (sign) of 8 bit number.
       // This multiplies the value by 4, so we need to divide it by 4
-      data[i] = ((char)(val<<2))/4;
-      val = 64;
+      data = ((char)(val<<2))/4;
+
+      switch (i) {
+        case 0: dx = data - x; x = data; break;
+        case 1: dy = data - y; y = data; break;
+        case 2: dz = data - z; z = data; break;
+      };
     }
   }
-
-  dx = data[0] - x;
-  dy = data[1] - y;
-  dz = data[2] - z;
-  x = data[0];
-  y = data[1];
-  z = data[2];
 }
 
 void MMA7660::print(void) {
