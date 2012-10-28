@@ -60,3 +60,27 @@ void Controller::print(HardwareSerial *serial) {
 
   serial->println("");
 }
+
+signed char Controller::pitch(void) {
+  return map(right_stick_y, -128, 127, -90, 90);
+}
+
+signed char Controller::roll(void) {
+  return map(right_stick_x, -128, 127, -90, 90);
+}
+
+void Controller::resetIfOldData(void) {
+  if ((lastUpdateAt + 5000) < millis())
+    reset();
+}
+
+void Controller::reset(void) {
+  right_trigger = 10;
+  left_trigger = 10;
+
+  right_stick_x = 0;
+  right_stick_y = 0;
+
+  left_stick_x = 0;
+  left_stick_y = 0;
+}

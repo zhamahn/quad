@@ -2,18 +2,11 @@
 #include "main.h"
 #include "escs.h"
 
-void ESCs::computePIDs(void) {
-  x->pid->Compute();
-  nx->pid->Compute();
-  y->pid->Compute();
-  nx->pid->Compute();
-}
-
-void ESCs::setOutputs(void) {
-  x->set();
-  nx->set();
-  y->set();
-  ny->set();
+void ESCs::writeOutputs(void) {
+  x->write();
+  nx->write();
+  y->write();
+  ny->write();
 }
 
 void ESCs::decreaseOutputs(int step) {
@@ -44,4 +37,14 @@ bool ESCs::allStopped(void) {
 
 double ESCs::avgOutput(void) {
   return (x->output + nx->output + y->output + ny->output) / 4;
+}
+
+void ESCs::changePitch(int amount) {
+  x->change(amount * -1);
+  nx->change(amount);
+}
+
+void ESCs::changeRoll(int amount) {
+  y->change(amount * -1);
+  ny->change(amount);
 }

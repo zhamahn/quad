@@ -59,10 +59,10 @@ void setup() {
   quad.acc        = &acc;
   quad.alt        = &alt;
 
-  //Wire.begin();
+  Wire.begin();
 
-  //Acc.init();
-  //Gyro.init();
+  acc.init();
+  gyro.init();
 
   //attachInterrupt(PING_INT, alt.interrupt, FALLING);
 
@@ -89,22 +89,21 @@ void loop() {
     if (readFrame(&mySerial, data) == FRAME_COMPLETE)
       controller.updateFromDataArray(data);
   }
-  //int input;
+  //controller.print(&Serial);
 
-  //Acc.read();
-  //Acc.print();
-  //delay(100);
+  acc.read();
+  acc.print();
+  Serial.println(".");
+  //gyro.read();
+  //gyro.print();
 
-  //getInput();
-  controller.print(&Serial);
+  //if (controller.right_trigger > 10)
+    //escs.increaseOutputs( (controller.right_trigger - 10) / 6 );
+  //else if (controller.left_trigger > 10)
+    //escs.decreaseOutputs( (controller.left_trigger - 10) / 6 );
 
-  if (controller.right_trigger > 10)
-    escs.increaseOutputs( (controller.right_trigger - 10) / 6 );
-  else if (controller.left_trigger > 10)
-    escs.decreaseOutputs( (controller.left_trigger - 10) / 6 );
-
-  escs.computePIDs();
-  escs.setOutputs();
+  quad.computePIDs();
+  quad.setESCs();
   delay(100);
 }
 // }}}

@@ -3,18 +3,16 @@
 #include <Arduino.h>
 
 ESC::ESC(int _pin) {
-  pid = new PID(&input, &output, &setpoint, KP, KI, KD, AUTOMATIC);
-  pid->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
   pin = _pin;
   correction = 0;
 }
 
-double ESC::set(void) {
+int ESC::write(void) {
   analogWrite(pin, output + correction);
   return output;
 }
 
-double ESC::set(double _output) {
+int ESC::write(int _output) {
   if (_output < OUTPUT_MIN)
     output = OUTPUT_MIN;
   else if (_output > OUTPUT_MAX)
@@ -22,22 +20,25 @@ double ESC::set(double _output) {
   else
     output = _output;
 
-  analogWrite(pin, output + correction);
+  write();
   return output;
 }
 
-double ESC::increase(void) {
+int ESC::increase(void) {
   return increase(ESC_STEP);
 }
-double ESC::increase(int step) {
-  return set(output + step);
+int ESC::increase(int step) {
+  return write(output + step);
 }
-double ESC::decrease(void) {
+int ESC::decrease(void) {
   return decrease(ESC_STEP);
 }
-double ESC::decrease(int step = ESC_STEP) {
-  return set(output - step);
+int ESC::decrease(int step = ESC_STEP) {
+  return change(output - step);
 }
 bool ESC::stopped(void) {
   return (output <= OUTPUT_MIN);
+}
+int ESC::change(int amount) {
+  write(output + amount);
 }

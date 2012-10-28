@@ -12,14 +12,14 @@ void MMA7660::init(void) {
   //debug("--> Set to generate automatic interrupt after every measurement");
   //writeReg(MMA7660addr, MMA7660_INTSU, 0x03);
 
-  debug("--> Set sample rate.");
-  writeReg(MMA7660addr, MMA7660_SR, 0x00);
+  //debug("--> Set sample rate.");
+  //writeReg(MMA7660addr, MMA7660_SR, 0x00);
 
-  debug("--> Set pulse detection.");
-  writeReg(MMA7660addr, MMA7660_PDET, 0x00);
+  //debug("--> Set pulse detection.");
+  //writeReg(MMA7660addr, MMA7660_PDET, 0x00);
   //writeReg(MMA7660addr, MMA7660_PDET, 0xE1);
 
-  writeReg(MMA7660addr, MMA7660_PD, 0x04);
+  //writeReg(MMA7660addr, MMA7660_PD, 0x04);
  
   debug("--> Set back to normal operation mode");
   writeReg(MMA7660addr, MMA7660_MODE, 0x01);
@@ -81,4 +81,12 @@ bool MMA7660::ascending(void) {
 
 bool MMA7660::descending(void) {
   return z < MMA7660_STABILITY_THRESHOLD;
+}
+
+signed char MMA7660::pitch(void) {
+  return map(y, -32, 31, -90, 90);
+}
+
+signed char MMA7660::roll(void) {
+  return map(x, -32, 31, -90, 90);
 }

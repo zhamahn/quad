@@ -30,5 +30,8 @@ class MMA7660 {
   bool stableX(void);
   bool ascending(void);
   bool descending(void);
+
+  signed char pitch(void);
+  signed char roll(void);
 };
 #endif

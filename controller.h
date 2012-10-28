@@ -33,10 +33,19 @@ struct Controller {
   bool y;
 
   unsigned long lastUpdateAt;
+
   void updateButtons(unsigned char);
   void updateDpad(unsigned char);
   void updateFromDataArray(unsigned char *);
   void print(HardwareSerial *);
+
+  signed char roll(void);
+  signed char pitch(void);
+
+  signed char yawSpeed(void);
+
+  void resetIfOldData(void);
+  void reset(void);
 };
 
 #endif

@@ -56,3 +56,7 @@ bool ITG3200::stableY(void) {
 bool ITG3200::stableZ(void) {
   return abs(z) > ITG3200_STABILITY_THRESHOLD;
 }
+
+int ITG3200::pitch(void) { return y; }
+int ITG3200::roll(void) { return x; }
+int ITG3200::yaw(void) { return z; }

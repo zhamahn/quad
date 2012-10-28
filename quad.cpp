@@ -2,6 +2,14 @@
 #include "quad.h"
 #include "main.h"
 
+Quad::Quad(void) {
+  pitchPID = new PID(&pitchInput, &pitchOutput, &pitchSetpoint, KP, KI, KD, AUTOMATIC);
+  rollPID = new PID(&rollInput, &rollOutput, &rollSetpoint, KP, KI, KD, AUTOMATIC);
+
+  pitchPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
+  rollPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
+}
+
 void Quad::stabilize(void) {
   acc->read();
   while (!acc->stable()) {
@@ -42,4 +50,19 @@ void Quad::preFlight(void) {
   setAltitude(20);
   escs->setCorrections();
 }
-// }}}
+
+void Quad::computePIDs(void) {
+  pitchSetpoint = (double)(controller->pitch());
+  rollSetpoint = (double)(controller->roll());
+
+  pitchInput = (double)(acc->pitch());
+  rollInput = (double)(acc->roll());
+
+  pitchPID->Compute();
+  rollPID->Compute();
+}
+
+void Quad::setESCs(void) {
+  escs->changePitch(pitchOutput);
+  escs->changeRoll(rollOutput);
+}

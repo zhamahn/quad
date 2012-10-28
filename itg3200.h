@@ -30,5 +30,9 @@ class ITG3200 {
   bool stableY(void);
   bool stableX(void);
   bool stableZ(void);
+
+  int pitch(void);
+  int roll(void);
+  int yaw(void);
 };
 #endif

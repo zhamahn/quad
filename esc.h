@@ -6,20 +6,20 @@
 class ESC {
   public:
 
-  double input, output, setpoint;
   int correction;
-  PID * pid;
   int pin;
+  int output;
 
   ESC(int);
 
-  double set(void);
-  double set(double);
-  double increase(void);
-  double increase(int);
-  double decrease(void);
-  double decrease(int);
+  int write(void);
+  int write(int);
+  int increase(void);
+  int increase(int);
+  int decrease(void);
+  int decrease(int);
   bool stopped(void);
+  int change(int);
 };
 
 #endif
