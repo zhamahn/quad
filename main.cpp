@@ -45,6 +45,7 @@ int main(void)
 void setup() {
   debug("Starting setup");
   Serial.begin(9600);
+  mySerial.begin(9600);
 
   // Initialize classes
   escs.x  = &esc_x;
@@ -95,13 +96,15 @@ void loop() {
   //delay(100);
 
   //getInput();
+  controller.print(&Serial);
 
-  if (controller.right_trigger_delta > 10)
-    escs.increaseOutputs( (controller.right_trigger_delta - 10) / 6 );
-  else if (controller.left_trigger_delta > 10)
-    escs.decreaseOutputs( (controller.left_trigger_delta - 10) / 6 );
+  if (controller.right_trigger > 10)
+    escs.increaseOutputs( (controller.right_trigger - 10) / 6 );
+  else if (controller.left_trigger > 10)
+    escs.decreaseOutputs( (controller.left_trigger - 10) / 6 );
 
   escs.computePIDs();
   escs.setOutputs();
+  delay(100);
 }
 // }}}
