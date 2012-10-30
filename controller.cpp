@@ -71,11 +71,11 @@ signed char Controller::roll(void) {
 
 int Controller::altitude(int currentAltitude) {
   if (right_trigger > 20)
-    return (currentAltitude + right_trigger);
+    return constrain(currentAltitude + right_trigger, 0, 400);
   else if (left_trigger > 20)
-    return (currentAltitude - left_trigger);
+    return constrain(currentAltitude - left_trigger, 0, 400);
   else
-    return currentAltitude;
+    return constrain(currentAltitude, 0, 400);
 }
 
 void Controller::resetIfOldData(void) {
