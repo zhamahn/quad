@@ -24,6 +24,10 @@ Controller controller;
 Quad quad;
 SoftwareSerial mySerial(PIN_SERIAL_RX, PIN_SERIAL_TX);
 
+void pingInterrupt(void) {
+  alt.measure();
+}
+
 int main(void)
 {
   init();
@@ -64,21 +68,15 @@ void setup() {
   acc.init();
   gyro.init();
 
-  //attachInterrupt(PING_INT, alt.interrupt, FALLING);
+  attachInterrupt(PING_INT, pingInterrupt, FALLING);
 
-  //pinMode(ESC_X_PIN, OUTPUT);
-  //pinMode(ESC_NX_PIN, OUTPUT);
-  //pinMode(ESC_Y_PIN, OUTPUT);
-  //pinMode(ESC_NY_PIN, OUTPUT);
+  pinMode(ESC_X_PIN, OUTPUT);
+  pinMode(ESC_NX_PIN, OUTPUT);
+  pinMode(ESC_Y_PIN, OUTPUT);
+  pinMode(ESC_NY_PIN, OUTPUT);
 
-  //// Set all motor speeds to ESC min
-  //setOutputs(OUTPUT_MIN);
-
-  //// Power on ESCs
-  //// batteryOn();
-  //// delay(ESC_STARTUP_DELAY);
-
-  //preFlight();
+  // Set all motor speeds to ESC min
+  escs.write(OUTPUT_MIN);
 
   debug("Entering main loop");
 }
@@ -89,21 +87,12 @@ void loop() {
     if (readFrame(&mySerial, data) == FRAME_COMPLETE)
       controller.updateFromDataArray(data);
   }
-  //controller.print(&Serial);
 
   acc.read();
-  acc.print();
-  Serial.println(".");
-  //gyro.read();
-  //gyro.print();
-
-  //if (controller.right_trigger > 10)
-    //escs.increaseOutputs( (controller.right_trigger - 10) / 6 );
-  //else if (controller.left_trigger > 10)
-    //escs.decreaseOutputs( (controller.left_trigger - 10) / 6 );
+  gyro.read();
+  alt.start();
 
   quad.computePIDs();
   quad.setESCs();
-  delay(100);
 }
 // }}}
