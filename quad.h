@@ -32,7 +32,6 @@ class Quad {
 
     void stabilize(void);
     void landNow(void);
-    void setAltitude(int);
 
     void preFlight(void);
 

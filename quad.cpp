@@ -33,18 +33,6 @@ void Quad::landNow(void) {
   }
 }
 
-void Quad::setAltitude(int altitude) {
-  // craft is below desired altitude
-  if (alt->distance < altitude) {
-    while (alt->distance < altitude)
-      escs->increaseOutputs();
-  } else {
-  // craft is above desired altitude
-    while (alt->distance > altitude)
-      escs->decreaseOutputs();
-  }
-}
-
 void Quad::preFlight(void) {
   debug("Running pre-flight setup");
   setAltitude(20);
