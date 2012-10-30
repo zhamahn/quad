@@ -30,13 +30,7 @@ class Quad {
     // functions
     Quad(void);
 
-    void stabilize(void);
-    void landNow(void);
-
-    void preFlight(void);
-
     void computePIDs(void);
-
     void setESCs(void);
 
   private:

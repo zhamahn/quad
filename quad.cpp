@@ -10,35 +10,6 @@ Quad::Quad(void) {
   rollPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
 }
 
-void Quad::stabilize(void) {
-  acc->read();
-  while (!acc->stable()) {
-    if (acc->y > STABILITY_THRESHOLD)      { escs->y->decrease(); escs->ny->increase(); }
-    else if (acc->y < STABILITY_THRESHOLD) { escs->y->increase(); escs->ny->decrease(); }
-
-    if (acc->x > STABILITY_THRESHOLD)      { escs->x->decrease(); escs->nx->increase(); }
-    else if (acc->x < STABILITY_THRESHOLD) { escs->x->increase(); escs->nx->decrease(); }
-
-    acc->read();
-  }
-}
-
-void Quad::landNow(void) {
-  stabilize();
-
-  // Halt all motors
-  while (! escs->allStopped()) {
-    escs->decrease();
-    delay(100);
-  }
-}
-
-void Quad::preFlight(void) {
-  debug("Running pre-flight setup");
-  setAltitude(20);
-  escs->setCorrections();
-}
-
 void Quad::computePIDs(void) {
   pitchInput = (double)(acc->pitch());
   rollInput = (double)(acc->roll());
