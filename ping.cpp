@@ -40,7 +40,3 @@ void Ping::print(void) {
   Serial.print(distance, DEC);
   Serial.println("");
 }
-
-void Ping::interrupt(void) {
-  measure();
-}
