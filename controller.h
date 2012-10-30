@@ -41,6 +41,7 @@ struct Controller {
 
   signed char roll(void);
   signed char pitch(void);
+  int altitude(int);
 
   signed char yawSpeed(void);
 

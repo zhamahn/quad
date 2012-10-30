@@ -69,6 +69,15 @@ signed char Controller::roll(void) {
   return map(right_stick_x, -128, 127, -90, 90);
 }
 
+int Controller::altitude(int currentAltitude) {
+  if (right_trigger > 20)
+    return (currentAltitude + right_trigger);
+  else if (left_trigger > 20)
+    return (currentAltitude - left_trigger);
+  else
+    return currentAltitude;
+}
+
 void Controller::resetIfOldData(void) {
   if ((lastUpdateAt + 5000) < millis())
     reset();

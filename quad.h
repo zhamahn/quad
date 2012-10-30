@@ -21,9 +21,11 @@ class Quad {
     // PID stuff
     PID *pitchPID;
     PID *rollPID;
+    PID *altitudePID;
 
     double pitchInput, pitchOutput, pitchSetpoint;
     double rollInput, rollOutput, rollSetpoint;
+    double altitudeInput, altitudeOutput, altitudeSetpoint;
 
     // functions
     Quad(void);

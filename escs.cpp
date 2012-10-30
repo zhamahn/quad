@@ -48,3 +48,10 @@ void ESCs::changeRoll(int amount) {
   y->change(amount * -1);
   ny->change(amount);
 }
+
+void ESCs::changeAltitude(int amount) {
+  x->change(amount);
+  nx->change(amount);
+  y->change(amount);
+  ny->change(amount);
+}

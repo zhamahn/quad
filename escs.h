@@ -18,5 +18,6 @@ struct ESCs {
 
   void changePitch(int);
   void changeRoll(int);
+  void changeAltitude(int);
 };
 #endif

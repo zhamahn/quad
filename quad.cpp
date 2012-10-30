@@ -52,17 +52,21 @@ void Quad::preFlight(void) {
 }
 
 void Quad::computePIDs(void) {
-  pitchSetpoint = (double)(controller->pitch());
-  rollSetpoint = (double)(controller->roll());
-
   pitchInput = (double)(acc->pitch());
   rollInput = (double)(acc->roll());
+  altitudeInput = (double)(alt->distance);
+
+  pitchSetpoint = (double)(controller->pitch());
+  rollSetpoint = (double)(controller->roll());
+  altitudeSetpoint = (double)(controller->altitude(alt->distance));
 
   pitchPID->Compute();
   rollPID->Compute();
+  altitudePID->Compute();
 }
 
 void Quad::setESCs(void) {
   escs->changePitch(pitchOutput);
   escs->changeRoll(rollOutput);
+  escs->changeAltitude(altitudeOutput);
 }
