@@ -9,12 +9,13 @@ struct ESCs {
   ESC *y;
   ESC *ny;
 
-  void writeOutputs(void);
-  void decreaseOutputs(int = ESC_STEP);
-  void increaseOutputs(int = ESC_STEP);
+  void write(void);
+  void write(int);
+  void decrease(int = ESC_STEP);
+  void increase(int = ESC_STEP);
   void setCorrections(void);
   bool allStopped(void);
-  double avgOutput(void);
+  double avg(void);
 
   void changePitch(int);
   void changeRoll(int);

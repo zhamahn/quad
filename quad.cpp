@@ -28,7 +28,7 @@ void Quad::landNow(void) {
 
   // Halt all motors
   while (! escs->allStopped()) {
-    escs->decreaseOutputs();
+    escs->decrease();
     delay(100);
   }
 }
