@@ -15,7 +15,7 @@ struct ESCs {
   void increase(int = ESC_STEP);
   void setCorrections(void);
   bool allStopped(void);
-  double avg(void);
+  double average(void);
 
   void changePitch(int);
   void changeRoll(int);

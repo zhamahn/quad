@@ -31,7 +31,7 @@ void ESCs::increase(int step) {
 }
 
 void ESCs::setCorrections(void) {
-  double avg = avg();
+  double avg = average();
   x->correction  = x->output  - avg;
   nx->correction = nx->output - avg;
   y->correction  = y->output  - avg;
@@ -42,7 +42,7 @@ bool ESCs::allStopped(void) {
   return (x->stopped() && nx->stopped() && y->stopped() && ny->stopped());
 }
 
-double ESCs::avg(void) {
+double ESCs::average(void) {
   return (x->output + nx->output + y->output + ny->output) / 4;
 }
 
