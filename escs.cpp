@@ -31,7 +31,7 @@ void ESCs::increase(int step) {
 }
 
 void ESCs::setCorrections(void) {
-  double avg = avgOutput();
+  double avg = avg();
   x->correction  = x->output  - avg;
   nx->correction = nx->output - avg;
   y->correction  = y->output  - avg;
