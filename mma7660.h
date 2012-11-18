@@ -2,8 +2,6 @@
 #define mma7660_h
 
 #include "helpers.h"
-#include "main.h"
-#include "itg3200.h"
 
 #define MMA7660addr   0x4c
 #define MMA7660_X     0x00
@@ -22,7 +20,6 @@ class MMA7660 {
   public:
     char x, y, z;
     float pitch, roll;
-    ITG3200 *gyro;
 
     void init(void);
     void read(void);
@@ -30,7 +27,5 @@ class MMA7660 {
 
   private:
     char x0, y0, z0;
-
-    int kalman(int, int, int);
 };
 #endif

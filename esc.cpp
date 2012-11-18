@@ -1,6 +1,7 @@
-#include "esc.h"
-#include "main.h"
 #include <Arduino.h>
+
+#include "esc.h"
+#include "quad.h"
 
 ESC::ESC(int _pin) {
   pin = _pin;

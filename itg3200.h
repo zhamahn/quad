@@ -1,6 +1,5 @@
 #ifndef itg3200_h
 #define itg3200_h
-#include "main.h"
 
 class ITG3200 {
   public:

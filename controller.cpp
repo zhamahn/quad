@@ -1,7 +1,8 @@
-#include "controller.h"
-#include "main.h"
 #include <Arduino.h>
 #include <HardwareSerial.h>
+
+#include "controller.h"
+#include "quad.h"
 
 void Controller::updateButtons(unsigned char data) {
   left_stick  = data & B10000000;

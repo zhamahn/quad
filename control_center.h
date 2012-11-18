@@ -1,5 +1,5 @@
-#ifndef quad_h
-#define quad_h
+#ifndef control_center_h
+#define control_center_h
 
 #include <PID_v1.h>
 

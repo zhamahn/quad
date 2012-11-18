@@ -1,5 +1,7 @@
-#include "helpers.h"
 #include <Wire.h>
+
+#include "helpers.h"
+
 void writeReg(byte dev, byte reg, byte val) {
   Wire.beginTransmission(dev);
   delay(100);

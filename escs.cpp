@@ -1,5 +1,6 @@
 #include <Arduino.h>
-#include "main.h"
+
+#include "quad.h"
 #include "escs.h"
 
 void ESCs::write(void) {

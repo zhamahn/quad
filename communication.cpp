@@ -1,5 +1,5 @@
 #include "communication.h"
-#include "main.h"
+#include "quad.h"
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 

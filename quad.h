@@ -1,6 +1,5 @@
-#ifndef main_h
-#define main_h
-#include <Arduino.h>
+#ifndef quad_h
+#define quad_h
 // {{{ Defines
 // Pin definitions
 #define LED 13
