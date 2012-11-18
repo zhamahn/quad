@@ -65,33 +65,33 @@ void MMA7660::print(void) {
   Serial.println("");
 }
 
-bool MMA7660::stable(void) {
-  return (stableX() && stableY());
-}
+//bool MMA7660::stable(void) {
+  //return (stableX() && stableY());
+//}
 
-bool MMA7660::stableX(void) {
-  return abs(x) > MMA7660_STABILITY_THRESHOLD;
-}
+//bool MMA7660::stableX(void) {
+  //return abs(x) > MMA7660_STABILITY_THRESHOLD;
+//}
 
-bool MMA7660::stableY(void) {
-  return abs(y) > MMA7660_STABILITY_THRESHOLD;
-}
+//bool MMA7660::stableY(void) {
+  //return abs(y) > MMA7660_STABILITY_THRESHOLD;
+//}
 
-bool MMA7660::ascending(void) {
-  return z > MMA7660_STABILITY_THRESHOLD;
-}
+//bool MMA7660::ascending(void) {
+  //return z > MMA7660_STABILITY_THRESHOLD;
+//}
 
-bool MMA7660::descending(void) {
-  return z < MMA7660_STABILITY_THRESHOLD;
-}
+//bool MMA7660::descending(void) {
+  //return z < MMA7660_STABILITY_THRESHOLD;
+//}
 
-signed char MMA7660::pitch(void) {
-  return map(y, -32, 31, -90, 90);
-}
+//signed char MMA7660::pitch(void) {
+  //return map(y, -32, 31, -90, 90);
+//}
 
-signed char MMA7660::roll(void) {
-  return DEG_TO_RAD(map(x, -32, 31, -90, 90));
-}
+//signed char MMA7660::roll(void) {
+  //return DEG_TO_RAD(map(x, -32, 31, -90, 90));
+//}
 
-int MMA7660::kalman(int angle, int rate, int looptime) {
-}
+//int MMA7660::kalman(int angle, int rate, int looptime) {
+//}

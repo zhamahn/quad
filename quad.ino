@@ -6,7 +6,7 @@
 #include "quad.h"
 #include "utils.h"
 #include "esc.h"
-#include "itg3200.h"
+#include "adxl345.h"
 #include "mma7660.h"
 #include "ping.h"
 #include "controller.h"
@@ -15,7 +15,7 @@
 #include "control_center.h"
 
 ITG3200 gyro;
-MMA7660 acc;
+ADXL345 acc;
 Ping alt(PING_PIN);
 ESC esc_x(ESC_X_PIN);
 ESC esc_nx(ESC_NX_PIN);

@@ -5,7 +5,7 @@
 
 #include "esc.h"
 #include "itg3200.h"
-#include "mma7660.h"
+#include "adxl345.h"
 #include "ping.h"
 #include "controller.h"
 #include "escs.h"
@@ -15,7 +15,7 @@ class ControlCenter {
     ESCs *escs;
     Controller *controller;
     ITG3200 *gyro;
-    MMA7660 *acc;
+    ADXL345 *acc;
     Ping *alt;
 
     // PID stuff
