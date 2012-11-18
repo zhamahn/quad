@@ -50,8 +50,8 @@ void setup() {
 
   Wire.begin();
 
-  acc.init();
-  gyro.init();
+  acc.begin();
+  gyro.begin();
 
   dcm.acc = &acc;
   dcm.gyro = &gyro;
@@ -76,8 +76,8 @@ void loop() {
       controller.updateFromDataArray(data);
   }
 
-  acc.read();
-  gyro.read();
+  acc.update();
+  gyro.update();
   alt.start();
 
   quad.computePIDs();

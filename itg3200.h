@@ -4,6 +4,7 @@
 class ITG3200 {
   public:
     int rawX, rawY, rawZ;
+    int smoothX, smoothY, smoothZ;
     float x, y, z;
     float correctedX, correctedY, correctedZ;
 
@@ -20,7 +21,6 @@ class ITG3200 {
     float smoothFactor;
 
     void read(void);
-    int smooth(int);
     float valueToRadians(int);
 };
 

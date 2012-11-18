@@ -21,7 +21,7 @@ void ITG3200::begin(void) {
 
 void ITG3200::read(void) {
   char i;
-  readReg(ITG3200addr, ITG3200_GX_H, 6);
+  readReg(ITG_ADDR, GYRO_XOUT_H, 6);
 
   if (Wire.available()) {
     for (i = 0; i < 6; i++) {
@@ -41,9 +41,12 @@ void ITG3200::update(void) {
   long int currentTime = micros();
   long int timeFactor = (currentTime - lastUpdate) / 1000000;
   read();
-  x = valueToRadians(rawX * timeFactor);
-  y = valueToRadians(rawY * timeFactor);
-  z = valueToRadians(rawZ * timeFactor);
+  smoothX = smooth(rawX, smoothX, smoothFactor);
+  smoothY = smooth(rawY, smoothY, smoothFactor);
+  smoothZ = smooth(rawZ, smoothZ, smoothFactor);
+  x = valueToRadians(smoothX * timeFactor);
+  y = valueToRadians(smoothY * timeFactor);
+  z = valueToRadians(smoothZ * timeFactor);
   lastUpdate = currentTime;
 }
 
