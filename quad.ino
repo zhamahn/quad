@@ -25,6 +25,7 @@ ESCs escs;
 Controller controller;
 ControlCenter quad;
 SoftwareSerial mySerial(PIN_SERIAL_RX, PIN_SERIAL_TX);
+DCM dcm;
 
 void pingInterrupt(void) {
   alt.measure();
@@ -52,7 +53,8 @@ void setup() {
   acc.init();
   gyro.init();
 
-  acc.gyro = &gyro;
+  dcm.acc = &acc;
+  dcm.gyro = &gyro;
 
   attachInterrupt(PING_INT, pingInterrupt, FALLING);
 

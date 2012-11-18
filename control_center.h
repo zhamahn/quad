@@ -9,6 +9,7 @@
 #include "ping.h"
 #include "controller.h"
 #include "escs.h"
+#include "dcm.h"
 
 class ControlCenter {
   public:
@@ -17,6 +18,7 @@ class ControlCenter {
     ITG3200 *gyro;
     ADXL345 *acc;
     Ping *alt;
+    DCM *dcm;
 
     // PID stuff
     PID *pitchPID;

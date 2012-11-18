@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <math.h>
 #include "dcm.h"
 
@@ -9,10 +10,11 @@ void DCM::begin(void) {
   exInt = eyInt = ezInt = 0.0;
   Kp = 0.2;
   Ki = 0.0005;
+  lastUpdate = micros();
 }
 
-void DCM::updateQuaternions(long int sampleTime) {
-  long int halfSampleTime = sampleTime/2;
+void DCM::updateQuaternions(void) {
+  long int halfSampleTime = (micros() - lastUpdate)/2;
 
   float norm;
   float vx, vy, vz;
@@ -76,6 +78,8 @@ void DCM::updateQuaternions(long int sampleTime) {
   q1 = q1 / norm;
   q2 = q2 / norm;
   q3 = q3 / norm;
+
+  lastUpdate = micros();
 }
 
 void DCM::updateEulerAngles(void) {
@@ -90,4 +94,12 @@ bool DCM::isSwitched(float previousError, float currentError) {
     return true;
   }
   return false;
+}
+
+float DCM::pitch(void) {
+  return x;
+}
+
+float DCM::roll(void) {
+  return y;
 }
