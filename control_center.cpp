@@ -1,8 +1,7 @@
 #include <Arduino.h>
-#include "quad.h"
-#include "main.h"
+#include "control_center.h"
 
-Quad::Quad(void) {
+ControlCenter::ControlCenter(void) {
   pitchPID = new PID(&pitchInput, &pitchOutput, &pitchSetpoint, KP, KI, KD, AUTOMATIC);
   rollPID = new PID(&rollInput, &rollOutput, &rollSetpoint, KP, KI, KD, AUTOMATIC);
   altitudePID = new PID(&altitudeInput, &altitudeOutput, &altitudeSetpoint, KP, KI, KD, AUTOMATIC);
@@ -12,7 +11,7 @@ Quad::Quad(void) {
   altitudePID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
 }
 
-void Quad::computePIDs(void) {
+void ControlCenter::computePIDs(void) {
   pitchInput = (double)(acc->pitch());
   rollInput = (double)(acc->roll());
   altitudeInput = (double)(alt->distance);
@@ -26,7 +25,7 @@ void Quad::computePIDs(void) {
   altitudePID->Compute();
 }
 
-void Quad::setESCs(void) {
+void ControlCenter::setESCs(void) {
   escs->changePitch(pitchOutput);
   escs->changeRoll(rollOutput);
   escs->changeAltitude(altitudeOutput);

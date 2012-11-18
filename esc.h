@@ -1,6 +1,5 @@
 #ifndef esc_h
 #define esc_h
-#include <PID_v1/PID_v1.h>
 #define ESC_STEP 4
 
 class ESC {

@@ -1,7 +1,7 @@
 #ifndef quad_h
 #define quad_h
 
-#include <PID_v1/PID_v1.h>
+#include <PID_v1.h>
 
 #include "esc.h"
 #include "itg3200.h"
@@ -10,7 +10,7 @@
 #include "controller.h"
 #include "escs.h"
 
-class Quad {
+class ControlCenter {
   public:
     ESCs *escs;
     Controller *controller;
@@ -28,7 +28,7 @@ class Quad {
     double altitudeInput, altitudeOutput, altitudeSetpoint;
 
     // functions
-    Quad(void);
+    ControlCenter(void);
 
     void computePIDs(void);
     void setESCs(void);

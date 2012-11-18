@@ -1,8 +1,7 @@
 #include <Arduino.h>
-#include <Wire/Wire.h>
+#include <Wire.h>
 #include "mma7660.h"
 #include "helpers.h"
-// {{{ Functions
 void MMA7660::init(void) {
   debug("Initializing accelerometer.");
 

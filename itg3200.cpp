@@ -1,6 +1,6 @@
 #include "itg3200.h"
 #include <Arduino.h>
-#include <Wire/Wire.h>
+#include <Wire.h>
 #include "helpers.h"
 void ITG3200::init(void) {
   debug("Initializing gyroscope.");
