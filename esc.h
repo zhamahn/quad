@@ -5,21 +5,20 @@
 
 class ESC {
   public:
+    int correction;
+    int pin;
+    int output;
 
-  int correction;
-  int pin;
-  int output;
+    ESC(int);
 
-  ESC(int);
-
-  int write(void);
-  int write(int);
-  int increase(void);
-  int increase(int);
-  int decrease(void);
-  int decrease(int);
-  bool stopped(void);
-  int change(int);
+    int write(void);
+    int write(int);
+    int increase(void);
+    int increase(int);
+    int decrease(void);
+    int decrease(int);
+    bool stopped(void);
+    int change(int);
 };
 
 #endif

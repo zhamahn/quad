@@ -3,6 +3,7 @@
 
 #include "helpers.h"
 #include "main.h"
+#include "itg3200.h"
 
 #define MMA7660addr   0x4c
 #define MMA7660_X     0x00
@@ -19,19 +20,17 @@
 
 class MMA7660 {
   public:
-  char x, y, z;
-  char dx, dy, dz;
+    char x, y, z;
+    float pitch, roll;
+    ITG3200 *gyro;
 
-  void init(void);
-  void read(void);
-  void print(void);
-  bool stable(void);
-  bool stableY(void);
-  bool stableX(void);
-  bool ascending(void);
-  bool descending(void);
+    void init(void);
+    void read(void);
+    void print(void);
 
-  signed char pitch(void);
-  signed char roll(void);
+  private:
+    char x0, y0, z0;
+
+    int kalman(int, int, int);
 };
 #endif

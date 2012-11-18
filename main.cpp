@@ -68,6 +68,8 @@ void setup() {
   acc.init();
   gyro.init();
 
+  acc.gyro = &gyro;
+
   attachInterrupt(PING_INT, pingInterrupt, FALLING);
 
   pinMode(ESC_X_PIN, OUTPUT);
