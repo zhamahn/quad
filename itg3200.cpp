@@ -3,7 +3,7 @@
 #include <math.h>
 
 #include "itg3200.h"
-#include "helpers.h"
+#include "utils.h"
 
 void ITG3200::begin(void) {
   //Set internal clock to 1kHz with 42Hz LPF and Full Scale to 3 for proper operation

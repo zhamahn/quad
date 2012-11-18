@@ -1,8 +1,6 @@
 #ifndef mma7660_h
 #define mma7660_h
 
-#include "helpers.h"
-
 #define MMA7660addr   0x4c
 #define MMA7660_X     0x00
 #define MMA7660_Y     0x01

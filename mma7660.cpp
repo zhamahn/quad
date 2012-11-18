@@ -3,7 +3,7 @@
 #include <math.h>
 
 #include "mma7660.h"
-#include "helpers.h"
+#include "utils.h"
 
 void MMA7660::init(void) {
   debug("Initializing accelerometer.");

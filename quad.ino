@@ -3,7 +3,8 @@
 #include <SoftwareSerial.h>
 #include <PID_v1.h>
 
-#include "helpers.h"
+#include "quad.h"
+#include "utils.h"
 #include "esc.h"
 #include "itg3200.h"
 #include "mma7660.h"
