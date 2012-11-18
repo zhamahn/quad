@@ -1,18 +1,22 @@
-#include "itg3200.h"
 #include <Arduino.h>
 #include <Wire.h>
-#include "helpers.h"
-void ITG3200::init(void) {
-  debug("Initializing gyroscope.");
+#include <math.h>
 
-  debug("--> reset.");
-  writeReg(ITG3200addr, ITG3200_PWR_M, 0x80);
- 
-  debug("--> set sample rate divider.");
-  writeReg(ITG3200addr, ITG3200_SMPL, 0x00);
- 
-  debug("--> set measurement accuracy.");
-  writeReg(ITG3200addr, ITG3200_DLPF, 0x18);
+#include "itg3200.h"
+#include "helpers.h"
+
+void ITG3200::begin(void) {
+  //Set internal clock to 1kHz with 42Hz LPF and Full Scale to 3 for proper operation
+  writeReg(ITG_ADDR, DLPF_FS, DLPF_FS_SEL_0|DLPF_FS_SEL_1|DLPF_CFG_0);
+
+  //Set sample rate divider for 100 Hz operation
+  writeReg(ITG_ADDR, SMPLRT_DIV, 9);	//Fsample = Fint / (divider + 1) where Fint is 1kHz
+
+  //Select X gyro PLL for clock source
+  writeReg(ITG_ADDR, PWR_MGM, PWR_MGM_CLK_SEL_0);
+
+  lastUpdate = micros();
+  smoothFactor = radians(1.0 / 14.374); // ITG3200 14.375 LSBs per °/sec
 }
 
 void ITG3200::read(void) {
@@ -22,15 +26,29 @@ void ITG3200::read(void) {
   if (Wire.available()) {
     for (i = 0; i < 6; i++) {
       switch (i) {
-        case 0: x  = Wire.read()<<8; break;
-        case 1: x |= Wire.read();    break;
-        case 2: y  = Wire.read()<<8; break;
-        case 3: y |= Wire.read();    break;
-        case 4: z  = Wire.read()<<8; break;
-        case 5: z |= Wire.read();    break;
+        case 0: rawX  = Wire.read()<<8; break;
+        case 1: rawX |= Wire.read();    break;
+        case 2: rawY  = Wire.read()<<8; break;
+        case 3: rawY |= Wire.read();    break;
+        case 4: rawZ  = Wire.read()<<8; break;
+        case 5: rawZ |= Wire.read();    break;
       }
     }
   }
+}
+
+void ITG3200::update(void) {
+  long int currentTime = micros();
+  long int timeFactor = (currentTime - lastUpdate) / 1000000;
+  read();
+  x = valueToRadians(rawX * timeFactor);
+  y = valueToRadians(rawY * timeFactor);
+  z = valueToRadians(rawZ * timeFactor);
+  lastUpdate = currentTime;
+}
+
+float ITG3200::valueToRadians(int value) {
+  return radians((float)value/14.375);
 }
 
 void ITG3200::print(void) {
@@ -41,22 +59,6 @@ void ITG3200::print(void) {
   Serial.println("");
 }
 
-bool ITG3200::stable(void) {
-  return (stableX() && stableY() && stableZ());
-}
-
-bool ITG3200::stableX(void) {
-  return abs(x) > ITG3200_STABILITY_THRESHOLD;
-}
-
-bool ITG3200::stableY(void) {
-  return abs(y) > ITG3200_STABILITY_THRESHOLD;
-}
-
-bool ITG3200::stableZ(void) {
-  return abs(z) > ITG3200_STABILITY_THRESHOLD;
-}
-
-int ITG3200::pitch(void) { return y; }
-int ITG3200::roll(void) { return x; }
-int ITG3200::yaw(void) { return z; }
+float ITG3200::pitch(void) { return x; }
+float ITG3200::roll(void) { return y; }
+float ITG3200::yaw(void) { return z; }

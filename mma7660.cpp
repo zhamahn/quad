@@ -1,7 +1,10 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <math.h>
+
 #include "mma7660.h"
 #include "helpers.h"
+
 void MMA7660::init(void) {
   debug("Initializing accelerometer.");
 
@@ -43,9 +46,9 @@ void MMA7660::read(void) {
       data = ((char)(val<<2))/4;
 
       switch (i) {
-        case 0: dx = data - x; x = data; break;
-        case 1: dy = data - y; y = data; break;
-        case 2: dz = data - z; z = data; break;
+        case 0: x = data; break;
+        case 1: y = data; break;
+        case 2: z = data; break;
       };
     }
   }
@@ -87,5 +90,8 @@ signed char MMA7660::pitch(void) {
 }
 
 signed char MMA7660::roll(void) {
-  return map(x, -32, 31, -90, 90);
+  return DEG_TO_RAD(map(x, -32, 31, -90, 90));
+}
+
+int MMA7660::kalman(int angle, int rate, int looptime) {
 }
