@@ -8,7 +8,9 @@ class ADXL345 {
     float x, y, z;
 
     void begin(void);
+#ifdef DEBUG
     void print(void);
+#endif
     void update(void);
 
     float pitch(void);

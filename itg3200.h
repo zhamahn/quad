@@ -10,7 +10,9 @@ class ITG3200 {
 
     void begin(void);
     void update(void);
+#ifdef DEBUG
     void print(void);
+#endif
 
     float pitch(void);
     float roll(void);

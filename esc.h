@@ -2,21 +2,18 @@
 #define esc_h
 #define ESC_STEP 4
 
+#include "quad.h"
+
 class ESC {
   public:
+    unsigned char pin;
     int gain;
-    int pin;
     int output;
 
-    ESC(int);
+    ESC(unsigned char);
 
     int write(void);
-    int write(int);
-    int increase(void);
-    int increase(int);
-    int decrease(void);
-    int decrease(int);
-    bool stopped(void);
+    int set(int);
     int change(int);
 };
 

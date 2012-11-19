@@ -10,25 +10,11 @@ void ESCs::write(void) {
   ny->write();
 }
 
-void ESCs::write(int value) {
-  x->write(value);
-  nx->write(value);
-  y->write(value);
-  ny->write(value);
-}
-
-void ESCs::decrease(int step) {
-  x->decrease(step);
-  nx->decrease(step);
-  y->decrease(step);
-  ny->decrease(step);
-}
-
-void ESCs::increase(int step) {
-  x->increase(step);
-  nx->increase(step);
-  y->increase(step);
-  ny->increase(step);
+void ESCs::set(int value) {
+  x->set(value);
+  nx->set(value);
+  y->set(value);
+  ny->set(value);
 }
 
 void ESCs::setGains(void) {
@@ -37,10 +23,6 @@ void ESCs::setGains(void) {
   nx->gain = nx->output - avg;
   y->gain  = y->output  - avg;
   ny->gain = ny->output - avg;
-}
-
-bool ESCs::allStopped(void) {
-  return (x->stopped() && nx->stopped() && y->stopped() && ny->stopped());
 }
 
 double ESCs::average(void) {

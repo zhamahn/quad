@@ -54,6 +54,7 @@ float ITG3200::valueToRadians(int value) {
   return radians((float)value/14.375);
 }
 
+#ifdef DEBUG
 void ITG3200::print(void) {
   Serial.print("Rotation: ");
   Serial.print("X: "); Serial.print(x, DEC);
@@ -61,6 +62,7 @@ void ITG3200::print(void) {
   Serial.print(", Z: "); Serial.print(z, DEC);
   Serial.println("");
 }
+#endif
 
 float ITG3200::pitch(void) { return x; }
 float ITG3200::roll(void) { return y; }

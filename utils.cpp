@@ -20,12 +20,6 @@ void readReg(int dev, int reg, int count) {
   Wire.requestFrom(dev, count);
 }
 
-void debug(const char *msg) {
-  #ifdef DEBUG
-    Serial.println(msg);
-  #endif
-}
-
 int smooth(int rawData, int smoothedData, float factor) {
   if (factor > 1){      // check to make sure param's are within range
     factor = .99;

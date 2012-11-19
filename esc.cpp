@@ -3,7 +3,7 @@
 #include "esc.h"
 #include "quad.h"
 
-ESC::ESC(int _pin) {
+ESC::ESC(unsigned char _pin) {
   pin = _pin;
   gain = 0;
 }
@@ -13,33 +13,11 @@ int ESC::write(void) {
   return output;
 }
 
-int ESC::write(int _output) {
-  if (_output < OUTPUT_MIN)
-    output = OUTPUT_MIN;
-  else if (_output > OUTPUT_MAX)
-    output = OUTPUT_MAX;
-  else
-    output = _output;
-
-  write();
-  return output;
+int ESC::set(int value) {
+  output = constrain(value, OUTPUT_MIN, OUTPUT_MAX);
+  return write();
 }
 
-int ESC::increase(void) {
-  return increase(ESC_STEP);
-}
-int ESC::increase(int step) {
-  return write(output + step);
-}
-int ESC::decrease(void) {
-  return decrease(ESC_STEP);
-}
-int ESC::decrease(int step = ESC_STEP) {
-  return change(output - step);
-}
-bool ESC::stopped(void) {
-  return (output <= OUTPUT_MIN);
-}
 int ESC::change(int amount) {
-  write(output + amount);
+  return set(output + amount);
 }

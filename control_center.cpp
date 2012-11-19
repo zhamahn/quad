@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <PID_v1.h>
+
 #include "control_center.h"
 #include "quad.h"
 

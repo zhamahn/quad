@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "ping.h"
 
-Ping::Ping(int _pin) {
+Ping::Ping(unsigned char _pin) {
   pin = _pin;
   started_at = 0;
 }
@@ -35,8 +35,10 @@ void Ping::measure(void) {
     distance = PING_MAX_RANGE+1;
 }
 
+#ifdef DEBUG
 void Ping::print(void) {
   Serial.print("Altitude: ");
   Serial.print(distance, DEC);
   Serial.println("");
 }
+#endif

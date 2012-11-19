@@ -3,15 +3,17 @@
 #define PING_MAX_RANGE 400
 class Ping {
   public:
-  volatile int distance;
-  int pin;
+    volatile int distance;
+    unsigned char pin;
 
-  Ping(int);
-  void start(void);
-  void measure(void);
-  void print(void);
+    Ping(unsigned char);
+    void start(void);
+    void measure(void);
+#ifdef DEBUG
+    void print(void);
+#endif
   
   private:
-  volatile unsigned long started_at;
+    volatile unsigned long started_at;
 };
 #endif

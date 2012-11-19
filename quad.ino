@@ -31,7 +31,6 @@ void pingInterrupt(void) {
 }
 
 void setup() {
-  debug("Starting setup");
   Serial.begin(9600);
   mySerial.begin(9600);
 
@@ -63,9 +62,7 @@ void setup() {
   pinMode(ESC_NY_PIN, OUTPUT);
 
   // Set all motor speeds to ESC min
-  escs.write(OUTPUT_MIN);
-
-  debug("Entering main loop");
+  escs.set(OUTPUT_MIN);
 }
 
 void loop() {

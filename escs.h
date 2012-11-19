@@ -3,22 +3,24 @@
 
 #include "esc.h"
 
-struct ESCs {
-  ESC *x;
-  ESC *nx;
-  ESC *y;
-  ESC *ny;
+#include "quad.h"
 
-  void write(void);
-  void write(int);
-  void decrease(int = ESC_STEP);
-  void increase(int = ESC_STEP);
-  void setGains(void);
-  bool allStopped(void);
-  double average(void);
+class ESCs {
+  public:
+    ESC *x;
+    ESC *nx;
+    ESC *y;
+    ESC *ny;
 
-  void changePitch(int);
-  void changeRoll(int);
-  void changeAltitude(int);
+    void write(void);
+    void set(int);
+    void setGains(void);
+
+    void changePitch(int);
+    void changeRoll(int);
+    void changeAltitude(int);
+
+  private:
+    double average(void);
 };
 #endif
