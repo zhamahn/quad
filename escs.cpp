@@ -31,12 +31,12 @@ void ESCs::increase(int step) {
   ny->increase(step);
 }
 
-void ESCs::setCorrections(void) {
+void ESCs::setGains(void) {
   double avg = average();
-  x->correction  = x->output  - avg;
-  nx->correction = nx->output - avg;
-  y->correction  = y->output  - avg;
-  ny->correction = ny->output - avg;
+  x->gain  = x->output  - avg;
+  nx->gain = nx->output - avg;
+  y->gain  = y->output  - avg;
+  ny->gain = ny->output - avg;
 }
 
 bool ESCs::allStopped(void) {

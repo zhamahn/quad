@@ -5,11 +5,11 @@
 
 ESC::ESC(int _pin) {
   pin = _pin;
-  correction = 0;
+  gain = 0;
 }
 
 int ESC::write(void) {
-  analogWrite(pin, output + correction);
+  analogWrite(pin, output + gain);
   return output;
 }
 

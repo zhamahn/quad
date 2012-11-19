@@ -4,7 +4,7 @@
 
 class ESC {
   public:
-    int correction;
+    int gain;
     int pin;
     int output;
 

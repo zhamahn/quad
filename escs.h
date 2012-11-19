@@ -13,7 +13,7 @@ struct ESCs {
   void write(int);
   void decrease(int = ESC_STEP);
   void increase(int = ESC_STEP);
-  void setCorrections(void);
+  void setGains(void);
   bool allStopped(void);
   double average(void);
 
