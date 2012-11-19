@@ -34,12 +34,12 @@ void ADXL345::read(void) {
 
 void ADXL345::update(void) {
   read();
-  smoothX = smooth(rawX, x, smoothFactor);
-  smoothY = smooth(rawY, y, smoothFactor);
-  smoothZ = smooth(rawZ, z, smoothFactor);
-  x = valueToG(smoothX);
-  y = valueToG(smoothY);
-  z = valueToG(smoothZ);
+  x = smooth(rawX, x, smoothFactor);
+  y = smooth(rawY, y, smoothFactor);
+  z = smooth(rawZ, z, smoothFactor);
+  Gx = valueToG(x);
+  Gy = valueToG(y);
+  Gz = valueToG(z);
 }
 
 float ADXL345::valueToG(int value) {

@@ -4,8 +4,8 @@
 class ADXL345 {
   public:
     int rawX, rawY, rawZ;
-    int smoothX, smoothY, smoothZ;
-    float x, y, z;
+    int x, y, z;
+    float Gx, Gy, Gz;
 
     void begin(void);
 #ifdef DEBUG
