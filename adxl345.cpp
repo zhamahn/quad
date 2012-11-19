@@ -11,8 +11,7 @@ void ADXL345::begin(void) {
   //Set the Range to +/- 4G
   writeReg(ADXL_ADDR, DATA_FORMAT, RANGE_0);
 
-  //default ADXL345 rate is 100 Hz. Perfect!
-  smoothFactor = 0.1;
+  smoothFactor = 0.4;
 }
 
 void ADXL345::read(void) {
@@ -35,7 +34,15 @@ void ADXL345::read(void) {
 
 void ADXL345::update(void) {
   read();
-  x = smooth(rawX, x, smoothFactor);
-  y = smooth(rawY, y, smoothFactor);
-  z = smooth(rawZ, z, smoothFactor);
+  smoothX = smooth(rawX, x, smoothFactor);
+  smoothY = smooth(rawY, y, smoothFactor);
+  smoothZ = smooth(rawZ, z, smoothFactor);
+  x = valueToG(smoothX);
+  y = valueToG(smoothY);
+  z = valueToG(smoothZ);
+}
+
+float ADXL345::valueToG(int value) {
+  // 4G == 0.0078
+  return (float)value*0.0078;
 }

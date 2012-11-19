@@ -4,7 +4,8 @@
 class ADXL345 {
   public:
     int rawX, rawY, rawZ;
-    int x, y, z;
+    int smoothX, smoothY, smoothZ;
+    float x, y, z;
 
     void begin(void);
     void print(void);
@@ -14,6 +15,7 @@ class ADXL345 {
     float roll(void);
   private:
     void read(void);
+    float valueToG(int);
 
     float smoothFactor;
 };
