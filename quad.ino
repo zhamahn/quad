@@ -7,7 +7,6 @@
 #include "utils.h"
 #include "esc.h"
 #include "adxl345.h"
-#include "mma7660.h"
 #include "ping.h"
 #include "controller.h"
 #include "communication.h"
