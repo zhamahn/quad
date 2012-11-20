@@ -1,1 +1,4 @@
 Code for my Arduino based quadrotor.
+
+Resources:
+http://www.uavdesign.net/adaptive-a-distributed-control/quaternion-based-quadrotor-control
