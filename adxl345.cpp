@@ -55,4 +55,15 @@ void ADXL345::print(void) {
   Serial.print(", Z: "); Serial.print(z, DEC);
   Serial.println("");
 }
+void ADXL345::printForGraph(void) {
+  Serial.print(rawX, DEC); Serial.print(";");
+  Serial.print(rawY, DEC); Serial.print(";");
+  Serial.print(rawZ, DEC); Serial.print(";");
+  Serial.print(x, DEC); Serial.print(";");
+  Serial.print(y, DEC); Serial.print(";");
+  Serial.print(z, DEC); Serial.print(";");
+  Serial.print(Gx, DEC); Serial.print(";");
+  Serial.print(Gy, DEC); Serial.print(";");
+  Serial.print(Gz, DEC);
+}
 #endif

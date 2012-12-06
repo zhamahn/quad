@@ -10,6 +10,7 @@ class ADXL345 {
     void begin(void);
 #ifdef DEBUG
     void print(void);
+    void printForGraph(void);
 #endif
     void update(void);
 

@@ -12,6 +12,7 @@ class ITG3200 {
     void update(void);
 #ifdef DEBUG
     void print(void);
+    void printForGraph(void);
 #endif
 
     float pitch(void);

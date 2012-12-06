@@ -62,6 +62,17 @@ void ITG3200::print(void) {
   Serial.print(", Z: "); Serial.print(z, DEC);
   Serial.println("");
 }
+void ITG3200::printForGraph(void) {
+  Serial.print(rawX, DEC); Serial.print(";");
+  Serial.print(rawY, DEC); Serial.print(";");
+  Serial.print(rawZ, DEC); Serial.print(";");
+  Serial.print(smoothX, DEC); Serial.print(";");
+  Serial.print(smoothY, DEC); Serial.print(";");
+  Serial.print(smoothZ, DEC); Serial.print(";");
+  Serial.print(x, DEC); Serial.print(";");
+  Serial.print(y, DEC); Serial.print(";");
+  Serial.print(z, DEC);
+}
 #endif
 
 float ITG3200::pitch(void) { return x; }

@@ -103,3 +103,26 @@ float DCM::pitch(void) {
 float DCM::roll(void) {
   return y;
 }
+
+void DCM::print(void) {
+  Serial.print("Quaternions: ");
+  Serial.print("q0: "); Serial.print(q0, DEC);
+  Serial.print(", q1: "); Serial.print(q1, DEC);
+  Serial.print(", q2: "); Serial.print(q2, DEC);
+  Serial.print(", q3: "); Serial.print(q3, DEC);
+  Serial.print("Euler angles: ");
+  Serial.print("x: "); Serial.print(x, DEC);
+  Serial.print("y: "); Serial.print(y, DEC);
+  Serial.print("z: "); Serial.print(z, DEC);
+  Serial.println("");
+}
+
+void DCM::printForGraph(void) {
+  Serial.print(q0, DEC); Serial.print(";");
+  Serial.print(q1, DEC); Serial.print(";");
+  Serial.print(q2, DEC); Serial.print(";");
+  Serial.print(q3, DEC); Serial.print(";");
+  Serial.print(x, DEC); Serial.print(";");
+  Serial.print(y, DEC); Serial.print(";");
+  Serial.print(z, DEC);
+}

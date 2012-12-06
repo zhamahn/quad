@@ -18,6 +18,10 @@ class DCM {
 
     float pitch(void);
     float roll(void);
+#ifdef DEBUG
+    void print(void);
+    void printForGraph(void);
+#endif
 
   private:
     float Kp; // Proportional gin governs rate of convergence to accelerometer/magnetometer
