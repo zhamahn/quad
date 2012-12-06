@@ -19,6 +19,7 @@ import numpy as np
 import pylab
 #Data comes from here
 from Arduino_Monitor import SerialData as DataGen
+import pprint
 
 
 class BoundControlBox(wx.Panel):
@@ -78,7 +79,6 @@ class GraphFrame(wx.Frame):
         wx.Frame.__init__(self, None, -1, self.title)
         
         self.datagen = DataGen()
-        self.data = [self.datagen.next()]
         self.paused = False
         
         self.create_menu()
@@ -88,6 +88,41 @@ class GraphFrame(wx.Frame):
         self.redraw_timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.on_redraw_timer, self.redraw_timer)
         self.redraw_timer.Start(REFRESH_INTERVAL_MS)
+
+        self.data_names = [
+            'acc_raw_x',
+            'acc_raw_y',
+            'acc_raw_z',
+            'acc_x',
+            'acc_y',
+            'acc_z',
+            'acc_gx',
+            'acc_gy',
+            'acc_gz',
+
+            'gyro_raw_x',
+            'gyro_raw_y',
+            'gyro_raw_z',
+            'gyro_smooth_x',
+            'gyro_smooth_y',
+            'gyro_smooth_z',
+            'gyro_x',
+            'gyro_y',
+            'gyro_z',
+
+            'dcm_q0',
+            'dcm_q1',
+            'dcm_q2',
+            'dcm_q3',
+            'dcm_x',
+            'dcm_y',
+            'dcm_z',
+        ]
+
+        self.data = {}
+
+        for data_name in self.data_names:
+            self.data[data_name] = [0.0]
 
     def create_menu(self):
         self.menubar = wx.MenuBar()
@@ -169,7 +204,8 @@ class GraphFrame(wx.Frame):
         # to the plotted line series
         #
         self.plot_data = self.axes.plot(
-            self.data,
+            #self.data,
+            [1],
             linewidth=1,
             color=(1, 1, 0),
             )[0]
@@ -182,7 +218,7 @@ class GraphFrame(wx.Frame):
         # xmax.
         #
         if self.xmax_control.is_auto():
-            xmax = len(self.data) if len(self.data) > 50 else 50
+            xmax = len(self.data['acc_x']) if len(self.data['acc_x']) > 50 else 50
         else:
             xmax = int(self.xmax_control.manual_value())
             
@@ -199,12 +235,12 @@ class GraphFrame(wx.Frame):
         # the whole data set.
         #
         if self.ymin_control.is_auto():
-            ymin = round(min(self.data), 0) - 1
+            ymin = round(min(self.data['acc_x']), 0) - 1
         else:
             ymin = int(self.ymin_control.manual_value())
         
         if self.ymax_control.is_auto():
-            ymax = round(max(self.data), 0) + 1
+            ymax = round(max(self.data['acc_x']), 0) + 1
         else:
             ymax = int(self.ymax_control.manual_value())
 
@@ -227,9 +263,11 @@ class GraphFrame(wx.Frame):
         #
         pylab.setp(self.axes.get_xticklabels(),
             visible=self.cb_xlab.IsChecked())
-        
-        self.plot_data.set_xdata(np.arange(len(self.data)))
-        self.plot_data.set_ydata(np.array(self.data))
+
+        #self.plot_data.set_xdata(np.arange(len(self.data)))
+        #self.plot_data.set_ydata(np.array(self.data))
+        self.plot_data.set_xdata(np.arange(len(self.data['acc_x'])))
+        self.plot_data.set_ydata(np.array(self.data['acc_x']))
         
         self.canvas.draw()
     
@@ -267,7 +305,7 @@ class GraphFrame(wx.Frame):
         # (to respond to scale modifications, grid change, etc.)
         #
         if not self.paused:
-            self.data.append(self.datagen.next())
+            self.update_data(self.datagen.next())
         
         self.draw_plot()
     
@@ -286,6 +324,9 @@ class GraphFrame(wx.Frame):
     def on_flash_status_off(self, event):
         self.statusbar.SetStatusText('')
 
+    def update_data(self, data_dict):
+        for key in data_dict.keys():
+            self.data[key].append(data_dict[key])
 
 if __name__ == '__main__':
     app = wx.PySimpleApp()
