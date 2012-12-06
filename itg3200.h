@@ -22,6 +22,7 @@ class ITG3200 {
   private:
     long int lastUpdate;
     float smoothFactor;
+    float scaleFactor;
 
     void read(void);
     float valueToRadians(int);

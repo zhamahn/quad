@@ -16,7 +16,8 @@ void ITG3200::begin(void) {
   writeReg(ITG_ADDR, PWR_MGM, PWR_MGM_CLK_SEL_0);
 
   lastUpdate = micros();
-  smoothFactor = radians(1.0 / 14.374); // ITG3200 14.375 LSBs per °/sec
+  scaleFactor = radians(1.0 / 14.374); // ITG3200 14.375 LSBs per °/sec
+  smoothFactor = 0.1;
 }
 
 void ITG3200::read(void) {
@@ -39,7 +40,7 @@ void ITG3200::read(void) {
 
 void ITG3200::update(void) {
   long int currentTime = micros();
-  long int timeFactor = (currentTime - lastUpdate) / 1000000;
+  float timeFactor = (currentTime - lastUpdate) / 1000000.0;
   read();
   smoothX = smooth(rawX, smoothX, smoothFactor);
   smoothY = smooth(rawY, smoothY, smoothFactor);
@@ -51,7 +52,7 @@ void ITG3200::update(void) {
 }
 
 float ITG3200::valueToRadians(int value) {
-  return radians((float)value/14.375);
+  return value * scaleFactor;
 }
 
 #ifdef DEBUG
