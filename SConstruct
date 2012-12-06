@@ -99,6 +99,7 @@ ARDUINO_BOARD   = resolve_var('ARDUINO_BOARD', 'atmega328')
 ARDUINO_VER     = resolve_var('ARDUINO_VER', 0) # Default to 0 if nothing is specified
 RST_TRIGGER     = resolve_var('RST_TRIGGER', None) # use built-in pulseDTR() by default
 EXTRA_LIB       = resolve_var('EXTRA_LIB', None) # handy for adding another arduino-lib dir
+DEBUG            = resolve_var('DEBUG', '')
 
 pprint(VARTAB, indent = 4)
 
@@ -198,6 +199,10 @@ hwVariant = path.join(ARDUINO_HOME, 'hardware/arduino/variants',
                      getBoardConf("build.variant", ""))
 if hwVariant:
     envArduino.Append(CPPPATH = hwVariant)
+
+if DEBUG:
+    envArduino.Append(CPPDEFINES={'DEBUG' : '1'})
+    envArduino.Append(CDEFINES={'DEBUG' : '1'})
 
 def run(cmd):
     """Run a command and decipher the return code. Exit by default."""

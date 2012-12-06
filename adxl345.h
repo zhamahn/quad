@@ -22,7 +22,7 @@ class ADXL345 {
     float smoothFactor;
 };
 
-#define ADXL_ADDR 0xA6
+#define ADXL_ADDR 0x53
 
 //ADXL Register Map
 #define DEVID 0x00 //Device ID Register
