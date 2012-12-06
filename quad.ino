@@ -45,6 +45,7 @@ void setup() {
   quad.gyro       = &gyro;
   quad.acc        = &acc;
   quad.alt        = &alt;
+  quad.dcm        = &dcm;
 
   Wire.begin();
 
