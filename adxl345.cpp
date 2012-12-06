@@ -46,3 +46,13 @@ float ADXL345::valueToG(int value) {
   // 4G == 0.0078
   return (float)value*0.0078;
 }
+
+#ifdef DEBUG
+void ADXL345::print(void) {
+  Serial.print("Acc: ");
+  Serial.print("X: "); Serial.print(x, DEC);
+  Serial.print(", Y: "); Serial.print(y, DEC);
+  Serial.print(", Z: "); Serial.print(z, DEC);
+  Serial.println("");
+}
+#endif
