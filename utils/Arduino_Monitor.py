@@ -131,5 +131,5 @@ class SerialData(object):
 if __name__=='__main__':
     s = SerialData()
     for i in range(500):
-        time.sleep(.015)
+        #time.sleep(.015)
         print s.next()

@@ -4,7 +4,7 @@ import random
 import sys
 import wx
 
-REFRESH_INTERVAL_MS = 90
+REFRESH_INTERVAL_MS = 60
 
 # The recommended way to use wx with mpl is with the WXAgg
 # backend.
@@ -140,7 +140,7 @@ class GraphFrame(wx.Frame):
     def create_main_panel(self):
         self.panel = wx.Panel(self)
 
-        self.init_plot()
+        self.init_plots()
         self.canvas = FigCanvas(self.panel, -1, self.fig)
 
         self.xmin_control = BoundControlBox(self.panel, -1, "X min", 0)
@@ -189,86 +189,118 @@ class GraphFrame(wx.Frame):
     def create_status_bar(self):
         self.statusbar = self.CreateStatusBar()
 
-    def init_plot(self):
+    def init_acc_plot(self):
+        self.acc_ax = self.fig.add_subplot(311)
+        self.acc_ax.set_title('Acceleration data')
+        pylab.setp(self.acc_ax.get_xticklabels(), fontsize=8)
+        pylab.setp(self.acc_ax.get_yticklabels(), fontsize=8)
+        self.acc_data = self.acc_ax.plot(
+            [0],[0], [0],[0], [0],[0]
+            )
+
+    def init_gyro_plot(self):
+        self.gyro_ax = self.fig.add_subplot(311)
+        self.gyro_ax.set_title('Gyroscope data')
+        pylab.setp(self.gyro_ax.get_xticklabels(), fontsize=8)
+        pylab.setp(self.gyro_ax.get_yticklabels(), fontsize=8)
+        self.gyro_data = self.gyro_ax.plot(
+            [0],[0], [0],[0], [0],[0]
+            )
+
+    def init_dcm_plot(self):
+        self.dcm_ax = self.fig.add_subplot(411)
+        self.dcm_ax.set_title('DCM filter data')
+        pylab.setp(self.dcm_ax.get_xticklabels(), fontsize=8)
+        pylab.setp(self.dcm_ax.get_yticklabels(), fontsize=8)
+        self.dcm_data = self.dcm_ax.plot(
+            [0],[0], [0],[0], [0],[0], [0],[0]
+            )
+
+    def plot_xmax(self, values):
+        #if self.xmax_control.is_auto():
+            #xmax = len(self.data['acc_x']) if len(self.data['acc_x']) > 50 else 50
+        #else:
+            #xmax = int(self.xmax_control.manual_value())
+
+        if (len(values) > 50):
+            return len(values)
+        else:
+            return 50
+
+    def plot_xmin(self, xmax):
+            
+        #if self.xmin_control.is_auto():
+            #xmin = xmax - 50
+        #else:
+            #xmin = int(self.xmin_control.manual_value())
+
+        return xmax - 50
+
+    def plot_ymax(self, values):
+        #if self.ymax_control.is_auto():
+            #ymax = round(max(self.data['acc_x']), 0) + 1
+        #else:
+            #ymax = int(self.ymax_control.manual_value())
+
+        return (round(max(values), 0) + 1)
+        
+    def plot_ymin(self, values):
+        #if self.ymin_control.is_auto():
+            #ymin = round(min(self.data['acc_x']), 0) - 1
+        #else:
+            #ymin = int(self.ymin_control.manual_value())
+
+        return (round(max(values), 0) + 1)
+
+    def draw_acc_plot(self):
+        xmax = self.plot_xmax(self.data['acc_raw_x'])
+        xmin = self.plot_xmin(xmax)
+        ymax = 400
+        ymin = -400
+        self.acc_ax.set_xbound(lower=xmin, upper=xmax)
+        self.acc_ax.set_ybound(lower=ymin, upper=ymax)
+        self.acc_ax.grid(True, color='gray')
+        pylab.setp(self.acc_ax.get_xticklabels(),
+            visible=True)
+        self.acc_data[0].set_xdata(np.arange(len(self.data['acc_raw_x'])))
+        self.acc_data[0].set_ydata(np.array(self.data['acc_raw_x']))
+        self.acc_data[1].set_xdata(np.arange(len(self.data['acc_raw_y'])))
+        self.acc_data[1].set_ydata(np.array(self.data['acc_raw_y']))
+        self.acc_data[2].set_xdata(np.arange(len(self.data['acc_raw_z'])))
+        self.acc_data[2].set_ydata(np.array(self.data['acc_raw_z']))
+
+    def draw_gyro_plot(self):
+        xmax = self.plot_xmax(self.data['gyro_x'])
+        xmin = self.plot_xmin(xmax)
+        ymax = 3
+        ymin = -3
+        self.gyro_ax.set_xbound(lower=xmin, upper=xmax)
+        self.gyro_ax.set_ybound(lower=ymin, upper=ymax)
+        self.gyro_ax.grid(True, color='gray')
+        pylab.setp(self.gyro_ax.get_xticklabels(),
+            visible=True)
+        self.gyro_data[0].set_xdata(np.arange(len(self.data['gyro_x'])))
+        self.gyro_data[0].set_ydata(np.array(self.data['gyro_x']))
+        self.gyro_data[1].set_xdata(np.arange(len(self.data['gyro_y'])))
+        self.gyro_data[1].set_ydata(np.array(self.data['gyro_y']))
+        self.gyro_data[2].set_xdata(np.arange(len(self.data['gyro_z'])))
+        self.gyro_data[2].set_ydata(np.array(self.data['gyro_z']))
+
+    #def draw_dcm_plot(self):
+
+    def init_plots(self):
         self.dpi = 100
         self.fig = Figure((3.0, 3.0), dpi=self.dpi)
+        #self.init_acc_plot()
+        self.init_gyro_plot()
+        #self.init_dcm_plot()
 
-        self.axes = self.fig.add_subplot(111)
-        self.axes.set_axis_bgcolor('black')
-        self.axes.set_title('Arduino Serial Data', size=12)
-        
-        pylab.setp(self.axes.get_xticklabels(), fontsize=8)
-        pylab.setp(self.axes.get_yticklabels(), fontsize=8)
-
-        # plot the data as a line series, and save the reference
-        # to the plotted line series
-        #
-        self.plot_data = self.axes.plot(
-            #self.data,
-            [1],
-            linewidth=1,
-            color=(1, 1, 0),
-            )[0]
-
-    def draw_plot(self):
+    def draw_plots(self):
         """ Redraws the plot
 """
-        # when xmin is on auto, it "follows" xmax to produce a
-        # sliding window effect. therefore, xmin is assigned after
-        # xmax.
-        #
-        if self.xmax_control.is_auto():
-            xmax = len(self.data['acc_x']) if len(self.data['acc_x']) > 50 else 50
-        else:
-            xmax = int(self.xmax_control.manual_value())
-            
-        if self.xmin_control.is_auto():
-            xmin = xmax - 50
-        else:
-            xmin = int(self.xmin_control.manual_value())
+        #self.draw_acc_plot()
+        self.draw_gyro_plot()
 
-        # for ymin and ymax, find the minimal and maximal values
-        # in the data set and add a mininal margin.
-        #
-        # note that it's easy to change this scheme to the
-        # minimal/maximal value in the current display, and not
-        # the whole data set.
-        #
-        if self.ymin_control.is_auto():
-            ymin = round(min(self.data['acc_x']), 0) - 1
-        else:
-            ymin = int(self.ymin_control.manual_value())
-        
-        if self.ymax_control.is_auto():
-            ymax = round(max(self.data['acc_x']), 0) + 1
-        else:
-            ymax = int(self.ymax_control.manual_value())
-
-        self.axes.set_xbound(lower=xmin, upper=xmax)
-        self.axes.set_ybound(lower=ymin, upper=ymax)
-        
-        # anecdote: axes.grid assumes b=True if any other flag is
-        # given even if b is set to False.
-        # so just passing the flag into the first statement won't
-        # work.
-        #
-        if self.cb_grid.IsChecked():
-            self.axes.grid(True, color='gray')
-        else:
-            self.axes.grid(False)
-
-        # Using setp here is convenient, because get_xticklabels
-        # returns a list over which one needs to explicitly
-        # iterate, and setp already handles this.
-        #
-        pylab.setp(self.axes.get_xticklabels(),
-            visible=self.cb_xlab.IsChecked())
-
-        #self.plot_data.set_xdata(np.arange(len(self.data)))
-        #self.plot_data.set_ydata(np.array(self.data))
-        self.plot_data.set_xdata(np.arange(len(self.data['acc_x'])))
-        self.plot_data.set_ydata(np.array(self.data['acc_x']))
-        
         self.canvas.draw()
     
     def on_pause_button(self, event):
@@ -279,10 +311,10 @@ class GraphFrame(wx.Frame):
         self.pause_button.SetLabel(label)
     
     def on_cb_grid(self, event):
-        self.draw_plot()
+        self.draw_plots()
     
     def on_cb_xlab(self, event):
-        self.draw_plot()
+        self.draw_plots()
     
     def on_save_plot(self, event):
         file_choices = "PNG (*.png)|*.png"
@@ -307,7 +339,7 @@ class GraphFrame(wx.Frame):
         if not self.paused:
             self.update_data(self.datagen.next())
         
-        self.draw_plot()
+        self.draw_plots()
     
     def on_exit(self, event):
         self.Destroy()
