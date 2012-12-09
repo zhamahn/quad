@@ -21,8 +21,9 @@ void DCM::updateQuaternions(void) {
   float ex, ey, ez;
   float ax, ay, az;
   float gx, gy, gz;
+  float q0i, q1i, q2i, q3i;
   
-  // Normalize accelerometr values
+  // Normalize accelerometer values
   norm = sqrt( acc->x*acc->x + acc->y*acc->y + acc->z*acc->z );
   ax = acc->x / norm;
   ay = acc->y / norm;
@@ -40,28 +41,25 @@ void DCM::updateQuaternions(void) {
 
   // integral error scaled integral gain
   exInt = exInt + ex*Ki;
-  if (isSwitched(previousEx,ex)) {
+  if (isSwitched(previousEx,ex))
     exInt = 0.0;
-  }
   previousEx = ex;
 	
   eyInt = eyInt + ey*Ki;
-  if (isSwitched(previousEy,ey)) {
+  if (isSwitched(previousEy,ey))
     eyInt = 0.0;
-  }
   previousEy = ey;
 
   ezInt = ezInt + ez*Ki;
-  if (isSwitched(previousEz,ez)) {
+  if (isSwitched(previousEz,ez))
     ezInt = 0.0;
-  }
   previousEz = ez;
 	
   // adjusted gyroscope measurements
   gx = gyro->x + Kp*ex + exInt;
   gy = gyro->y + Kp*ey + eyInt;
   gz = gyro->z + Kp*ez + ezInt;
-    
+
   // integrate quaternion rate and normalise
   q0i = (-q1*gx - q2*gy - q3*gz) * halfSampleTime;
   q1i = ( q0*gx + q2*gz - q3*gy) * halfSampleTime;

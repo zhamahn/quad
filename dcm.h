@@ -32,7 +32,6 @@ class DCM {
     float previousEx,
           previousEy,
           previousEz;
-    float q0i, q1i, q2i, q3i;
     bool isSwitched(float, float);
     long int lastUpdate;
 };
