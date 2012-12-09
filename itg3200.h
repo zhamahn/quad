@@ -1,12 +1,17 @@
 #ifndef itg3200_h
 #define itg3200_h
 
+#define ITG_SCALE_TO_RADIANS 823.626831 // 14.375 LSBs per °/sec, / Pi / 180
+
+#define ITG_X_ERROR 55
+#define ITG_Y_ERROR 35
+#define ITG_Z_ERROR -4
+
 class ITG3200 {
   public:
     int rawX, rawY, rawZ;
     int smoothX, smoothY, smoothZ;
     float x, y, z;
-    float correctedX, correctedY, correctedZ;
 
     void begin(void);
     void update(void);
@@ -25,7 +30,6 @@ class ITG3200 {
     float scaleFactor;
 
     void read(void);
-    float valueToRadians(int);
 };
 
 /* ************************ Register map for the ITG3200 ****************************/

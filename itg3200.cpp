@@ -39,20 +39,19 @@ void ITG3200::read(void) {
 }
 
 void ITG3200::update(void) {
-  long int currentTime = micros();
-  float timeFactor = (currentTime - lastUpdate) / 1000000.0;
   read();
+  // Apply error correction
+  rawX += ITG_X_ERROR;
+  rawY += ITG_Y_ERROR;
+  rawZ += ITG_Z_ERROR;
+  // Smoothen read values
   smoothX = smooth(rawX, smoothX, smoothFactor);
   smoothY = smooth(rawY, smoothY, smoothFactor);
   smoothZ = smooth(rawZ, smoothZ, smoothFactor);
-  x = valueToRadians(smoothX * timeFactor);
-  y = valueToRadians(smoothY * timeFactor);
-  z = valueToRadians(smoothZ * timeFactor);
-  lastUpdate = currentTime;
-}
-
-float ITG3200::valueToRadians(int value) {
-  return value * scaleFactor;
+  // Convert to radians
+  x = (float)smoothX * scaleFactor;
+  y = (float)smoothY * scaleFactor;
+  z = (float)smoothZ * scaleFactor;
 }
 
 #ifdef DEBUG
