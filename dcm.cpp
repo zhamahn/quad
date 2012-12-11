@@ -6,11 +6,20 @@ void DCM::begin(void) {
   exInt = eyInt = ezInt = 0.0;
   previousEx = previousEy = previousEz = 0.0;
   q0 = 1.0;
-  q1 = q2 = q3 = 0.0;
-  exInt = eyInt = ezInt = 0.0;
+  q1 = 0.0;
+  q2 = 0.0;
+  q3 = 0.0;
+  exInt = 0.0;
+  eyInt = 0.0;
+  ezInt = 0.0;
   Kp = 0.2;
   Ki = 0.0005;
-  lastUpdate = micros();
+  lastUpdate = 0;
+}
+
+void DCM::update(void) {
+  updateQuaternions();
+  updateEulerAngles();
 }
 
 void DCM::updateQuaternions(void) {

@@ -13,8 +13,7 @@ class DCM {
     ADXL345 *acc;
 
     void begin(void);
-    void updateQuaternions(void);
-    void updateEulerAngles(void);
+    void update(void);
 
     float pitch(void);
     float roll(void);
@@ -32,8 +31,11 @@ class DCM {
     float previousEx,
           previousEy,
           previousEz;
+
     bool isSwitched(float, float);
     long int lastUpdate;
+    void updateQuaternions(void);
+    void updateEulerAngles(void);
 };
 
 #endif

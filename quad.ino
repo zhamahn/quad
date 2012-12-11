@@ -33,6 +33,7 @@ void pingInterrupt(void) {
 void setup() {
   Serial.begin(9600);
   mySerial.begin(9600);
+  Wire.begin();
 
   // Initialize classes
   escs.x  = &esc_x;
@@ -47,10 +48,9 @@ void setup() {
   quad.alt        = &alt;
   quad.dcm        = &dcm;
 
-  Wire.begin();
-
   acc.begin();
   gyro.begin();
+  dcm.begin();
 
   dcm.acc = &acc;
   dcm.gyro = &gyro;
@@ -75,7 +75,8 @@ void loop() {
 
   acc.update();
   gyro.update();
-  alt.start();
+  dcm.update();
+  //alt.start();
 
   quad.computePIDs();
   quad.setESCs();
