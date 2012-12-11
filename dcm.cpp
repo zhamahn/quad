@@ -3,8 +3,6 @@
 #include "dcm.h"
 
 void DCM::begin(void) {
-  exInt = eyInt = ezInt = 0.0;
-  previousEx = previousEy = previousEz = 0.0;
   q0 = 1.0;
   q1 = 0.0;
   q2 = 0.0;
@@ -12,95 +10,89 @@ void DCM::begin(void) {
   exInt = 0.0;
   eyInt = 0.0;
   ezInt = 0.0;
-  Kp = 0.2;
-  Ki = 0.0005;
-  lastUpdate = 0;
+  integralFBx = 0.0f,  integralFBy = 0.0f, integralFBz = 0.0f;
+  now = 0;
 }
 
 void DCM::update(void) {
+  now = micros();
+  sampleFreq = 1.0 / ((now - lastUpdate) / 1000000.0);
+  lastUpdate = now;
   updateQuaternions();
   updateEulerAngles();
 }
 
 void DCM::updateQuaternions(void) {
-  long int halfSampleTime = (micros() - lastUpdate)/2;
+  float recipNorm;
+  float halfex = 0.0f, halfey = 0.0f, halfez = 0.0f;
+  float qa, qb, qc;
+  float halfvx, halfvy, halfvz;
+  float invSampleFreq = (1.0f / sampleFreq);
 
-  float norm;
-  float vx, vy, vz;
-  float ex, ey, ez;
-  float ax, ay, az;
-  float gx, gy, gz;
-  float q0i, q1i, q2i, q3i;
+  float ax = acc->x;
+  float ay = acc->y;
+  float az = acc->z;
+
+  float gx = gyro->x;
+  float gy = gyro->y;
+  float gz = gyro->z;
+
+  // Normalise accelerometer measurement
+  recipNorm = invSqrt(ax * ax + ay * ay + az * az);
+  ax *= recipNorm;
+  ay *= recipNorm;
+  az *= recipNorm;
   
-  // Normalize accelerometer values
-  norm = sqrt( acc->x*acc->x + acc->y*acc->y + acc->z*acc->z );
-  ax = acc->x / norm;
-  ay = acc->y / norm;
-  az = acc->z / norm;
+  // Estimated direction of gravity
+  halfvx = q1*q3 - q0*q2;
+  halfvy = q0*q1 + q2*q3;
+  halfvz = q0*q0 - 0.5f + q3*q3;
 
-  // Estimated direction of gravity and flux (v and w)
-  vx = 2*(q1*q3 - q0*q2);
-  vy = 2*(q0*q1 + q2*q3);
-  vz = q0*q0 - q1*q1 - q2*q2 + q3*q3;
+  // Error is sum of cross product between estimated direction and measured direction of field vectors
+  halfex += (ay * halfvz - az * halfvy);
+  halfey += (az * halfvx - ax * halfvz);
+  halfez += (ax * halfvy - ay * halfvx);
 
-  // Error is sum of cross product between reference direction of fields and direction measured by sensors
-  ex = (vy*az - vz*ay);
-  ey = (vz*ax - vx*az);
-  ez = (vx*ay - vy*ax);
+  if(halfex != 0.0f && halfey != 0.0f && halfez != 0.0f) {
+    // Compute and apply integral feedback if enabled
+    integralFBx += DCM_TWO_KI * halfex * invSampleFreq;  // integral error scaled by Ki
+    integralFBy += DCM_TWO_KI * halfey * invSampleFreq;
+    integralFBz += DCM_TWO_KI * halfez * invSampleFreq;
+    gx += integralFBx;  // apply integral feedback
+    gy += integralFBy;
+    gz += integralFBz;
+  }
 
-  // integral error scaled integral gain
-  exInt = exInt + ex*Ki;
-  if (isSwitched(previousEx,ex))
-    exInt = 0.0;
-  previousEx = ex;
-	
-  eyInt = eyInt + ey*Ki;
-  if (isSwitched(previousEy,ey))
-    eyInt = 0.0;
-  previousEy = ey;
+  // Apply proportional feedback
+  gx += DCM_TWO_KP * halfex;
+  gy += DCM_TWO_KP * halfey;
+  gz += DCM_TWO_KP * halfez;
+  
+  // Integrate rate of change of quaternion
+  gx *= (0.5f * invSampleFreq);   // pre-multiply common factors
+  gy *= (0.5f * invSampleFreq);
+  gz *= (0.5f * invSampleFreq);
+  qa = q0;
+  qb = q1;
+  qc = q2;
+  q0 += (-qb * gx - qc * gy - q3 * gz);
+  q1 += ( qa * gx + qc * gz - q3 * gy);
+  q2 += ( qa * gy - qb * gz + q3 * gx);
+  q3 += ( qa * gz + qb * gy - qc * gx);
+  
+  // Normalise quaternion
+  recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
+  q0 *= recipNorm;
+  q1 *= recipNorm;
+  q2 *= recipNorm;
+  q3 *= recipNorm;
 
-  ezInt = ezInt + ez*Ki;
-  if (isSwitched(previousEz,ez))
-    ezInt = 0.0;
-  previousEz = ez;
-	
-  // adjusted gyroscope measurements
-  gx = gyro->x + Kp*ex + exInt;
-  gy = gyro->y + Kp*ey + eyInt;
-  gz = gyro->z + Kp*ez + ezInt;
-
-  // integrate quaternion rate and normalise
-  q0i = (-q1*gx - q2*gy - q3*gz) * halfSampleTime;
-  q1i = ( q0*gx + q2*gz - q3*gy) * halfSampleTime;
-  q2i = ( q0*gy - q1*gz + q3*gx) * halfSampleTime;
-  q3i = ( q0*gz + q1*gy - q2*gx) * halfSampleTime;
-  q0 += q0i;
-  q1 += q1i;
-  q2 += q2i;
-  q3 += q3i;
-    
-  // normalise quaternion
-  norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
-  q0 = q0 / norm;
-  q1 = q1 / norm;
-  q2 = q2 / norm;
-  q3 = q3 / norm;
-
-  lastUpdate = micros();
 }
 
 void DCM::updateEulerAngles(void) {
   x = atan2(2 * (q0*q1 + q2*q3), 1 - 2 *(q1*q1 + q2*q2));
   y = asin(2 * (q0*q2 - q1*q3));
   z = atan2(2 * (q0*q3 + q1*q2), 1 - 2 *(q2*q2 + q3*q3));
-}
-
-bool DCM::isSwitched(float previousError, float currentError) {
-  if ( (previousError > 0 && currentError < 0) ||
-       (previousError < 0 && currentError > 0) ) {
-    return true;
-  }
-  return false;
 }
 
 float DCM::pitch(void) {
@@ -125,11 +117,25 @@ void DCM::print(void) {
 }
 
 void DCM::printForGraph(void) {
-  Serial.print(q0, DEC); Serial.print(";");
-  Serial.print(q1, DEC); Serial.print(";");
-  Serial.print(q2, DEC); Serial.print(";");
-  Serial.print(q3, DEC); Serial.print(";");
-  Serial.print(x, DEC); Serial.print(";");
-  Serial.print(y, DEC); Serial.print(";");
+  Serial.print(q0, DEC); Serial.print('\t');
+  Serial.print(q1, DEC); Serial.print('\t');
+  Serial.print(q2, DEC); Serial.print('\t');
+  Serial.print(q3, DEC); Serial.print('\t');
+  Serial.print(x, DEC); Serial.print('\t');
+  Serial.print(y, DEC); Serial.print('\t');
   Serial.print(z, DEC);
+}
+
+float DCM::invSqrt(float number) {
+  volatile long i;
+  volatile float x, y;
+  volatile const float f = 1.5F;
+
+  x = number * 0.5F;
+  y = number;
+  i = * ( long * ) &y;
+  i = 0x5f375a86 - ( i >> 1 );
+  y = * ( float * ) &i;
+  y = y * ( f - ( x * y * y ) );
+  return y;
 }
