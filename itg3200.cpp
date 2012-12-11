@@ -63,14 +63,14 @@ void ITG3200::print(void) {
   Serial.println("");
 }
 void ITG3200::printForGraph(void) {
-  Serial.print(rawX, DEC); Serial.print(";");
-  Serial.print(rawY, DEC); Serial.print(";");
-  Serial.print(rawZ, DEC); Serial.print(";");
-  Serial.print(smoothX, DEC); Serial.print(";");
-  Serial.print(smoothY, DEC); Serial.print(";");
-  Serial.print(smoothZ, DEC); Serial.print(";");
-  Serial.print(x, DEC); Serial.print(";");
-  Serial.print(y, DEC); Serial.print(";");
+  Serial.print(rawX, DEC); Serial.print('\t');
+  Serial.print(rawY, DEC); Serial.print('\t');
+  Serial.print(rawZ, DEC); Serial.print('\t');
+  Serial.print(smoothX, DEC); Serial.print('\t');
+  Serial.print(smoothY, DEC); Serial.print('\t');
+  Serial.print(smoothZ, DEC); Serial.print('\t');
+  Serial.print(x, DEC); Serial.print('\t');
+  Serial.print(y, DEC); Serial.print('\t');
   Serial.print(z, DEC);
 }
 #endif

@@ -104,7 +104,7 @@ class SerialData(object):
             23: 'dcm_y',
             24: 'dcm_z',
         }
-        value_list = raw_line.strip().split(';')
+        value_list = raw_line.strip().split('\t')
         value_hash = {}
         for index, value in enumerate(value_list):
             name = index_name[index]
