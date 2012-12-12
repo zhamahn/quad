@@ -50,14 +50,8 @@ void ADXL345::print(void) {
   Serial.println("");
 }
 void ADXL345::printForGraph(void) {
-  Serial.print(rawX, DEC); Serial.print('\t');
-  Serial.print(rawY, DEC); Serial.print('\t');
-  Serial.print(rawZ, DEC); Serial.print('\t');
   Serial.print(x, DEC); Serial.print('\t');
   Serial.print(y, DEC); Serial.print('\t');
-  Serial.print(z, DEC); Serial.print('\t');
-  Serial.print(Gx, DEC); Serial.print('\t');
-  Serial.print(Gy, DEC); Serial.print('\t');
-  Serial.print(Gz, DEC);
+  Serial.print(z, DEC);
 }
 #endif
