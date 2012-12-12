@@ -4,10 +4,8 @@
 #include "itg3200.h"
 #include "adxl345.h"
 
-#define DCM_KP 0.5f
-#define DCM_KI 0.1f
-#define DCM_TWO_KP  (2.0f * DCM_KP) // 2 * proportional gain
-#define DCM_TWO_KI  (2.0f * DCM_KI) // 2 * integral gain
+#define DCM_TWO_KP  (3.0f) // original value: 1.0
+#define DCM_TWO_KI  (0.1f) // original value: 0.2
 
 class DCM {
   public:
