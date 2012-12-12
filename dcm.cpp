@@ -28,6 +28,7 @@ void DCM::updateQuaternions(void) {
   float qa, qb, qc;
   float halfvx, halfvy, halfvz;
   float invSampleFreq = (1.0f / sampleFreq);
+  float halfInvSampleFreq = 0.5f * invSampleFreq;
 
   float ax = acc->x;
   float ay = acc->y;
@@ -69,9 +70,9 @@ void DCM::updateQuaternions(void) {
   gz += DCM_TWO_KP * halfez;
   
   // Integrate rate of change of quaternion
-  gx *= (0.5f * invSampleFreq);   // pre-multiply common factors
-  gy *= (0.5f * invSampleFreq);
-  gz *= (0.5f * invSampleFreq);
+  gx *= (halfInvSampleFreq);   // pre-multiply common factors
+  gy *= (halfInvSampleFreq);
+  gz *= (halfInvSampleFreq);
   qa = q0;
   qb = q1;
   qc = q2;
