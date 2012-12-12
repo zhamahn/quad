@@ -2,6 +2,9 @@
 #define itg3200_h
 
 #define ITG_SCALE_TO_RADIANS 823.626831 // 14.375 LSBs per °/sec, / Pi / 180
+#define ITG_SMOOTH_FACTOR 0.01
+#define ITG_SCALE_FACTOR 0.0012142265
+//#define ITG_SCALE_FACTOR 0.00121422655627823123481
 
 #define ITG_X_ERROR 55
 #define ITG_Y_ERROR 35
@@ -9,8 +12,6 @@
 
 class ITG3200 {
   public:
-    int rawX, rawY, rawZ;
-    int smoothX, smoothY, smoothZ;
     float x, y, z;
 
     void begin(void);
@@ -20,14 +21,9 @@ class ITG3200 {
     void printForGraph(void);
 #endif
 
-    float pitch(void);
-    float roll(void);
-    float yaw(void);
-
   private:
-    long int lastUpdate;
-    float smoothFactor;
-    float scaleFactor;
+    int rawX, rawY, rawZ;
+    int smoothX, smoothY, smoothZ;
 
     void read(void);
 };

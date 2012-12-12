@@ -14,10 +14,6 @@ void ITG3200::begin(void) {
 
   //Select X gyro PLL for clock source
   writeReg(ITG_ADDR, PWR_MGM, PWR_MGM_CLK_SEL_0);
-
-  lastUpdate = micros();
-  scaleFactor = radians(1.0 / 14.374); // ITG3200 14.375 LSBs per °/sec
-  smoothFactor = 0.1;
 }
 
 void ITG3200::read(void) {
@@ -45,13 +41,13 @@ void ITG3200::update(void) {
   rawY += ITG_Y_ERROR;
   rawZ += ITG_Z_ERROR;
   // Smoothen read values
-  smoothX = smooth(rawX, smoothX, smoothFactor);
-  smoothY = smooth(rawY, smoothY, smoothFactor);
-  smoothZ = smooth(rawZ, smoothZ, smoothFactor);
+  smoothX = smooth(rawX, smoothX, ITG_SMOOTH_FACTOR);
+  smoothY = smooth(rawY, smoothY, ITG_SMOOTH_FACTOR);
+  smoothZ = smooth(rawZ, smoothZ, ITG_SMOOTH_FACTOR);
   // Convert to radians
-  x = (float)smoothX * scaleFactor;
-  y = (float)smoothY * scaleFactor;
-  z = (float)smoothZ * scaleFactor;
+  x = (float)smoothX * ITG_SCALE_FACTOR * -1.0;
+  y = (float)smoothY * ITG_SCALE_FACTOR * -1.0;
+  z = (float)smoothZ * ITG_SCALE_FACTOR;
 }
 
 #ifdef DEBUG
@@ -74,7 +70,3 @@ void ITG3200::printForGraph(void) {
   Serial.print(z, DEC);
 }
 #endif
-
-float ITG3200::pitch(void) { return x; }
-float ITG3200::roll(void) { return y; }
-float ITG3200::yaw(void) { return z; }

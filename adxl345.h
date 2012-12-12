@@ -1,26 +1,25 @@
 #ifndef adxl345_h
 #define adxl345_h
 
+#define ADXL_SMOOTH_FACTOR 0.1
+#define ADXL_SCALE_FACTOR 0.0078
+
 class ADXL345 {
   public:
-    int rawX, rawY, rawZ;
     int x, y, z;
-    float Gx, Gy, Gz;
 
     void begin(void);
+    void update(void);
+    float valueToG(int);
 #ifdef DEBUG
     void print(void);
     void printForGraph(void);
 #endif
-    void update(void);
 
-    float pitch(void);
-    float roll(void);
   private:
-    void read(void);
-    float valueToG(int);
+    int rawX, rawY, rawZ;
 
-    float smoothFactor;
+    void read(void);
 };
 
 #define ADXL_ADDR 0x53

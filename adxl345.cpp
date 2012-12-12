@@ -10,8 +10,6 @@ void ADXL345::begin(void) {
 
   //Set the Range to +/- 4G
   writeReg(ADXL_ADDR, DATA_FORMAT, RANGE_0);
-
-  smoothFactor = 0.4;
 }
 
 void ADXL345::read(void) {
@@ -34,17 +32,13 @@ void ADXL345::read(void) {
 
 void ADXL345::update(void) {
   read();
-  x = smooth(rawX, x, smoothFactor);
-  y = smooth(rawY, y, smoothFactor);
-  z = smooth(rawZ, z, smoothFactor);
-  Gx = valueToG(x);
-  Gy = valueToG(y);
-  Gz = valueToG(z);
+  x = smooth(rawX, x, ADXL_SMOOTH_FACTOR) * -1.0;
+  y = smooth(rawY, y, ADXL_SMOOTH_FACTOR) * -1.0;
+  z = smooth(rawZ, z, ADXL_SMOOTH_FACTOR);
 }
 
 float ADXL345::valueToG(int value) {
-  // 4G == 0.0078
-  return (float)value*0.0078;
+  return (float)value * ADXL_SCALE_FACTOR;
 }
 
 #ifdef DEBUG
