@@ -46,7 +46,6 @@ void setup()
 
 
 float decodeFloat(String inString) {
-  println(inString);
   return Float.parseFloat(inString);
   /*byte [] inData = new byte[4];*/
 
