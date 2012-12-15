@@ -67,18 +67,63 @@ void setup() {
 }
 
 void loop() {
+  unsigned long loopStart = micros();
   unsigned char data[8];
   if (mySerial.available() > 0) {
     if (readFrame(&mySerial, data) == FRAME_COMPLETE)
       controller.updateFromDataArray(data);
   }
 
+  /*char input;*/
+  /*bool isKi = false;*/
+  /*bool isKp = false;*/
+  /*bool valRead = false;*/
+  /*char val_string[5];*/
+  /*int i;*/
+  /*for (i=0; i<10; i++) { val_string[i] = '0'; }*/
+  /*int val_index = 0;*/
+  /*while (Serial.available() > 0) {*/
+    /*input = Serial.read();*/
+    /*if (isKi && valRead) {*/
+      /*dcm.Ki = atof(val_string);*/
+    /*} else if (isKp && valRead) {*/
+      /*dcm.Kp = atof(val_string);*/
+    /*} else if (isKp || isKi) {*/
+      /*if (input == '\n') {*/
+        /*valRead = true;*/
+      /*} else {*/
+        /*val_string[val_index] = input;*/
+        /*val_index += 1;*/
+      /*}*/
+    /*} else {*/
+      /*switch (input) {*/
+      /*case 'p': isKp = true; break;*/
+      /*case 'i': isKi = true; break;*/
+      /*}*/
+    /*}*/
+  /*}*/
+
   acc.update();
   gyro.update();
   dcm.update();
   //alt.start();
 
-  quad.computePIDs();
-  quad.setESCs();
+  //quad.computePIDs();
+  /*quad.setESCs();*/
+  /*acc.printForGraph(); Serial.print('\t');*/
+  /*gyro.printForGraph(); Serial.print('\t');*/
+  /*dcm.printForGraph();*/
+  /*Serial.print(dcm.q0, DEC); Serial.print(",");*/
+  /*Serial.print(dcm.q1, DEC); Serial.print(",");*/
+  /*Serial.print(dcm.q2, DEC); Serial.print(",");*/
+  /*Serial.print(dcm.q3, DEC);*/
+  Serial.print(dcm.pitch, DEC); Serial.print('\t');
+  Serial.print(dcm.roll, DEC); Serial.print('\t');
+  Serial.print(dcm.yaw, DEC); Serial.print('\t');
+  unsigned long loopEnd = micros();
+  Serial.print(" Loop execution time: ");
+  Serial.print(loopEnd - loopStart, DEC);
+  Serial.println("");
+  delay(50);
 }
 // }}}
