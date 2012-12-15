@@ -91,17 +91,9 @@ void DCM::updateQuaternions(void) {
 }
 
 void DCM::updateEulerAngles(void) {
-  x = atan2(2 * (q0*q1 + q2*q3), 1 - 2 *(q1*q1 + q2*q2));
-  y = asin(2 * (q0*q2 - q1*q3));
-  z = atan2(2 * (q0*q3 + q1*q2), 1 - 2 *(q2*q2 + q3*q3));
-}
-
-float DCM::pitch(void) {
-  return x;
-}
-
-float DCM::roll(void) {
-  return y;
+  pitch = (int)DEGREES( -asin(2 * q1 * q3 + 2 * q0 * q2) ); // theta
+  roll  = (int)DEGREES( atan2(2 * q2 * q3 - 2 * q0 * q1, 2 * q0 * q0 + 2 * q3 * q3 - 1) ); // phi
+  yaw   = (int)DEGREES( atan2(2 * q1 * q2 - 2 * q0 * q3, 2 * q0 * q0 + 2 * q1 * q1 - 1) ); // psi
 }
 
 void DCM::print(void) {
@@ -111,9 +103,9 @@ void DCM::print(void) {
   Serial.print(", q2: "); Serial.print(q2, DEC);
   Serial.print(", q3: "); Serial.print(q3, DEC);
   Serial.print("Euler angles: ");
-  Serial.print("x: "); Serial.print(x, DEC);
-  Serial.print("y: "); Serial.print(y, DEC);
-  Serial.print("z: "); Serial.print(z, DEC);
+  Serial.print("pitch: "); Serial.print(pitch, DEC);
+  Serial.print("roll: "); Serial.print(roll, DEC);
+  Serial.print("yaw: "); Serial.print(yaw, DEC);
   Serial.println("");
 }
 
@@ -122,9 +114,9 @@ void DCM::printForGraph(void) {
   Serial.print(q1, DEC); Serial.print('\t');
   Serial.print(q2, DEC); Serial.print('\t');
   Serial.print(q3, DEC); Serial.print('\t');
-  Serial.print(x, DEC); Serial.print('\t');
-  Serial.print(y, DEC); Serial.print('\t');
-  Serial.print(z, DEC);
+  Serial.print(pitch, DEC); Serial.print('\t');
+  Serial.print(roll, DEC); Serial.print('\t');
+  Serial.print(yaw, DEC);
 }
 
 float DCM::invSqrt(float number) {
