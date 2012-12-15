@@ -124,6 +124,8 @@ class SerialData(object):
                 #print 'bogus data',raw_line
                 time.sleep(.005)
         return self.empty_value_hash()
+    def write(self, value):
+        self.ser.write(value + '\n')
     def __del__(self):
         if self.ser:
             self.ser.close()

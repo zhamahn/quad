@@ -4,7 +4,7 @@ import random
 import sys
 import wx
 
-REFRESH_INTERVAL_MS = 60
+REFRESH_INTERVAL_MS = 90
 
 # The recommended way to use wx with mpl is with the WXAgg
 # backend.
@@ -21,6 +21,42 @@ import pylab
 from Arduino_Monitor import SerialData as DataGen
 import pprint
 
+class FloatControlBox(wx.Panel):
+  def __init__(self, parent, ID, label, initval, datagen):
+    wx.Panel.__init__(self, parent, ID)
+
+    self.value = initval
+    self.label = label
+    box = wx.StaticBox(self, -1, label)
+    sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+    self.datagen = datagen
+
+    self.manual_text = wx.TextCtrl(self, -1,
+        size=(70,-1),
+        value=str(initval),
+        style=wx.TE_PROCESS_ENTER)
+
+    self.Bind(wx.EVT_UPDATE_UI, self.on_update_manual_text, self.manual_text)
+    self.Bind(wx.EVT_TEXT_ENTER, self.on_text_enter, self.manual_text)
+
+    manual_box = wx.BoxSizer(wx.HORIZONTAL)
+    manual_box.Add(self.manual_text, flag=wx.ALIGN_CENTER_VERTICAL)
+
+    sizer.Add(manual_box, 0, wx.ALL, 10)
+
+    self.SetSizer(sizer)
+    sizer.Fit(self)
+
+
+  def on_update_manual_text(self, event):
+    self.manual_text.Enable
+
+  def on_text_enter(self, event):
+    self.value = self.manual_text.GetValue()
+    self.datagen.write(self.label + self.value)
+
+  def manual_value(self):
+    return self.value
 
 class BoundControlBox(wx.Panel):
     """ A static box with a couple of radio buttons and a text
@@ -143,11 +179,9 @@ class GraphFrame(wx.Frame):
         self.init_plots()
         self.canvas = FigCanvas(self.panel, -1, self.fig)
 
-        self.xmin_control = BoundControlBox(self.panel, -1, "X min", 0)
-        self.xmax_control = BoundControlBox(self.panel, -1, "X max", 50)
-        self.ymin_control = BoundControlBox(self.panel, -1, "Y min", 0)
-        self.ymax_control = BoundControlBox(self.panel, -1, "Y max", 100)
-        
+        self.kp = FloatControlBox(self.panel, -1, "p", 0.2, self.datagen)
+        self.ki = FloatControlBox(self.panel, -1, "i", 0.1, self.datagen)
+
         self.pause_button = wx.Button(self.panel, -1, "Pause")
         self.Bind(wx.EVT_BUTTON, self.on_pause_button, self.pause_button)
         self.Bind(wx.EVT_UPDATE_UI, self.on_update_pause_button, self.pause_button)
@@ -172,11 +206,8 @@ class GraphFrame(wx.Frame):
         self.hbox1.Add(self.cb_xlab, border=5, flag=wx.ALL | wx.ALIGN_CENTER_VERTICAL)
         
         self.hbox2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.hbox2.Add(self.xmin_control, border=5, flag=wx.ALL)
-        self.hbox2.Add(self.xmax_control, border=5, flag=wx.ALL)
-        self.hbox2.AddSpacer(24)
-        self.hbox2.Add(self.ymin_control, border=5, flag=wx.ALL)
-        self.hbox2.Add(self.ymax_control, border=5, flag=wx.ALL)
+        self.hbox2.Add(self.kp, border=5, flag=wx.ALL)
+        self.hbox2.Add(self.ki, border=5, flag=wx.ALL)
         
         self.vbox = wx.BoxSizer(wx.VERTICAL)
         self.vbox.Add(self.canvas, 1, flag=wx.LEFT | wx.TOP | wx.GROW)
@@ -208,12 +239,12 @@ class GraphFrame(wx.Frame):
             )
 
     def init_dcm_plot(self):
-        self.dcm_ax = self.fig.add_subplot(411)
+        self.dcm_ax = self.fig.add_subplot(311)
         self.dcm_ax.set_title('DCM filter data')
         pylab.setp(self.dcm_ax.get_xticklabels(), fontsize=8)
         pylab.setp(self.dcm_ax.get_yticklabels(), fontsize=8)
         self.dcm_data = self.dcm_ax.plot(
-            [0],[0], [0],[0], [0],[0], [0],[0]
+            [0],[0], [0],[0], [0],[0]
             )
 
     def plot_xmax(self, values):
@@ -264,10 +295,10 @@ class GraphFrame(wx.Frame):
             visible=True)
         self.acc_data[0].set_xdata(np.arange(len(self.data['acc_raw_x'])))
         self.acc_data[0].set_ydata(np.array(self.data['acc_raw_x']))
-        self.acc_data[1].set_xdata(np.arange(len(self.data['acc_raw_y'])))
-        self.acc_data[1].set_ydata(np.array(self.data['acc_raw_y']))
-        self.acc_data[2].set_xdata(np.arange(len(self.data['acc_raw_z'])))
-        self.acc_data[2].set_ydata(np.array(self.data['acc_raw_z']))
+        self.acc_data[1].set_xdata(np.arange(len(self.data['acc_x'])))
+        self.acc_data[1].set_ydata(np.array(self.data['acc_x']))
+        #self.acc_data[2].set_xdata(np.arange(len(self.data['acc_raw_z'])))
+        #self.acc_data[2].set_ydata(np.array(self.data['acc_raw_z']))
 
     def draw_gyro_plot(self):
         xmax = self.plot_xmax(self.data['gyro_x'])
@@ -286,20 +317,36 @@ class GraphFrame(wx.Frame):
         self.gyro_data[2].set_xdata(np.arange(len(self.data['gyro_z'])))
         self.gyro_data[2].set_ydata(np.array(self.data['gyro_z']))
 
-    #def draw_dcm_plot(self):
+    def draw_dcm_plot(self):
+        xmax = self.plot_xmax(self.data['dcm_x'])
+        xmin = self.plot_xmin(xmax)
+        ymax = 5
+        ymin = -5
+        self.dcm_ax.set_xbound(lower=xmin, upper=xmax)
+        self.dcm_ax.set_ybound(lower=ymin, upper=ymax)
+        self.dcm_ax.grid(True, color='gray')
+        pylab.setp(self.dcm_ax.get_xticklabels(),
+            visible=True)
+        self.dcm_data[0].set_xdata(np.arange(len(self.data['dcm_x'])))
+        self.dcm_data[0].set_ydata(np.array(self.data['dcm_x']))
+        #self.dcm_data[1].set_xdata(np.arange(len(self.data['dcm_y'])))
+        #self.dcm_data[1].set_ydata(np.array(self.data['dcm_y']))
+        #self.dcm_data[2].set_xdata(np.arange(len(self.data['dcm_z'])))
+        #self.dcm_data[2].set_ydata(np.array(self.data['dcm_z']))
 
     def init_plots(self):
         self.dpi = 100
-        self.fig = Figure((3.0, 3.0), dpi=self.dpi)
+        self.fig = Figure(figsize=(6, 4), dpi=self.dpi)
         #self.init_acc_plot()
-        self.init_gyro_plot()
-        #self.init_dcm_plot()
+        #self.init_gyro_plot()
+        self.init_dcm_plot()
 
     def draw_plots(self):
         """ Redraws the plot
 """
         #self.draw_acc_plot()
-        self.draw_gyro_plot()
+        #self.draw_gyro_plot()
+        self.draw_dcm_plot()
 
         self.canvas.draw()
     
