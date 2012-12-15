@@ -65,11 +65,11 @@ void Controller::print(HardwareSerial *serial) {
 #endif
 
 signed char Controller::pitch(void) {
-  return map(right_stick_y, -128, 127, -90, 90);
+  return map(right_stick_y, -128, 127, -45, 45);
 }
 
 signed char Controller::roll(void) {
-  return map(right_stick_x, -128, 127, -90, 90);
+  return map(right_stick_x, -128, 127, -45, 45);
 }
 
 int Controller::altitude(int currentAltitude) {
