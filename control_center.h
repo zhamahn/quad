@@ -28,6 +28,7 @@ class ControlCenter {
     double pitchInput, pitchOutput, pitchSetpoint;
     double rollInput, rollOutput, rollSetpoint;
     double altitudeInput, altitudeOutput, altitudeSetpoint;
+    double yawInput, yawOutput, yawSetpoint;
 
     // functions
     ControlCenter(void);
