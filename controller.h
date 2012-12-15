@@ -37,7 +37,9 @@ struct Controller {
   void updateButtons(unsigned char);
   void updateDpad(unsigned char);
   void updateFromDataArray(unsigned char *);
+  #ifdef DEBUG
   void print(HardwareSerial *);
+  #endif
 
   signed char roll(void);
   signed char pitch(void);

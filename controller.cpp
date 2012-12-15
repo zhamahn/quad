@@ -1,7 +1,8 @@
-#include "controller.h"
-#include "main.h"
 #include <Arduino.h>
 #include <HardwareSerial.h>
+
+#include "controller.h"
+#include "quad.h"
 
 void Controller::updateButtons(unsigned char data) {
   left_stick  = data & B10000000;
@@ -35,6 +36,7 @@ void Controller::updateFromDataArray(unsigned char data[]) {
   lastUpdateAt = millis();
 }
 
+#ifdef DEBUG
 void Controller::print(HardwareSerial *serial) {
   serial->print("rt: "); serial->print(right_trigger, DEC); serial->print(", ");
   serial->print("lt: "); serial->print(left_trigger, DEC); serial->print(", ");
@@ -60,13 +62,14 @@ void Controller::print(HardwareSerial *serial) {
 
   serial->println("");
 }
+#endif
 
 signed char Controller::pitch(void) {
-  return map(right_stick_y, -128, 127, -90, 90);
+  return map(right_stick_y, -128, 127, -45, 45);
 }
 
 signed char Controller::roll(void) {
-  return map(right_stick_x, -128, 127, -90, 90);
+  return map(right_stick_x, -128, 127, -45, 45);
 }
 
 int Controller::altitude(int currentAltitude) {

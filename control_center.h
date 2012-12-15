@@ -1,22 +1,24 @@
-#ifndef quad_h
-#define quad_h
+#ifndef control_center_h
+#define control_center_h
 
 #include <PID_v1.h>
 
 #include "esc.h"
 #include "itg3200.h"
-#include "mma7660.h"
+#include "adxl345.h"
 #include "ping.h"
 #include "controller.h"
 #include "escs.h"
+#include "dcm.h"
 
 class ControlCenter {
   public:
     ESCs *escs;
     Controller *controller;
     ITG3200 *gyro;
-    MMA7660 *acc;
+    ADXL345 *acc;
     Ping *alt;
+    DCM *dcm;
 
     // PID stuff
     PID *pitchPID;
@@ -26,6 +28,7 @@ class ControlCenter {
     double pitchInput, pitchOutput, pitchSetpoint;
     double rollInput, rollOutput, rollSetpoint;
     double altitudeInput, altitudeOutput, altitudeSetpoint;
+    double yawInput, yawOutput, yawSetpoint;
 
     // functions
     ControlCenter(void);

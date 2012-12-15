@@ -1,1 +1,12 @@
 Code for my Arduino based quadrotor.
+
+Resources:
+https://www.sparkfun.com/products/10121
+
+Some theory:
+http://www.uavdesign.net/adaptive-a-distributed-control/quaternion-based-quadrotor-control
+
+code:
+http://www.jhsaudio.com/code/
+http://bildr.org/2012/03/stable-orientation-digital-imu-6dof-arduino/
+AeroQuad sources

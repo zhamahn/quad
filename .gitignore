@@ -4,3 +4,4 @@ quad.elf
 quad.hex
 .sconsign.dblite
 *.o
+*.pyc

@@ -1,5 +1,8 @@
 #include <Arduino.h>
+#include <PID_v1.h>
+
 #include "control_center.h"
+#include "quad.h"
 
 ControlCenter::ControlCenter(void) {
   pitchPID = new PID(&pitchInput, &pitchOutput, &pitchSetpoint, KP, KI, KD, AUTOMATIC);
@@ -12,17 +15,20 @@ ControlCenter::ControlCenter(void) {
 }
 
 void ControlCenter::computePIDs(void) {
-  pitchInput = (double)(acc->pitch());
-  rollInput = (double)(acc->roll());
-  altitudeInput = (double)(alt->distance);
+  pitchInput = dcm->pitch;
+  rollInput = dcm->roll;
+  //yawInput = dcm->yaw;
+  //altitudeInput = (double)(alt->distance);
 
-  pitchSetpoint = (double)(controller->pitch());
-  rollSetpoint = (double)(controller->roll());
-  altitudeSetpoint = (double)(controller->altitude(alt->distance));
+  pitchSetpoint = controller->pitch();
+  rollSetpoint = controller->roll();
+  //yawSetpoint = controller->yaw();
+  //altitudeSetpoint = (double)(controller->altitude(alt->distance));
 
   pitchPID->Compute();
   rollPID->Compute();
-  altitudePID->Compute();
+  //yawPID->Compute();
+  //altitudePID->Compute();
 }
 
 void ControlCenter::setESCs(void) {

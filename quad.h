@@ -1,8 +1,7 @@
-#ifndef main_h
-#define main_h
-#include <Arduino.h>
-// {{{ Defines
-// Pin definitions
+#ifndef quad_h
+#define quad_h
+
+// Pin defines
 #define LED 13
 #define PING_PIN 7
 #define PING_INT 0
@@ -12,6 +11,8 @@
 #define ESC_NX_PIN 5
 #define ESC_Y_PIN 8
 #define ESC_NY_PIN 9
+
+// Settings
 
 #define ESC_ALL -1
 #define ESC_N 4
@@ -25,8 +26,6 @@
 #define PIN_SERIAL_RX 2
 #define PIN_SERIAL_TX 4
 
-// Calibration values
-// PID
 #define KP 2
 #define KI 5
 #define KD 1
@@ -36,11 +35,6 @@
 #define ITG3200_STABILITY_THRESHOLD 10
 #define STABILIZATION_STEP 1
 
-#define MMA7660_1G 40
-
-#define DEBUG
-
-// Flight modes
 #define FLIGHT_MODE 0
 #define AUTO_STABLE 0
 #define AUTO_STABLE_INPUT_LIMIT 20
@@ -48,6 +42,4 @@
 #define POINT_HIGHER 1
 #define POINT_LOWER 2
 
-// }}}
-// }}}
 #endif
