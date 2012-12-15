@@ -32,8 +32,8 @@ void ADXL345::read(void) {
 
 void ADXL345::update(void) {
   read();
-  x = smooth(rawX, x, ADXL_SMOOTH_FACTOR) * -1.0;
-  y = smooth(rawY, y, ADXL_SMOOTH_FACTOR) * -1.0;
+  x = smooth(rawX, x, ADXL_SMOOTH_FACTOR);
+  y = smooth(rawY, y, ADXL_SMOOTH_FACTOR);
   z = smooth(rawZ, z, ADXL_SMOOTH_FACTOR);
 }
 

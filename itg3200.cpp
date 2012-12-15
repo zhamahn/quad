@@ -45,8 +45,8 @@ void ITG3200::update(void) {
   smoothY = smooth(rawY, smoothY, ITG_SMOOTH_FACTOR);
   smoothZ = smooth(rawZ, smoothZ, ITG_SMOOTH_FACTOR);
   // Convert to radians
-  x = (float)smoothX * ITG_SCALE_FACTOR * -1.0;
-  y = (float)smoothY * ITG_SCALE_FACTOR * -1.0;
+  x = (float)smoothX * ITG_SCALE_FACTOR;
+  y = (float)smoothY * ITG_SCALE_FACTOR;
   z = (float)smoothZ * ITG_SCALE_FACTOR;
 }
 
