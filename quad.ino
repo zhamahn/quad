@@ -34,6 +34,10 @@ void setup() {
   Serial.begin(9600);
   mySerial.begin(9600);
   Wire.begin();
+  quad.begin();
+  acc.begin();
+  gyro.begin();
+  dcm.begin();
 
   // Initialize classes
   escs.x  = &esc_x;
@@ -47,10 +51,6 @@ void setup() {
   quad.acc        = &acc;
   quad.alt        = &alt;
   quad.dcm        = &dcm;
-
-  acc.begin();
-  gyro.begin();
-  dcm.begin();
 
   dcm.acc = &acc;
   dcm.gyro = &gyro;

@@ -7,9 +7,9 @@
 #define PING_INT 0
 #define PING_INT_PIN 2
 
-#define ESC_X_PIN 10
+#define ESC_X_PIN 6
 #define ESC_NX_PIN 5
-#define ESC_Y_PIN 8
+#define ESC_Y_PIN 10
 #define ESC_NY_PIN 9
 
 // Settings
@@ -18,13 +18,13 @@
 #define ESC_N 4
 
 #define OUTPUT_MIN 10
-#define OUTPUT_MAX 200
+#define OUTPUT_MAX 255
 #define PRE_FLIGHT_MAX_OUTPUT 15
 
 #define MAX_TILT 10
 
-#define PIN_SERIAL_RX 2
-#define PIN_SERIAL_TX 4
+#define PIN_SERIAL_RX 4
+#define PIN_SERIAL_TX 2
 
 #define KP 2
 #define KI 5

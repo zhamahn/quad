@@ -4,7 +4,7 @@
 #include "control_center.h"
 #include "quad.h"
 
-ControlCenter::ControlCenter(void) {
+void ControlCenter::begin(void) {
   pitchPID = new PID(&pitchInput, &pitchOutput, &pitchSetpoint, KP, KI, KD, AUTOMATIC);
   rollPID = new PID(&rollInput, &rollOutput, &rollSetpoint, KP, KI, KD, AUTOMATIC);
   altitudePID = new PID(&altitudeInput, &altitudeOutput, &altitudeSetpoint, KP, KI, KD, AUTOMATIC);
@@ -14,7 +14,7 @@ ControlCenter::ControlCenter(void) {
   altitudePID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
 }
 
-void ControlCenter::computePIDs(void) {
+void ControlCenter::updatePIDs(void) {
   pitchInput = dcm->pitch;
   rollInput = dcm->roll;
   //yawInput = dcm->yaw;
@@ -31,8 +31,10 @@ void ControlCenter::computePIDs(void) {
   //altitudePID->Compute();
 }
 
-void ControlCenter::setESCs(void) {
-  escs->changePitch(pitchOutput);
-  escs->changeRoll(rollOutput);
-  escs->changeAltitude(altitudeOutput);
+void ControlCenter::setOutputs(void) {
+  double average = escs.average();
+  escs->y->write(average + pitchOutput);
+  escs->ny->write(average - pitchOutput);
+  escs->x->write(average + rollOutput);
+  escs->nx->write(average - rollOutput);
 }

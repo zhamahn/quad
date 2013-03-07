@@ -31,10 +31,10 @@ class ControlCenter {
     double yawInput, yawOutput, yawSetpoint;
 
     // functions
-    ControlCenter(void);
+    void begin(void);
 
-    void computePIDs(void);
-    void setESCs(void);
+    void updatePIDs(void);
+    void setOutputs(void);
 
   private:
 };

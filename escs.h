@@ -19,8 +19,7 @@ class ESCs {
     void changePitch(int);
     void changeRoll(int);
     void changeAltitude(int);
-
-  private:
     double average(void);
+  private:
 };
 #endif

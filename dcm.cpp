@@ -96,6 +96,7 @@ void DCM::updateEulerAngles(void) {
   yaw   = (int)DEGREES( atan2(2 * q1 * q2 - 2 * q0 * q3, 2 * q0 * q0 + 2 * q1 * q1 - 1) ); // psi
 }
 
+#ifdef DEBUG
 void DCM::print(void) {
   Serial.print("Quaternions: ");
   Serial.print("q0: "); Serial.print(q0, DEC);
@@ -118,7 +119,9 @@ void DCM::printForGraph(void) {
   Serial.print(roll, DEC); Serial.print('\t');
   Serial.print(yaw, DEC);
 }
+#endif
 
+// ~~~~MAGIC~~~~
 float DCM::invSqrt(float number) {
   volatile long i;
   volatile float x, y;
