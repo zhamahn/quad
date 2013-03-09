@@ -7,93 +7,127 @@ void DCM::begin(void) {
   q1 = 0.0;
   q2 = 0.0;
   q3 = 0.0;
-  exInt = 0.0;
-  eyInt = 0.0;
-  ezInt = 0.0;
-  integralFBx = 0.0f,  integralFBy = 0.0f, integralFBz = 0.0f;
-  now = 0;
+  lastUpdate = micros();
 }
 
 void DCM::update(void) {
-  now = micros();
-  sampleFreq = 1.0 / ((now - lastUpdate) / 1000000.0);
-  lastUpdate = now;
   updateQuaternions();
   updateEulerAngles();
+  lastUpdate = micros();
 }
 
 void DCM::updateQuaternions(void) {
-  float recipNorm;
-  float halfex = 0.0f, halfey = 0.0f, halfez = 0.0f;
-  float qa, qb, qc;
-  float halfvx, halfvy, halfvz;
-  float invSampleFreq = (1.0f / sampleFreq);
-  float halfInvSampleFreq = 0.5f * invSampleFreq;
+  //float norm;
+  //float halfex = 0.0f, halfey = 0.0f, halfez = 0.0f;
+  //float qa, qb, qc;
+  //float halfvx, halfvy, halfvz;
+  //float invSampleFreq = (1.0f / sampleFreq);
+  //float halfInvSampleFreq = 0.5f * invSampleFreq;
+  float norm;
+  float hx, hy, hz, bx, bz;
+  float vx, vy, vz, wx, wy, wz;
+  float q0i, q1i, q2i, q3i;
+  float exAcc, eyAcc, ezAcc;
+  float exMag, eyMag, ezMag;
+  float exInt, eyInt, ezInt;
 
   float ax = acc->x;
   float ay = acc->y;
   float az = acc->z;
 
+  float mx = mag->x;
+  float my = mag->y;
+  float mz = acc->z;
+
   float gx = gyro->x;
   float gy = gyro->y;
   float gz = gyro->z;
 
+  float halfT = (micros() - lastUpdate) / 2;
+
+  // auxiliary variables to reduce number of repeated operations
+  float q0q0 = q0*q0;
+  float q0q1 = q0*q1;
+  float q0q2 = q0*q2;
+  float q0q3 = q0*q3;
+  float q1q1 = q1*q1;
+  float q1q2 = q1*q2;
+  float q1q3 = q1*q3;
+  float q2q2 = q2*q2;
+  float q2q3 = q2*q3;
+  float q3q3 = q3*q3;
+
   // Normalise accelerometer measurement
-  recipNorm = invSqrt(ax * ax + ay * ay + az * az);
-  ax *= recipNorm;
-  ay *= recipNorm;
-  az *= recipNorm;
+  norm = sqrt(ax*ax + ay*ay + az*az);
+  ax = ax / norm;
+  ay = ay / norm;
+  az = az / norm;
+
+  // Normalize magnetometer measurement
+  norm = sqrt(mx*mx + my*my + mz*mz);
+  mx = mx / norm;
+  my = my / norm;
+  mz = mz / norm;
+
+  // compute reference direction of flux
+  hx = mx * 2*(0.5 - q2q2 - q3q3) + my * 2*(q1q2 - q0q3)       + mz * 2*(q1q3 + q0q2);
+  hy = mx * 2*(q1q2 + q0q3)       + my * 2*(0.5 - q1q1 - q3q3) + mz * 2*(q2q3 - q0q1);
+  hz = mx * 2*(q1q3 - q0q2)       + my * 2*(q2q3 + q0q1)       + mz * 2*(0.5 - q1q1 - q2q2);
+
+  bx = sqrt((hx*hx) + (hy*hy));
+  bz = hz;
   
   // Estimated direction of gravity
-  halfvx = q1*q3 - q0*q2;
-  halfvy = q0*q1 + q2*q3;
-  halfvz = q0*q0 - 0.5f + q3*q3;
+  vx = 2*(q1q3 - q0q2);
+  vy = 2*(q0q1 + q2q3);
+  vz = q0q0 - q1q1 - q2q2 + q3q3;
 
-  // Error is sum of cross product between estimated direction and measured direction of field vectors
-  halfex += (ay * halfvz - az * halfvy);
-  halfey += (az * halfvx - ax * halfvz);
-  halfez += (ax * halfvy - ay * halfvx);
+  // Estimated direction of flux
+  wx = bx * 2*(0.5 - q2q2 - q3q3) + bz * 2*(q1q3 - q0q2);
+  wy = bx * 2*(q1q2 - q0q3)       + bz * 2*(q0q1 + q2q3);
+  wz = bx * 2*(q0q2 + q1q3)       + bz * 2*(0.5 - q1q1 - q2q2);
 
-  if(halfex != 0.0f && halfey != 0.0f && halfez != 0.0f) {
-    // Compute and apply integral feedback if enabled
-    integralFBx += DCM_TWO_KI * halfex * invSampleFreq;  // integral error scaled by Ki
-    integralFBy += DCM_TWO_KI * halfey * invSampleFreq;
-    integralFBz += DCM_TWO_KI * halfez * invSampleFreq;
-    gx += integralFBx;  // apply integral feedback
-    gy += integralFBy;
-    gz += integralFBz;
-  }
+  // error is sum of cross product between reference direction of fields and direction measured by sensors
+  exAcc = (vy*az - vz*ay);
+  eyAcc = (vz*ax - vx*az);
+  ezAcc = (vx*ay - vy*ax);
+    
+  exMag = (my*wz - mz*wy);
+  eyMag = (mz*wx - mx*wz);
+  ezMag = (mx*wy - my*wx);
 
-  // Apply proportional feedback
-  gx += DCM_TWO_KP * halfex;
-  gy += DCM_TWO_KP * halfey;
-  gz += DCM_TWO_KP * halfez;
-  
-  // Integrate rate of change of quaternion
-  gx *= (halfInvSampleFreq);   // pre-multiply common factors
-  gy *= (halfInvSampleFreq);
-  gz *= (halfInvSampleFreq);
-  qa = q0;
-  qb = q1;
-  qc = q2;
-  q0 += (-qb * gx - qc * gy - q3 * gz);
-  q1 += ( qa * gx + qc * gz - q3 * gy);
-  q2 += ( qa * gy - qb * gz + q3 * gx);
-  q3 += ( qa * gz + qb * gy - qc * gx);
+  // integral error scaled integral gain
+  exInt = exInt + exAcc*DCM_ACC_KI + exMag*DCM_MAG_KI;
+  eyInt = eyInt + eyAcc*DCM_ACC_KI + eyMag*DCM_MAG_KI;
+  ezInt = ezInt + ezAcc*DCM_ACC_KI + ezMag*DCM_MAG_KI;
+
+  // adjusted gyroscope measurements
+  gx = gx + exAcc*DCM_ACC_KP + exMag*DCM_MAG_KP + exInt;
+  gy = gy + eyAcc*DCM_ACC_KP + eyMag*DCM_MAG_KP + eyInt;
+  gz = gz + ezAcc*DCM_ACC_KP + ezMag*DCM_MAG_KP + ezInt;
+
+  // integrate quaternion rate and normalise
+  q0i = (-q1*gx - q2*gy - q3*gz) * halfT;
+  q1i = ( q0*gx + q2*gz - q3*gy) * halfT;
+  q2i = ( q0*gy - q1*gz + q3*gx) * halfT;
+  q3i = ( q0*gz + q1*gy - q2*gx) * halfT;
+  q0 += q0i;
+  q1 += q1i;
+  q2 += q2i;
+  q3 += q3i;
   
   // Normalise quaternion
-  recipNorm = invSqrt(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
-  q0 *= recipNorm;
-  q1 *= recipNorm;
-  q2 *= recipNorm;
-  q3 *= recipNorm;
-
+  norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
+  q0 = q0 / norm;
+  q1 = q1 / norm;
+  q2 = q2 / norm;
+  q3 = q3 / norm;
 }
 
 void DCM::updateEulerAngles(void) {
-  pitch = (int)DEGREES( -asin(2 * q1 * q3 + 2 * q0 * q2) ); // theta
-  roll  = (int)DEGREES( atan2(2 * q2 * q3 - 2 * q0 * q1, 2 * q0 * q0 + 2 * q3 * q3 - 1) ); // phi
-  yaw   = (int)DEGREES( atan2(2 * q1 * q2 - 2 * q0 * q3, 2 * q0 * q0 + 2 * q1 * q1 - 1) ); // psi
+  pitch = (int)DEGREES( -asin(2*q1*q3 + 2*q0*q2) ); // theta
+  roll  = (int)DEGREES( atan2(2*q2*q3 - 2*q0*q1, 2*q0*q0 + 2*q3*q3 - 1) ); // phi
+  yaw   = (int)DEGREES( atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1) ); // psi
 }
 
 #ifdef DEBUG
@@ -120,18 +154,3 @@ void DCM::printForGraph(void) {
   Serial.print(yaw, DEC);
 }
 #endif
-
-// ~~~~MAGIC~~~~
-float DCM::invSqrt(float number) {
-  volatile long i;
-  volatile float x, y;
-  volatile const float f = 1.5F;
-
-  x = number * 0.5F;
-  y = number;
-  i = * ( long * ) &y;
-  i = 0x5f375a86 - ( i >> 1 );
-  y = * ( float * ) &i;
-  y = y * ( f - ( x * y * y ) );
-  return y;
-}
