@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <math.h>
 
 #include "itg3200.h"
 #include "utils.h"

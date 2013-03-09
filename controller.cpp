@@ -36,30 +36,30 @@ void Controller::updateFromDataArray(unsigned char data[]) {
 }
 
 #ifdef DEBUG
-void Controller::print(HardwareSerial *serial) {
-  serial->print("rt: "); serial->print(right_trigger, DEC); serial->print(", ");
-  serial->print("lt: "); serial->print(left_trigger, DEC); serial->print(", ");
+void Controller::print(void) {
+  Serial.print("rt: "); Serial.print(right_trigger, DEC); Serial.print(", ");
+  Serial.print("lt: "); Serial.print(left_trigger, DEC); Serial.print(", ");
 
-  serial->print("rsx: "); serial->print(right_stick_x, DEC); serial->print(", ");
-  serial->print("rsy: "); serial->print(right_stick_y, DEC); serial->print(", ");
+  Serial.print("rsx: "); Serial.print(right_stick_x, DEC); Serial.print(", ");
+  Serial.print("rsy: "); Serial.print(right_stick_y, DEC); Serial.print(", ");
 
-  serial->print("lsx: "); serial->print(left_stick_x, DEC); serial->print(", ");
-  serial->print("lsy: "); serial->print(left_stick_y, DEC); serial->print(", ");
+  Serial.print("lsx: "); Serial.print(left_stick_x, DEC); Serial.print(", ");
+  Serial.print("lsy: "); Serial.print(left_stick_y, DEC); Serial.print(", ");
 
-  /*serial->print("w: "); serial->print(white, DEC); serial->print(", ");*/
-  /*serial->print("b: "); serial->print(black, DEC); serial->print(", ");*/
-  /*serial->print("s: "); serial->print(start, DEC); serial->print(", ");*/
-  /*serial->print("b: "); serial->print(back, DEC); serial->print(", ");*/
-  /*serial->print("l: "); serial->print(left_stick, DEC); serial->print(", ");*/
-  /*serial->print("r: "); serial->print(right_stick, DEC); serial->print(", ");*/
+  /*Serial.print("w: "); Serial.print(white, DEC); Serial.print(", ");*/
+  /*Serial.print("b: "); Serial.print(black, DEC); Serial.print(", ");*/
+  /*Serial.print("s: "); Serial.print(start, DEC); Serial.print(", ");*/
+  /*Serial.print("b: "); Serial.print(back, DEC); Serial.print(", ");*/
+  /*Serial.print("l: "); Serial.print(left_stick, DEC); Serial.print(", ");*/
+  /*Serial.print("r: "); Serial.print(right_stick, DEC); Serial.print(", ");*/
 
-  /*serial->print("dpad (ulrd): ");*/
-    /*serial->print(up, DEC);*/
-    /*serial->print(left, DEC);*/
-    /*serial->print(right, DEC);*/
-    /*serial->print(down, DEC);*/
+  /*Serial.print("dpad (ulrd): ");*/
+    /*Serial.print(up, DEC);*/
+    /*Serial.print(left, DEC);*/
+    /*Serial.print(right, DEC);*/
+    /*Serial.print(down, DEC);*/
 
-  serial->println("");
+  Serial.println("");
 }
 #endif
 

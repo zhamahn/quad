@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <math.h>
 
 #include "hmc5883l.h"
 #include "utils.h"
