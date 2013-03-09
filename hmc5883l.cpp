@@ -6,7 +6,7 @@
 #include "utils.h"
 
 void HMC5883L::begin(void) {
-  writeReg(HMC5883L_ADDR, HMC5883L_MODE, HMC5883L_MEASURE_CONT)
+  writeReg(HMC5883L_ADDR, HMC5883L_MODE, HMC5883L_MODE_CONT);
 }
 
 void HMC5883L::read(void) {

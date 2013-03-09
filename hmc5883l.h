@@ -1,4 +1,4 @@
-#ifdef hmc5883l
+#ifndef hmc5883l
 #define hmc5883l
 
 #define HMC5883L_SMOOTH_FACTOR 0.1
@@ -13,10 +13,11 @@ class HMC5883L {
   private:
     int rawX, rawY, rawZ;
     void read(void);
-}
+};
 
 #define HMC5883L_ADDR 0x1E // Or 0x3D
 #define HMC5883L_MODE 0x02
+#define HMC5883L_MODE_CONT 0x00
 #define HMC5883L_X_MSB 0x03
 #define HMC5883L_X_LSB 0x04
 #define HMC5883L_Z_MSB 0x05
