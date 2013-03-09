@@ -17,20 +17,15 @@ void ITG3200::begin(void) {
 }
 
 void ITG3200::read(void) {
-  char i;
   readReg(ITG_ADDR, GYRO_XOUT_H, 6);
 
   if (Wire.available()) {
-    for (i = 0; i < 6; i++) {
-      switch (i) {
-        case 0: rawX  = Wire.read()<<8; break;
-        case 1: rawX |= Wire.read();    break;
-        case 2: rawY  = Wire.read()<<8; break;
-        case 3: rawY |= Wire.read();    break;
-        case 4: rawZ  = Wire.read()<<8; break;
-        case 5: rawZ |= Wire.read();    break;
-      }
-    }
+    rawX  = Wire.read()<<8;
+    rawX |= Wire.read();
+    rawY  = Wire.read()<<8;
+    rawY |= Wire.read();
+    rawZ  = Wire.read()<<8;
+    rawZ |= Wire.read();
   }
 }
 

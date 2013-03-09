@@ -13,20 +13,15 @@ void ADXL345::begin(void) {
 }
 
 void ADXL345::read(void) {
-  char i;
   readReg(ADXL_ADDR, DATAX0, 6);
 
-  if (Wire.available()) {
-    for (i = 0; i < 6; i++) {
-      switch (i) {
-        case 0: rawX  = Wire.read();    break;
-        case 1: rawX |= Wire.read()<<8; break;
-        case 2: rawY  = Wire.read();    break;
-        case 3: rawY |= Wire.read()<<8; break;
-        case 4: rawZ  = Wire.read();    break;
-        case 5: rawZ |= Wire.read()<<8; break;
-      }
-    }
+  if (Wire.available() >= 6) {
+    rawX  = Wire.read();
+    rawX |= Wire.read()<<8;
+    rawY  = Wire.read();
+    rawY |= Wire.read()<<8;
+    rawZ  = Wire.read();
+    rawZ |= Wire.read()<<8;
   }
 }
 
