@@ -11,6 +11,16 @@
 #include "escs.h"
 #include "dcm.h"
 
+#define ALTITUDE_OUTPUT_FACTOR 1
+#define ROLL_OUTPUT_FACTOR 1
+#define PITCH_OUTPUT_FACTOR 1
+#define YAW_OUTPUT_FACTOR 1
+
+#define ESC_X_CALIB 1
+#define ESC_NX_CALIB 1
+#define ESC_Y_CALIB 1
+#define ESC_NY_CALIB 1
+
 class ControlCenter {
   public:
     ESCs *escs;
@@ -24,6 +34,7 @@ class ControlCenter {
     PID *pitchPID;
     PID *rollPID;
     PID *altitudePID;
+    PID *yawPID;
 
     double pitchInput, pitchOutput, pitchSetpoint;
     double rollInput, rollOutput, rollSetpoint;
