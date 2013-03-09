@@ -4,6 +4,8 @@
 #include "control_center.h"
 #include "quad.h"
 #include "dcm.h"
+#include "controller.h"
+#include "esc.h"
 
 void ControlCenter::begin(void) {
   pitchPID    = new PID(&pitchInput,    &pitchOutput,    &pitchSetpoint,    KP, KI, KD, AUTOMATIC);
@@ -39,8 +41,8 @@ void ControlCenter::setOutputs(void) {
   double alt   = altitudeOutput * ALTITUDE_OUTPUT_FACTOR;
   double yaw   = yawOutput      * YAW_OUTPUT_FACTOR;
 
-  escs->y->change(  ( pitch + alt - yaw) * ESC_Y_CALIB  );
-  escs->ny->change( (-pitch + alt + yaw) * ESC_NY_CALIB );
-  escs->x->change(  ( roll  + alt - yaw) * ESC_X_CALIB  );
-  escs->nx->change( (-roll  + alt + yaw) * ESC_NX_CALIB );
+  y->change(  ( pitch + alt - yaw) * ESC_Y_CALIB  );
+  ny->change( (-pitch + alt + yaw) * ESC_NY_CALIB );
+  x->change(  ( roll  + alt - yaw) * ESC_X_CALIB  );
+  nx->change( (-roll  + alt + yaw) * ESC_NX_CALIB );
 }

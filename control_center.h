@@ -4,11 +4,7 @@
 #include <PID_v1.h>
 
 #include "esc.h"
-#include "itg3200.h"
-#include "adxl345.h"
-#include "ping.h"
 #include "controller.h"
-#include "escs.h"
 #include "dcm.h"
 
 #define ALTITUDE_OUTPUT_FACTOR 1
@@ -23,11 +19,7 @@
 
 class ControlCenter {
   public:
-    ESCs *escs;
     Controller *controller;
-    ITG3200 *gyro;
-    ADXL345 *acc;
-    Ping *alt;
     DCM *dcm;
 
     // PID stuff
@@ -35,6 +27,12 @@ class ControlCenter {
     PID *rollPID;
     PID *altitudePID;
     PID *yawPID;
+
+    // ESCS
+    ESC *x;
+    ESC *nx;
+    ESC *y;
+    ESC *ny;
 
     double pitchInput, pitchOutput, pitchSetpoint;
     double rollInput, rollOutput, rollSetpoint;

@@ -1,54 +1,73 @@
 #ifndef controller_h
 #define controller_h
-#include <HardwareSerial.h>
+#include <SoftwareSerial.h>
 
 #define TRIGGER_ZERO 150
 #define STICK_ZERO 128
 
-struct Controller {
-  signed char left_stick_x;
-  signed char left_stick_y;
+// Communication protocol
+#define BYTE_IS_FRAME_HEADER(byte) (byte == 0xFF)
+#define BYTE_IS_FRAME_FOOTER(byte) (byte >= 0xCC)
+#define PARITY_BIT(byte) (byte & 0x03)
+#define FRAME_DATA_LENGTH 8
 
-  signed char right_stick_x;
-  signed char right_stick_y;
+#define FRAME_INCOMPLETE 0
+#define FRAME_COMPLETE 1
+#define FRAME_DISCARDED 2
 
-  unsigned char right_trigger;
-  unsigned char left_trigger;
+class Controller {
+  public:
+    SoftwareSerial *mySerial;
 
-  int white;
-  int black;
+    signed char left_stick_x;
+    signed char left_stick_y;
 
-  bool up;
-  bool down;
-  bool left;
-  bool right;
+    signed char right_stick_x;
+    signed char right_stick_y;
 
-  bool left_stick;
-  bool right_stick;
-  bool back;
-  bool start;
-  bool a;
-  bool b;
-  bool x;
-  bool y;
+    unsigned char right_trigger;
+    unsigned char left_trigger;
 
-  unsigned long lastUpdateAt;
+    int white;
+    int black;
 
-  void updateButtons(unsigned char);
-  void updateDpad(unsigned char);
-  void updateFromDataArray(unsigned char *);
-  #ifdef DEBUG
-  void print(HardwareSerial *);
-  #endif
+    bool up;
+    bool down;
+    bool left;
+    bool right;
 
-  signed char roll(void);
-  signed char pitch(void);
-  int altitude(void);
+    bool left_stick;
+    bool right_stick;
+    bool back;
+    bool start;
+    bool a;
+    bool b;
+    bool x;
+    bool y;
 
-  signed char yaw(void);
+    void update();
+    void updateButtons(unsigned char);
+    void updateDpad(unsigned char);
+    void updateFromDataArray(unsigned char *);
+    #ifdef DEBUG
+    void print();
+    #endif
 
-  void resetIfOldData(void);
-  void reset(void);
+    signed char roll(void);
+    signed char pitch(void);
+    int altitude(void);
+
+    signed char yaw(void);
+
+    void resetIfOldData(void);
+    void reset(void);
+
+  private:
+    unsigned long lastUpdateAt;
+
+    int countOnes(unsigned char);
+    int readFrame(unsigned char *);
+
 };
 
 #endif
