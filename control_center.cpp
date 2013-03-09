@@ -11,9 +11,9 @@ void ControlCenter::begin(void) {
   yawPID      = new PID(&yawInput,      &yawOutput,      &yawSetpoint,      KP, KI, KD, AUTOMATIC);
   altitudePID = new PID(&altitudeInput, &altitudeOutput, &altitudeSetpoint, KP, KI, KD, AUTOMATIC);
 
-  pitchPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
-  rollPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
-  altitudePID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
+  //pitchPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
+  //rollPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
+  //altitudePID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
 }
 
 void ControlCenter::updatePIDs(void) {
