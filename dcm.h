@@ -3,12 +3,11 @@
 
 #include "itg3200.h"
 #include "adxl345.h"
+#include "utils.h"
 
 #define DCM_TWO_KP  (3.0f) // original value: 1.0
 #define DCM_TWO_KI  (0.1f) // original value: 0.2
 
-//#define DEGREES(rad) ((rad) * 57.2957795130)
-#define DEGREES(rad) ((rad) * 180 / M_PI)
 
 class DCM {
   public:
