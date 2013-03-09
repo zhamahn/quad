@@ -1,8 +1,8 @@
 #ifndef esc_h
 #define esc_h
-#define ESC_STEP 4
 
-#include "quad.h"
+#define OUTPUT_MIN 10
+#define OUTPUT_MAX 255
 
 class ESC {
   public:

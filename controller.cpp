@@ -2,7 +2,6 @@
 #include <SoftwareSerial.h>
 
 #include "controller.h"
-#include "quad.h"
 
 void Controller::updateButtons(unsigned char data) {
   left_stick  = data & B10000000;

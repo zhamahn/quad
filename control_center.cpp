@@ -2,16 +2,15 @@
 #include <PID_v1.h>
 
 #include "control_center.h"
-#include "quad.h"
 #include "dcm.h"
 #include "controller.h"
 #include "esc.h"
 
 void ControlCenter::begin(void) {
-  pitchPID    = new PID(&pitchInput,    &pitchOutput,    &pitchSetpoint,    KP, KI, KD, AUTOMATIC);
-  rollPID     = new PID(&rollInput,     &rollOutput,     &rollSetpoint,     KP, KI, KD, AUTOMATIC);
-  yawPID      = new PID(&yawInput,      &yawOutput,      &yawSetpoint,      KP, KI, KD, AUTOMATIC);
-  altitudePID = new PID(&altitudeInput, &altitudeOutput, &altitudeSetpoint, KP, KI, KD, AUTOMATIC);
+  pitchPID    = new PID(&pitchInput,    &pitchOutput,    &pitchSetpoint,    PITCH_KP, PITCH_KI, PITCH_KD, AUTOMATIC);
+  rollPID     = new PID(&rollInput,     &rollOutput,     &rollSetpoint,     ROLL_KP,  ROLL_KI,  ROLL_KD,  AUTOMATIC);
+  yawPID      = new PID(&yawInput,      &yawOutput,      &yawSetpoint,      YAW_KP,   YAW_KI,   YAW_KD,   AUTOMATIC);
+  altitudePID = new PID(&altitudeInput, &altitudeOutput, &altitudeSetpoint, ALT_KP,   ALT_KI,   ALT_KD,   AUTOMATIC);
 
   //pitchPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
   //rollPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);

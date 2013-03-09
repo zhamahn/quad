@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
 #include "esc.h"
-#include "quad.h"
 
 ESC::ESC(unsigned char _pin) {
   pin = _pin;

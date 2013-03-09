@@ -1,9 +1,8 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <PID_v1.h>
 #include <SoftwareSerial.h>
+#include <PID_v1.h>
 
-#include "quad.h"
 #include "utils.h"
 #include "esc.h"
 #include "adxl345.h"
@@ -11,6 +10,19 @@
 #include "controller.h"
 #include "control_center.h"
 #include "hmc5883l.h"
+
+// Pins
+#define PING_PIN 7
+#define PING_INT 0
+#define PING_INT_PIN 2
+
+#define ESC_X_PIN 6
+#define ESC_NX_PIN 5
+#define ESC_Y_PIN 10
+#define ESC_NY_PIN 9
+
+#define PIN_SERIAL_RX 4
+#define PIN_SERIAL_TX 2
 
 ITG3200 gyro;
 ADXL345 acc;
