@@ -10,7 +10,6 @@ void HMC5883L::begin(void) {
 }
 
 void HMC5883L::read(void) {
-  char i;
   readReg(HMC5883L_ADDR, HMC5883L_X_MSB, 6);
   
   if (Wire.available() >= 6) {
