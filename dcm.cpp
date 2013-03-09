@@ -29,7 +29,7 @@ void DCM::updateQuaternions(void) {
   float q0i, q1i, q2i, q3i;
   float exAcc, eyAcc, ezAcc;
   float exMag, eyMag, ezMag;
-  float exInt, eyInt, ezInt;
+  float exInt = 0.0, eyInt = 0.0, ezInt = 0.0;
 
   float ax = acc->x;
   float ay = acc->y;
