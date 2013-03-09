@@ -17,12 +17,6 @@ void DCM::update(void) {
 }
 
 void DCM::updateQuaternions(void) {
-  //float norm;
-  //float halfex = 0.0f, halfey = 0.0f, halfez = 0.0f;
-  //float qa, qb, qc;
-  //float halfvx, halfvy, halfvz;
-  //float invSampleFreq = (1.0f / sampleFreq);
-  //float halfInvSampleFreq = 0.5f * invSampleFreq;
   float norm;
   float hx, hy, hz, bx, bz;
   float vx, vy, vz, wx, wy, wz;
