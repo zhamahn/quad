@@ -65,20 +65,19 @@ void Controller::print(HardwareSerial *serial) {
 #endif
 
 signed char Controller::pitch(void) {
-  return map(right_stick_y, -128, 127, -45, 45);
+  return map(left_stick_y, -128, 127, -45, 45);
 }
 
 signed char Controller::roll(void) {
-  return map(right_stick_x, -128, 127, -45, 45);
+  return map(left_stick_x, -128, 127, -45, 45);
 }
 
-int Controller::altitude(int currentAltitude) {
-  if (right_trigger > 20)
-    return constrain(currentAltitude + right_trigger, 0, 400);
-  else if (left_trigger > 20)
-    return constrain(currentAltitude - left_trigger, 0, 400);
-  else
-    return constrain(currentAltitude, 0, 400);
+int Controller::altitude(void) {
+  return (right_trigger - left_trigger);
+}
+
+signed char Controller::yaw(void) {
+  return map(right_stick_x, -127, 127, -45, 45);
 }
 
 void Controller::resetIfOldData(void) {
