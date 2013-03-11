@@ -23,16 +23,6 @@
 #define YAW_KI 5
 #define YAW_KD 1
 
-#define ALTITUDE_OUTPUT_FACTOR 1
-#define ROLL_OUTPUT_FACTOR 1
-#define PITCH_OUTPUT_FACTOR 1
-#define YAW_OUTPUT_FACTOR 1
-
-#define ESC_X_CALIB 1
-#define ESC_NX_CALIB 1
-#define ESC_Y_CALIB 1
-#define ESC_NY_CALIB 1
-
 class ControlCenter {
   public:
     Controller *controller;
@@ -44,11 +34,8 @@ class ControlCenter {
     PID *altitudePID;
     PID *yawPID;
 
-    // ESCS
-    ESC *x;
-    ESC *nx;
-    ESC *y;
-    ESC *ny;
+    ESC *escs[];
+    int escs_count;
 
     double pitchInput, pitchOutput, pitchSetpoint;
     double rollInput, rollOutput, rollSetpoint;
@@ -56,7 +43,7 @@ class ControlCenter {
     double yawInput, yawOutput, yawSetpoint;
 
     // functions
-    void begin(void);
+    ControlCenter(ESC *[], int);
 
     void updatePIDs(void);
     void setOutputs(void);

@@ -7,14 +7,22 @@
 class ESC {
   public:
     unsigned char pin;
-    int gain;
     int output;
 
-    ESC(unsigned char);
+    float pitch_factor;
+    float roll_factor;
+    float yaw_factor;
+    float altitude_factor;
 
-    int write(void);
+    ESC(unsigned char, float, float, float, float);
+
+    void write(void);
     int set(int);
     int change(int);
+    int changePitch(int);
+    int changeRoll(int);
+    int changeYaw(int);
+    int changeAltitude(int);
 };
 
 #endif

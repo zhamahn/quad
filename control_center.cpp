@@ -6,7 +6,9 @@
 #include "controller.h"
 #include "esc.h"
 
-void ControlCenter::begin(void) {
+ControlCenter::ControlCenter(ESC *escs[], int _escs_count) {
+  escs = escs;
+  escs_count = _escs_count;
   pitchPID    = new PID(&pitchInput,    &pitchOutput,    &pitchSetpoint,    PITCH_KP, PITCH_KI, PITCH_KD, AUTOMATIC);
   rollPID     = new PID(&rollInput,     &rollOutput,     &rollSetpoint,     ROLL_KP,  ROLL_KI,  ROLL_KD,  AUTOMATIC);
   yawPID      = new PID(&yawInput,      &yawOutput,      &yawSetpoint,      YAW_KP,   YAW_KI,   YAW_KD,   AUTOMATIC);
@@ -35,13 +37,16 @@ void ControlCenter::updatePIDs(void) {
 }
 
 void ControlCenter::setOutputs(void) {
-  double pitch = pitchOutput    * PITCH_OUTPUT_FACTOR;
-  double roll  = rollOutput     * ROLL_OUTPUT_FACTOR;
-  double alt   = altitudeOutput * ALTITUDE_OUTPUT_FACTOR;
-  double yaw   = yawOutput      * YAW_OUTPUT_FACTOR;
+  int i;
 
-  y->change(  ( pitch + alt - yaw) * ESC_Y_CALIB  );
-  ny->change( (-pitch + alt + yaw) * ESC_NY_CALIB );
-  x->change(  ( roll  + alt - yaw) * ESC_X_CALIB  );
-  nx->change( (-roll  + alt + yaw) * ESC_NX_CALIB );
+  for (i=0; i<escs_count; i++) {
+    escs[i]->changePitch(pitchOutput);
+    escs[i]->changeRoll(rollOutput);
+    escs[i]->changeYaw(yawOutput);
+    escs[i]->changeAltitude(altitudeOutput);
+  }
+
+  for (i=0; i<escs_count; i++) {
+    escs[i]->write();
+  }
 }
