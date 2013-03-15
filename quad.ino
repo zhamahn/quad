@@ -59,7 +59,7 @@ ESC *escs[MOTOR_COUNT] = {&esc_x, &esc_nx, &esc_y, &esc_ny};
 Controller controller;
 ControlCenter quad(escs, MOTOR_COUNT);
 SoftwareSerial mySerial(PIN_SERIAL_RX, PIN_SERIAL_TX);
-DCM dcm;
+AHRS ahrs;
 
 void pingInterrupt(void) {
   alt.measure();
@@ -73,14 +73,14 @@ void setup() {
   // Initialize classes
   acc.begin();
   gyro.begin();
-  dcm.begin();
+  ahrs.begin();
 
   quad.controller = &controller;
-  quad.dcm        = &dcm;
+  quad.ahrs        = &ahrs;
 
-  dcm.acc = &acc;
-  dcm.gyro = &gyro;
-  dcm.mag = &mag;
+  ahrs.acc = &acc;
+  ahrs.gyro = &gyro;
+  ahrs.mag = &mag;
 
   controller.mySerial = &mySerial;
 
@@ -97,7 +97,7 @@ void loop() {
   acc.update();
   gyro.update();
   mag.update();
-  dcm.update();
+  ahrs.update();
 
   quad.updatePIDs();
   quad.setOutputs();

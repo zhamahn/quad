@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <math.h>
-#include "dcm.h"
+#include "ahrs.h"
 
-void DCM::begin(void) {
+void AHRS::begin(void) {
   q0 = 1.0;
   q1 = 0.0;
   q2 = 0.0;
@@ -10,13 +10,14 @@ void DCM::begin(void) {
   lastUpdate = micros();
 }
 
-void DCM::update(void) {
+void AHRS::update(void) {
   updateQuaternions();
   updateEulerAngles();
+  updateEarthAccels();
   lastUpdate = micros();
 }
 
-void DCM::updateQuaternions(void) {
+void AHRS::updateQuaternions(void) {
   float norm;
   float hx, hy, hz, bx, bz;
   float vx, vy, vz, wx, wy, wz;
@@ -91,14 +92,14 @@ void DCM::updateQuaternions(void) {
   ezMag = (mx*wy - my*wx);
 
   // integral error scaled integral gain
-  exInt = exInt + exAcc*DCM_ACC_KI + exMag*DCM_MAG_KI;
-  eyInt = eyInt + eyAcc*DCM_ACC_KI + eyMag*DCM_MAG_KI;
-  ezInt = ezInt + ezAcc*DCM_ACC_KI + ezMag*DCM_MAG_KI;
+  exInt = exInt + exAcc*AHRS_ACC_KI + exMag*AHRS_MAG_KI;
+  eyInt = eyInt + eyAcc*AHRS_ACC_KI + eyMag*AHRS_MAG_KI;
+  ezInt = ezInt + ezAcc*AHRS_ACC_KI + ezMag*AHRS_MAG_KI;
 
   // adjusted gyroscope measurements
-  gx = gx + exAcc*DCM_ACC_KP + exMag*DCM_MAG_KP + exInt;
-  gy = gy + eyAcc*DCM_ACC_KP + eyMag*DCM_MAG_KP + eyInt;
-  gz = gz + ezAcc*DCM_ACC_KP + ezMag*DCM_MAG_KP + ezInt;
+  gx = gx + exAcc*AHRS_ACC_KP + exMag*AHRS_MAG_KP + exInt;
+  gy = gy + eyAcc*AHRS_ACC_KP + eyMag*AHRS_MAG_KP + eyInt;
+  gz = gz + ezAcc*AHRS_ACC_KP + ezMag*AHRS_MAG_KP + ezInt;
 
   // integrate quaternion rate and normalise
   q0i = (-q1*gx - q2*gy - q3*gz) * halfT;
@@ -118,14 +119,22 @@ void DCM::updateQuaternions(void) {
   q3 = q3 / norm;
 }
 
-void DCM::updateEulerAngles(void) {
-  pitch = (int)DEGREES( -asin(2*q1*q3 + 2*q0*q2) ); // theta
-  roll  = (int)DEGREES( atan2(2*q2*q3 - 2*q0*q1, 2*q0*q0 + 2*q3*q3 - 1) ); // phi
-  yaw   = (int)DEGREES( atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1) ); // psi
+void AHRS::updateEulerAngles(void) {
+  pitch = -asin(2*q1*q3 + 2*q0*q2); // theta
+  roll  = atan2(2*q2*q3 - 2*q0*q1, 2*q0*q0 + 2*q3*q3 - 1); // phi
+  yaw   = atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1); // psi
+}
+
+void AHRS::updateEarthAccels(void) {
+  float sin_pitch = sin(DEGREES(pitch));
+  float sin_roll = sin(DEGREES(roll));
+  earthAccel[AHRS_XAXIS] = acc->x / sin_pitch / sin_roll;
+  earthAccel[AHRS_YAXIS] = acc->y / sin_pitch / sin_roll;
+  earthAccel[AHRS_ZAXIS] = acc->z / sin_pitch / sin_roll;
 }
 
 #ifdef DEBUG
-void DCM::print(void) {
+void AHRS::print(void) {
   Serial.print("Quaternions: ");
   Serial.print("q0: "); Serial.print(q0, DEC);
   Serial.print(", q1: "); Serial.print(q1, DEC);
@@ -138,7 +147,7 @@ void DCM::print(void) {
   Serial.println("");
 }
 
-void DCM::printForGraph(void) {
+void AHRS::printForGraph(void) {
   Serial.print(q0, DEC); Serial.print('\t');
   Serial.print(q1, DEC); Serial.print('\t');
   Serial.print(q2, DEC); Serial.print('\t');

@@ -2,7 +2,7 @@
 #include <PID_v1.h>
 
 #include "control_center.h"
-#include "dcm.h"
+#include "ahrs.h"
 #include "controller.h"
 #include "esc.h"
 
@@ -20,10 +20,10 @@ ControlCenter::ControlCenter(ESC *escs[], int _escs_count) {
 }
 
 void ControlCenter::updatePIDs(void) {
-  pitchInput = dcm->pitch;
-  rollInput = dcm->roll;
-  yawInput = dcm->yaw;
-  altitudeInput = dcm->earthAccel[DCM_ZAXIS];
+  pitchInput = ahrs->pitch;
+  rollInput = ahrs->roll;
+  yawInput = ahrs->yaw;
+  altitudeInput = ahrs->earthAccel[AHRS_ZAXIS];
 
   pitchSetpoint = controller->pitch();
   rollSetpoint = controller->roll();

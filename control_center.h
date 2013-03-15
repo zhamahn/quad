@@ -5,7 +5,7 @@
 
 #include "esc.h"
 #include "controller.h"
-#include "dcm.h"
+#include "ahrs.h"
 
 #define PITCH_KP 2
 #define PITCH_KI 5
@@ -26,7 +26,7 @@
 class ControlCenter {
   public:
     Controller *controller;
-    DCM *dcm;
+    AHRS *ahrs;
 
     // PID stuff
     PID *pitchPID;
