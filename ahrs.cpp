@@ -139,14 +139,14 @@ void AHRS::updateQuaternions(void) {
 }
 
 void AHRS::updateEulerAngles(void) {
-  pitch = -asin(2*q1*q3 + 2*q0*q2); // theta
-  roll  = atan2(2*q2*q3 - 2*q0*q1, 2*q0*q0 + 2*q3*q3 - 1); // phi
-  yaw   = atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1); // psi
+  pitch = DEGREES(-asin(2*q1*q3 + 2*q0*q2)); // theta
+  roll  = DEGREES(atan2(2*q2*q3 - 2*q0*q1, 2*q0*q0 + 2*q3*q3 - 1)); // phi
+  yaw   = DEGREES(atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1)); // psi
 }
 
 void AHRS::updateEarthAccels(void) {
-  float sin_pitch = sin(DEGREES(pitch));
-  float sin_roll = sin(DEGREES(roll));
+  int sin_pitch = sin(pitch);
+  int sin_roll = sin(roll);
   earthAccel[AHRS_XAXIS] = acc->x / sin_pitch / sin_roll;
   earthAccel[AHRS_YAXIS] = acc->y / sin_pitch / sin_roll;
   earthAccel[AHRS_ZAXIS] = acc->z / sin_pitch / sin_roll;
