@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <Wire.h>
 
 #include "itg3200.h"

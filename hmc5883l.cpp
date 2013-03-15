@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <Wire.h>
 
 #include "hmc5883l.h"

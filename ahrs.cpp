@@ -1,5 +1,3 @@
-#include <Arduino.h>
-#include <math.h>
 #include "ahrs.h"
 
 void AHRS::begin(void) {

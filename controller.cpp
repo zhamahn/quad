@@ -4,21 +4,21 @@
 #include "controller.h"
 
 void Controller::updateButtons(unsigned char data) {
-  left_stick  = data & B10000000;
-  right_stick = data & B1000000;
-  back        = data & B100000;
-  start       = data & B10000;
-  a           = data & B1000;
-  b           = data & B100;
-  x           = data & B10;
-  y           = data & B1;
+  left_stick  = data & 0b10000000;
+  right_stick = data & 0b1000000;
+  back        = data & 0b100000;
+  start       = data & 0b10000;
+  a           = data & 0b1000;
+  b           = data & 0b100;
+  x           = data & 0b10;
+  y           = data & 0b1;
 }
 
 void Controller::updateDpad(unsigned char data) {
-  up    = data & B1000;
-  down  = data & B100;
-  left  = data & B10;
-  right = data & B1;
+  up    = data & 0b1000;
+  down  = data & 0b100;
+  left  = data & 0b10;
+  right = data & 0b1;
 }
 
 void Controller::updateFromDataArray(unsigned char data[]) {
