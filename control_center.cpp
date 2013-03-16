@@ -19,15 +19,15 @@ ControlCenter::ControlCenter(ESC *escs[], int _escs_count) {
 }
 
 void ControlCenter::updatePIDs(void) {
-  pitchInput = ahrs->pitch;
-  rollInput = ahrs->roll;
-  yawInput = ahrs->yaw;
+  pitchInput    = ahrs->pitch;
+  rollInput     = ahrs->roll;
+  yawInput      = ahrs->yaw;
   altitudeInput = ahrs->earthAccel[AHRS_ZAXIS];
 
-  pitchSetpoint = controller->pitch();
-  rollSetpoint = controller->roll();
-  yawSetpoint = controller->yaw();
-  altitudeSetpoint = controller->altitude();
+  pitchSetpoint    = map(controller->left_stick_y, -128, 127, -45, 45);
+  rollSetpoint     = map(controller->left_stick_x, -128, 127, -45, 45);
+  yawSetpoint      = controller->right_stick_x;
+  altitudeSetpoint = controller->right_trigger - controller->left_trigger;
 
   pitchPID->Compute();
   rollPID->Compute();

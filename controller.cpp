@@ -31,8 +31,6 @@ void Controller::updateFromDataArray(unsigned char data[]) {
 
   updateButtons(data[6]);
   updateDpad(data[7]);
-
-  lastUpdateAt = millis();
 }
 
 #ifdef DEBUG
@@ -63,27 +61,6 @@ void Controller::print(void) {
 }
 #endif
 
-signed char Controller::pitch(void) {
-  return map(left_stick_y, -128, 127, -45, 45);
-}
-
-signed char Controller::roll(void) {
-  return map(left_stick_x, -128, 127, -45, 45);
-}
-
-int Controller::altitude(void) {
-  return (right_trigger - left_trigger);
-}
-
-signed char Controller::yaw(void) {
-  return map(right_stick_x, -127, 127, -45, 45);
-}
-
-void Controller::resetIfOldData(void) {
-  if ((lastUpdateAt + 5000) < millis())
-    reset();
-}
-
 void Controller::reset(void) {
   right_trigger = 10;
   left_trigger = 10;
@@ -97,10 +74,15 @@ void Controller::reset(void) {
 
 void Controller::update(void) {
   unsigned char data[8];
+  unsigned long now = millis();
+
   if (mySerial->available() > 0) {
     if (readFrame(data) == FRAME_COMPLETE)
       updateFromDataArray(data);
+      lastUpdateAt = now;
   }
+  if ((lastUpdateAt + 5000) < now)
+    reset();
 }
 
 int Controller::countOnes(unsigned char data) {

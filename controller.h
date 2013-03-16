@@ -46,27 +46,19 @@ class Controller {
     bool y;
 
     void update();
-    void updateButtons(unsigned char);
-    void updateDpad(unsigned char);
-    void updateFromDataArray(unsigned char *);
+    void reset(void);
     #ifdef DEBUG
     void print();
     #endif
-
-    signed char roll(void);
-    signed char pitch(void);
-    int altitude(void);
-
-    signed char yaw(void);
-
-    void resetIfOldData(void);
-    void reset(void);
 
   private:
     unsigned long lastUpdateAt;
 
     int countOnes(unsigned char);
     int readFrame(unsigned char *);
+    void updateButtons(unsigned char);
+    void updateDpad(unsigned char);
+    void updateFromDataArray(unsigned char *);
 
 };
 
