@@ -57,7 +57,7 @@ ESC esc_y( ESC_Y_PIN,  ESC_Y_PITCH,  ESC_Y_ROLL,  ESC_Y_YAW,  ESC_Y_ALTITUDE );
 ESC esc_ny(ESC_NY_PIN, ESC_NY_PITCH, ESC_NY_ROLL, ESC_NY_YAW, ESC_NY_ALTITUDE);
 ESC *escs[MOTOR_COUNT] = {&esc_x, &esc_nx, &esc_y, &esc_ny};
 Controller controller;
-ControlCenter quad(escs, MOTOR_COUNT);
+ControlCenter control_center(escs, MOTOR_COUNT);
 SoftwareSerial mySerial(PIN_SERIAL_RX, PIN_SERIAL_TX);
 AHRS ahrs;
 
@@ -75,8 +75,8 @@ void setup() {
   gyro.begin();
   ahrs.begin();
 
-  quad.controller = &controller;
-  quad.ahrs        = &ahrs;
+  control_center.controller = &controller;
+  control_center.ahrs        = &ahrs;
 
   ahrs.acc = &acc;
   ahrs.gyro = &gyro;
@@ -99,8 +99,8 @@ void loop() {
   mag.update();
   ahrs.update();
 
-  quad.updatePIDs();
-  quad.setOutputs();
+  control_center.updatePIDs();
+  control_center.setOutputs();
   //alt.start();
 }
 // }}}
