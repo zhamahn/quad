@@ -45,7 +45,7 @@
 #define ESC_Y_ALTITUDE 1
 #define ESC_NY_ALTITUDE 1
 
-#define MOTOR_COUNT 4
+#define ESCS_COUNT 4
 
 ITG3200 gyro;
 ADXL345 acc;
@@ -55,9 +55,9 @@ ESC esc_x( ESC_X_PIN,  ESC_X_PITCH,  ESC_X_ROLL,  ESC_X_YAW,  ESC_X_ALTITUDE );
 ESC esc_nx(ESC_NX_PIN, ESC_NX_PITCH, ESC_NX_ROLL, ESC_NX_YAW, ESC_NX_ALTITUDE);
 ESC esc_y( ESC_Y_PIN,  ESC_Y_PITCH,  ESC_Y_ROLL,  ESC_Y_YAW,  ESC_Y_ALTITUDE );
 ESC esc_ny(ESC_NY_PIN, ESC_NY_PITCH, ESC_NY_ROLL, ESC_NY_YAW, ESC_NY_ALTITUDE);
-ESC *escs[MOTOR_COUNT] = {&esc_x, &esc_nx, &esc_y, &esc_ny};
+ESC *escs[ESCS_COUNT] = {&esc_x, &esc_nx, &esc_y, &esc_ny};
 Controller controller;
-ControlCenter control_center(escs, MOTOR_COUNT);
+ControlCenter control_center(escs, ESCS_COUNT);
 SoftwareSerial mySerial(PIN_SERIAL_RX, PIN_SERIAL_TX);
 AHRS ahrs;
 

@@ -34,7 +34,7 @@ class ControlCenter {
     PID *altitudePID;
     PID *yawPID;
 
-    ESC *escs[];
+    ESC **escs;
     int escs_count;
 
     double pitchInput, pitchOutput, pitchSetpoint;

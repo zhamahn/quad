@@ -5,8 +5,8 @@
 #include "controller.h"
 #include "esc.h"
 
-ControlCenter::ControlCenter(ESC *escs[], int _escs_count) {
-  escs = escs;
+ControlCenter::ControlCenter(ESC *_escs[], int _escs_count) {
+  escs = _escs;
   escs_count = _escs_count;
   pitchPID    = new PID(&pitchInput,    &pitchOutput,    &pitchSetpoint,    PITCH_KP, PITCH_KI, PITCH_KD, AUTOMATIC);
   rollPID     = new PID(&rollInput,     &rollOutput,     &rollSetpoint,     ROLL_KP,  ROLL_KI,  ROLL_KD,  AUTOMATIC);
