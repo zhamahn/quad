@@ -111,14 +111,14 @@ void AHRS::updateQuaternions(void) {
   ezMag = (mx*wy - my*wx);
 
   // integral error scaled integral gain
-  exInt = exInt + exAcc*AHRS_ACC_KI + exMag*AHRS_MAG_KI;
-  eyInt = eyInt + eyAcc*AHRS_ACC_KI + eyMag*AHRS_MAG_KI;
-  ezInt = ezInt + ezAcc*AHRS_ACC_KI + ezMag*AHRS_MAG_KI;
+  exInt += exAcc*AHRS_ACC_KI + exMag*AHRS_MAG_KI;
+  eyInt += eyAcc*AHRS_ACC_KI + eyMag*AHRS_MAG_KI;
+  ezInt += ezAcc*AHRS_ACC_KI + ezMag*AHRS_MAG_KI;
 
   // adjusted gyroscope measurements
-  gx = gx + exAcc*AHRS_ACC_KP + exMag*AHRS_MAG_KP + exInt;
-  gy = gy + eyAcc*AHRS_ACC_KP + eyMag*AHRS_MAG_KP + eyInt;
-  gz = gz + ezAcc*AHRS_ACC_KP + ezMag*AHRS_MAG_KP + ezInt;
+  gx += exAcc*AHRS_ACC_KP + exMag*AHRS_MAG_KP + exInt;
+  gy += eyAcc*AHRS_ACC_KP + eyMag*AHRS_MAG_KP + eyInt;
+  gz += ezAcc*AHRS_ACC_KP + ezMag*AHRS_MAG_KP + ezInt;
 
   // integrate quaternion rate and normalise
   q0i = (-q1*gx - q2*gy - q3*gz) * halfT;
