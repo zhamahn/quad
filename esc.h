@@ -16,8 +16,7 @@ class ESC {
 
     ESC(unsigned char, float, float, float, float);
 
-    void write(void);
-    int set(int);
+    int write(void);
     int change(int);
     int changePitch(int);
     int changeRoll(int);
