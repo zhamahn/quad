@@ -76,7 +76,10 @@ void setup() {
   ahrs.begin();
 
   control_center.controller = &controller;
-  control_center.ahrs        = &ahrs;
+  control_center.ahrs       = &ahrs;
+  control_center.gyro       = &gyro;
+  control_center.acc        = &acc;
+  control_center.mag        = &mag;
 
   ahrs.acc = &acc;
   ahrs.gyro = &gyro;
@@ -98,9 +101,7 @@ void loop() {
   gyro.update();
   mag.update();
   ahrs.update();
-
-  control_center.updatePIDs();
-  control_center.setOutputs();
+  control_center.update();
   //alt.start();
 }
 // }}}
