@@ -39,8 +39,7 @@
 class AHRS {
   public:
     float q0, q1, q2, q3; // Quaternion elements representing the estimated orientation
-    float pitch, roll, yaw; // Estimated euler angles
-    float earthAccel[3];  // Accelerations in earth coordinates
+    //float earthAccel[3];  // Accelerations in earth coordinates
 
     ITG3200 *gyro;
     ADXL345 *acc;
@@ -48,18 +47,25 @@ class AHRS {
 
     void begin(void);
     void update(void);
+
+    float pitch(void);
+    float roll(void);
+    float yaw(void);
+
+    int earthAccelX(void);
+    int earthAccelY(void);
+    int earthAccelZ(void);
 #ifdef DEBUG
     void print(void);
     void printForGraph(void);
 #endif
 
   private:
-    float iq0, iq1, iq2, iq3;
     unsigned long lastUpdate; // sample period in milliseconds
 
     void updateQuaternions(void);
-    void updateEulerAngles(void);
-    void updateEarthAccels(void);
+    //void updateEulerAngles(void);
+    //void updateEarthAccels(void);
 };
 
 #endif
