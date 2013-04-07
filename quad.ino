@@ -74,6 +74,7 @@ void setup() {
   acc.begin();
   gyro.begin();
   ahrs.begin();
+  mag.begin();
 
   control_center.controller = &controller;
   control_center.ahrs       = &ahrs;
