@@ -22,7 +22,8 @@ void HMC5883L::read(void) {
 
 void HMC5883L::update(void) {
   read();
-  x = smooth(rawX, x, HMC5883L_SMOOTH_FACTOR);
-  y = smooth(rawY, y, HMC5883L_SMOOTH_FACTOR);
+  // Compensate for sensor orientation here
+  x = smooth(rawY*-1, x, HMC5883L_SMOOTH_FACTOR);
+  y = smooth(rawX*-1, y, HMC5883L_SMOOTH_FACTOR);
   z = smooth(rawZ, z, HMC5883L_SMOOTH_FACTOR);
 }

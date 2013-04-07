@@ -34,9 +34,10 @@ void ITG3200::update(void) {
   rawY += ITG_Y_ERROR;
   rawZ += ITG_Z_ERROR;
   // Smoothen read values
+  // Compensate for sensor orientation here
   smoothX = smooth(rawX, smoothX, ITG_SMOOTH_FACTOR);
-  smoothY = smooth(rawY, smoothY, ITG_SMOOTH_FACTOR);
-  smoothZ = smooth(rawZ, smoothZ, ITG_SMOOTH_FACTOR);
+  smoothY = smooth(rawY*-1, smoothY, ITG_SMOOTH_FACTOR);
+  smoothZ = smooth(rawZ*-1, smoothZ, ITG_SMOOTH_FACTOR);
   // Convert to radians
   x = (float)smoothX * ITG_SCALE_FACTOR;
   y = (float)smoothY * ITG_SCALE_FACTOR;

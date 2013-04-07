@@ -26,9 +26,10 @@ void ADXL345::read(void) {
 
 void ADXL345::update(void) {
   read();
+  // Compensate for sensor orientation here
   x = smooth(rawX, x, ADXL_SMOOTH_FACTOR);
-  y = smooth(rawY, y, ADXL_SMOOTH_FACTOR);
-  z = smooth(rawZ, z, ADXL_SMOOTH_FACTOR);
+  y = smooth(rawY*-1, y, ADXL_SMOOTH_FACTOR);
+  z = smooth(rawZ*-1, z, ADXL_SMOOTH_FACTOR);
 }
 
 float ADXL345::valueToG(int value) {
