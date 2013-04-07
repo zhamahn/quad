@@ -31,10 +31,10 @@
 #define AHRS_YAXIS 1
 #define AHRS_ZAXIS 2
 
-#define AHRS_ACC_KP 0.0
-#define AHRS_ACC_KI 0.0
-#define AHRS_MAG_KP 0.0
-#define AHRS_MAG_KI 0.0
+#define AHRS_ACC_KP 1.0 // reference 0.2
+#define AHRS_ACC_KI 0.005 // reference 0.0005
+#define AHRS_MAG_KP 2.0 // reference 2.0
+#define AHRS_MAG_KI 0.005 // reference 0.005
 
 class AHRS {
   public:
@@ -62,6 +62,8 @@ class AHRS {
 
   private:
     unsigned long lastUpdate; // sample period in milliseconds
+
+    float exInt, eyInt, ezInt; // scaled integral error
 
     void updateQuaternions(void);
     //void updateEulerAngles(void);

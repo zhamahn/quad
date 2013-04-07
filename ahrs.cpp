@@ -26,6 +26,9 @@ void AHRS::begin(void) {
   q1 = 0.0;
   q2 = 0.0;
   q3 = 0.0;
+  exInt = 0.0;
+  eyInt = 0.0;
+  ezInt = 0.0;
   lastUpdate = micros();
 }
 
@@ -43,7 +46,6 @@ void AHRS::updateQuaternions(void) {
   float q0i, q1i, q2i, q3i;
   float exAcc, eyAcc, ezAcc;
   float exMag, eyMag, ezMag;
-  float exInt = 0.0, eyInt = 0.0, ezInt = 0.0;
 
   float ax = acc->x;
   float ay = acc->y;
@@ -57,7 +59,7 @@ void AHRS::updateQuaternions(void) {
   float gy = gyro->y;
   float gz = gyro->z;
 
-  float halfT = (micros() - lastUpdate) / 2;
+  float halfT = (micros() - lastUpdate) / 1000000.0 / 2;
 
   // auxiliary variables to reduce number of repeated operations
   float q0q0 = q0*q0;
@@ -139,15 +141,15 @@ void AHRS::updateQuaternions(void) {
 }
 
 float AHRS::pitch(void) {
-  return -asin(2*q1*q3 + 2*q0*q2);
+  return asin(2 * (q0*q2 - q1*q3));
 }
 
 float AHRS::roll(void) {
-  return atan2(2*q2*q3 - 2*q0*q1, 2*q0*q0 + 2*q3*q3 - 1);
+  return atan2(2 * (q0*q1 + q2*q3), 1 - 2 * (q1*q1 + q2*q2));
 }
 
 float AHRS::yaw(void) {
-  return atan2(2*q1*q2 - 2*q0*q3, 2*q0*q0 + 2*q1*q1 - 1);
+  return atan2(2 * (q0*q3 + q1*q2), 1 - 2 * (q2*q2 + q3*q3));
 }
 
 //void AHRS::updateEulerAngles(void) {
