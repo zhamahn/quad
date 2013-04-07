@@ -5,6 +5,7 @@
 
 void HMC5883L::begin(void) {
   writeReg(HMC5883L_ADDR, HMC5883L_MODE, HMC5883L_MODE_CONT);
+  writeReg(HMC5883L_ADDR, HMC5883L_CONFREG_B, 0x80); // Decrease sensitivity
 }
 
 void HMC5883L::read(void) {
