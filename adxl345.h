@@ -75,8 +75,10 @@ class ADXL345 {
 #define DATA_READY (1<<7)
 
 //Data Format Bits
-#define RANGE_0 (1<<0)
-#define RANGE_1 (1<<1)
+#define RANGE_2 0x00
+#define RANGE_4 0x01
+#define RANGE_8 0x02
+#define RANGE_16 0x03
 #define JUSTIFY (1<<2)
 #define FULL_RES (1<<3)
 
