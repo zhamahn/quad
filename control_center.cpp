@@ -19,7 +19,7 @@ ControlCenter::ControlCenter(ESC *_escs[], int _escs_count) {
 }
 
 void ControlCenter::update(void) {
-  updateDesiredQuaternions();
+  updateTargetQuaternions();
   updateErrorQuaternions();
   updateErrorEulerAngles();
   updateOutputs();
@@ -58,7 +58,7 @@ void ControlCenter::setOutputs(void) {
   }
 }
 
-void ControlCenter::updateDesiredQuaternions(void) {
+void ControlCenter::updateTargetQuaternions(void) {
   float radPitch = RADS(map(controller->left_stick_y, -128, 127, -45, 45));
   float radRoll  = RADS(map(controller->left_stick_x, -128, 127, -45, 45));
   float radYaw   = ahrs->yaw() + RADS(controller->right_stick_x);

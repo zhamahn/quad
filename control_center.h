@@ -68,7 +68,7 @@ class ControlCenter {
     double altitudeInput, altitudeOutput, altitudeSetpoint;
     double yawInput, yawOutput, yawSetpoint;
 
-    void updateDesiredQuaternions(void);
+    void updateTargetQuaternions(void);
     void updateErrorQuaternions(void);
     void updateErrorEulerAngles(void);
     void updateOutputs();
