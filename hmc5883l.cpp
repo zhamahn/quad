@@ -5,7 +5,7 @@
 
 void HMC5883L::begin(void) {
   writeReg(HMC5883L_ADDR, HMC5883L_MODE, HMC5883L_MODE_CONT);
-  writeReg(HMC5883L_ADDR, HMC5883L_CONFREG_B, 0x80); // Decrease sensitivity
+  writeReg(HMC5883L_ADDR, HMC5883L_CONFREG_B, HMC5883L_GN5); // Set measurement gain
 }
 
 void HMC5883L::read(void) {
@@ -24,7 +24,7 @@ void HMC5883L::read(void) {
 void HMC5883L::update(void) {
   read();
   // Compensate for sensor orientation here
-  x = smooth(rawY*-1, x, HMC5883L_SMOOTH_FACTOR);
-  y = smooth(rawX*-1, y, HMC5883L_SMOOTH_FACTOR);
+  x = smooth(rawY, x, HMC5883L_SMOOTH_FACTOR);
+  y = smooth(rawX, y, HMC5883L_SMOOTH_FACTOR);
   z = smooth(rawZ, z, HMC5883L_SMOOTH_FACTOR);
 }
