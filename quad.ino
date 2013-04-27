@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SoftwareSerial.h>
-#include <PID_v1.h>
 
 #include "utils.h"
 #include "esc.h"

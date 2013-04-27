@@ -1,5 +1,3 @@
-#include <PID_v1.h>
-
 #include "control_center.h"
 #include "ahrs.h"
 #include "controller.h"
@@ -8,14 +6,6 @@
 ControlCenter::ControlCenter(ESC *_escs[], int _escs_count) {
   escs = _escs;
   escs_count = _escs_count;
-  pitchPID    = new PID(&pitchInput,    &pitchOutput,    &pitchSetpoint,    PITCH_KP, PITCH_KI, PITCH_KD, AUTOMATIC);
-  rollPID     = new PID(&rollInput,     &rollOutput,     &rollSetpoint,     ROLL_KP,  ROLL_KI,  ROLL_KD,  AUTOMATIC);
-  yawPID      = new PID(&yawInput,      &yawOutput,      &yawSetpoint,      YAW_KP,   YAW_KI,   YAW_KD,   AUTOMATIC);
-  altitudePID = new PID(&altitudeInput, &altitudeOutput, &altitudeSetpoint, ALT_KP,   ALT_KI,   ALT_KD,   AUTOMATIC);
-
-  //pitchPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
-  //rollPID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
-  //altitudePID->SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
 }
 
 void ControlCenter::update(void) {
@@ -24,23 +14,6 @@ void ControlCenter::update(void) {
   updateErrorEulerAngles();
   updateOutputs();
   setOutputs();
-}
-
-void ControlCenter::updatePIDs(void) {
-  pitchInput    = gyro->x;
-  rollInput     = gyro->y;
-  yawInput      = gyro->z;
-  altitudeInput = 0;
-
-  pitchSetpoint    = pitchError;
-  rollSetpoint     = rollError;
-  yawSetpoint      = yawError;
-  altitudeSetpoint = controller->right_trigger - controller->left_trigger;
-
-  pitchPID->Compute();
-  rollPID->Compute();
-  yawPID->Compute();
-  altitudePID->Compute();
 }
 
 void ControlCenter::setOutputs(void) {

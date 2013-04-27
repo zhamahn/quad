@@ -1,8 +1,6 @@
 #ifndef control_center_h
 #define control_center_h
 
-#include <PID_v1.h>
-
 #include "esc.h"
 #include "controller.h"
 #include "ahrs.h"
@@ -35,19 +33,12 @@ class ControlCenter {
     ADXL345 *acc;
     HMC5883L *mag;
 
-    // PID stuff
-    PID *pitchPID;
-    PID *rollPID;
-    PID *altitudePID;
-    PID *yawPID;
-
     ESC **escs;
     int escs_count;
 
     // functions
     ControlCenter(ESC *[], int);
 
-    void updatePIDs(void);
     void update(void);
 
   private:
