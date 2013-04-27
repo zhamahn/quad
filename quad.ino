@@ -16,12 +16,12 @@
 #define PING_INT 0
 #define PING_INT_PIN 2
 
-#define ESC_X_PIN 6
-#define ESC_NX_PIN 5
-#define ESC_Y_PIN 10
-#define ESC_NY_PIN 9
+#define ESC_X_PIN 11
+#define ESC_NX_PIN 10
+#define ESC_Y_PIN 9
+#define ESC_NY_PIN 6
 
-#define PIN_SERIAL_RX 4
+#define PIN_SERIAL_RX 3
 #define PIN_SERIAL_TX 2
 
 // Motor configuration
