@@ -41,8 +41,9 @@ void AHRS::update(void) {
 
 void AHRS::updateQuaternions(void) {
   float norm;
-  float hx, hy, hz, bx, bz;
-  float vx, vy, vz, wx, wy, wz;
+  float bx, by, bz;
+  float vx, vy, vz;
+  float wx, wy, wz;
   float q0i, q1i, q2i, q3i;
   float exAcc, eyAcc, ezAcc;
   float exMag, eyMag, ezMag;
@@ -79,6 +80,11 @@ void AHRS::updateQuaternions(void) {
   ay = ay / norm;
   az = az / norm;
 
+  // Estimated direction of gravity
+  vx = 2*(q1q3 - q0q2);
+  vy = 2*(q0q1 + q2q3);
+  vz = q0q0 - q1q1 - q2q2 + q3q3;
+
   // Normalize magnetometer measurement
   norm = sqrt(mx*mx + my*my + mz*mz);
   mx = mx / norm;
@@ -86,22 +92,14 @@ void AHRS::updateQuaternions(void) {
   mz = mz / norm;
 
   // compute reference direction of flux
-  hx = mx * 2*(0.5 - q2q2 - q3q3) + my * 2*(q1q2 - q0q3)       + mz * 2*(q1q3 + q0q2);
-  hy = mx * 2*(q1q2 + q0q3)       + my * 2*(0.5 - q1q1 - q3q3) + mz * 2*(q2q3 - q0q1);
-  hz = mx * 2*(q1q3 - q0q2)       + my * 2*(q2q3 + q0q1)       + mz * 2*(0.5 - q1q1 - q2q2);
-
-  bx = sqrt((hx*hx) + (hy*hy));
-  bz = hz;
+  bx = mx * 2*(0.5 - q2q2 - q3q3) + my * 2*(q1q2 - q0q3)       + mz * 2*(q1q3 + q0q2);
+  by = mx * 2*(q1q2 + q0q3)       + my * 2*(0.5 - q1q1 - q3q3) + mz * 2*(q2q3 - q0q1);
+  bz = mx * 2*(q1q3 - q0q2)       + my * 2*(q2q3 + q0q1)       + mz * 2*(0.5 - q1q1 - q2q2);
   
-  // Estimated direction of gravity
-  vx = 2*(q1q3 - q0q2);
-  vy = 2*(q0q1 + q2q3);
-  vz = q0q0 - q1q1 - q2q2 + q3q3;
-
   // Estimated direction of flux
-  wx = bx * 2*(0.5 - q2q2 - q3q3) + bz * 2*(q1q3 - q0q2);
-  wy = bx * 2*(q1q2 - q0q3)       + bz * 2*(q0q1 + q2q3);
-  wz = bx * 2*(q0q2 + q1q3)       + bz * 2*(0.5 - q1q1 - q2q2);
+  wx = bx * 2*(0.5 - q2q2 - q3q3) + by * 2*(q1q2 + q0q3)       + bz * 2*(q1q3 - q0q2);
+  wy = bx * 2*(q1q2 - q0q3)       + by * 2*(0.5 - q1q1 - q3q3) + bz * 2*(q2q3 + q0q1);
+  wz = bx * 2*(q1q3 + q0q2)       + by * 2*(q2q3 - q0q1)       + bz * 2*(0.5 - q1q1 - q2q2);
 
   // error is sum of cross product between reference direction of fields and direction measured by sensors
   exAcc = (vy*az - vz*ay);
@@ -117,12 +115,13 @@ void AHRS::updateQuaternions(void) {
   eyInt += eyAcc*AHRS_ACC_KI + eyMag*AHRS_MAG_KI;
   ezInt += ezAcc*AHRS_ACC_KI + ezMag*AHRS_MAG_KI;
 
+  // proportional error gain + integral error gain
   // adjusted gyroscope measurements
   gx += exAcc*AHRS_ACC_KP + exMag*AHRS_MAG_KP + exInt;
   gy += eyAcc*AHRS_ACC_KP + eyMag*AHRS_MAG_KP + eyInt;
   gz += ezAcc*AHRS_ACC_KP + ezMag*AHRS_MAG_KP + ezInt;
 
-  // integrate quaternion rate and normalise
+  // integrate quaternion rate
   q0i = (-q1*gx - q2*gy - q3*gz) * halfT;
   q1i = ( q0*gx + q2*gz - q3*gy) * halfT;
   q2i = ( q0*gy - q1*gz + q3*gx) * halfT;
