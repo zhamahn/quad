@@ -32,34 +32,44 @@ void ControlCenter::setOutputs(void) {
 }
 
 void ControlCenter::updateTargetQuaternions(void) {
-  float radPitch = RADS(map(controller->left_stick_y, -128, 127, -45, 45));
-  float radRoll  = RADS(map(controller->left_stick_x, -128, 127, -45, 45));
-  float radYaw   = ahrs->yaw() + RADS(controller->right_stick_x);
+  float pitch = -1 * controllerAxis(controller->left_stick_y);
+  float roll  = controllerAxis(controller->left_stick_x);
+  float yaw   = ahrs->yaw() + controllerAxis(controller->right_stick_x);
 
-  float sinPitch = sin(radPitch/2);
-  float cosPitch = cos(radPitch/2);
-  float sinRoll  = sin(radRoll/2);
-  float cosRoll  = cos(radRoll/2);
-  float sinYaw   = sin(radYaw/2);
-  float cosYaw   = cos(radYaw/2);
+  float sinPitch = sin(pitch/2);
+  float cosPitch = cos(pitch/2);
+  float sinRoll  = sin(roll/2);
+  float cosRoll  = cos(roll/2);
+  float sinYaw   = sin(yaw/2);
+  float cosYaw   = cos(yaw/2);
 
-  desired_q0 = cosRoll*cosPitch*cosYaw + sinRoll*sinPitch*sinYaw;
-  desired_q1 = sinRoll*cosPitch*cosYaw - cosRoll*sinPitch*sinYaw;
-  desired_q2 = cosRoll*sinPitch*cosYaw + sinRoll*cosPitch*sinYaw;
-  desired_q3 = cosRoll*cosPitch*sinYaw - sinRoll*sinPitch*cosYaw;
+  target_q0 = cosRoll*cosPitch*cosYaw + sinRoll*sinPitch*sinYaw;
+  target_q1 = sinRoll*cosPitch*cosYaw - cosRoll*sinPitch*sinYaw;
+  target_q2 = cosRoll*sinPitch*cosYaw + sinRoll*cosPitch*sinYaw;
+  target_q3 = cosRoll*cosPitch*sinYaw - sinRoll*sinPitch*cosYaw;
 }
 
 void ControlCenter::updateErrorQuaternions(void) {
-  error_q0 = desired_q0/ahrs->q1 - desired_q1/ahrs->q1 - desired_q2/ahrs->q2 - desired_q3/ahrs->q3;
-  error_q1 = desired_q0/ahrs->q0 + desired_q1/ahrs->q1 - desired_q2/ahrs->q3 + desired_q3/ahrs->q2;
-  error_q2 = desired_q0/ahrs->q3 + desired_q1/ahrs->q1 + desired_q2/ahrs->q0 - desired_q3/ahrs->q1;
-  error_q3 = desired_q0/ahrs->q2 - desired_q1/ahrs->q1 + desired_q2/ahrs->q1 + desired_q3/ahrs->q0;
+  float inverted_q0;
+  float inverted_q1;
+  float inverted_q2;
+  float inverted_q3;
+
+  inverted_q0 = ahrs->q0;
+  inverted_q1 = -1*ahrs->q1;
+  inverted_q2 = -1*ahrs->q2;
+  inverted_q3 = -1*ahrs->q3;
+
+  error_q0 = inverted_q0*target_q0 - inverted_q1*target_q1 - inverted_q2*target_q2 - inverted_q3*target_q3;
+  error_q1 = inverted_q0*target_q1 + inverted_q1*target_q0 + inverted_q2*target_q3 - inverted_q3*target_q2;
+  error_q2 = inverted_q0*target_q2 - inverted_q1*target_q3 + inverted_q2*target_q0 + inverted_q3*target_q1;
+  error_q3 = inverted_q0*target_q3 + inverted_q1*target_q2 - inverted_q2*target_q1 + inverted_q3*target_q0;
 }
 
 void ControlCenter::updateErrorEulerAngles(void) {
-  pitchError = -asin(2*error_q1*error_q3 + 2*error_q0*error_q2);
-  rollError  = atan2(2*error_q2*error_q3 - 2*error_q0*error_q1, 2*error_q0*error_q0 + 2*error_q3*error_q3 - 1);
-  yawError   = atan2(2*error_q1*error_q2 - 2*error_q0*error_q3, 2*error_q0*error_q0 + 2*error_q1*error_q1 - 1);
+  pitchError = -asin(2 * (error_q0*error_q2 - error_q1*error_q3));
+  rollError  = -atan2(2 * (error_q0*error_q1 + error_q2*error_q3), 1 - 2 * (error_q1*error_q1 + error_q2*error_q2));
+  yawError   = -atan2(2 * (error_q0*error_q3 + error_q1*error_q2), 1 - 2 * (error_q2*error_q2 + error_q3*error_q3));
 }
 
 float ControlCenter::pd(float error, float rate, float Kp, float Kd) {
@@ -67,7 +77,12 @@ float ControlCenter::pd(float error, float rate, float Kp, float Kd) {
 }
 
 void ControlCenter::updateOutputs(void) {
-  pitchOutput = pd(pitchError, gyro->y, PITCH_KP, PITCH_KD);
-  rollOutput  = pd(rollError,  gyro->x, ROLL_KP, ROLL_KD);
-  yawOutput   = pd(yawError,   gyro->z, YAW_KP, YAW_KD);
+  pitchOutput    = PITCH_OUTPUT_SCALE * pd(pitchError, gyro->y, PITCH_KP, PITCH_KD);
+  rollOutput     = ROLL_OUTPUT_SCALE  * pd(rollError,  gyro->x, ROLL_KP, ROLL_KD);
+  yawOutput      = YAW_OUTPUT_SCALE   * pd(yawError,   gyro->z, YAW_KP, YAW_KD);
+  altitudeOutput = ALT_OUTPUT_SCALE   * (controller->right_trigger - controller->left_trigger);
+}
+
+float ControlCenter::controllerAxis(int value) {
+  return RADS( map(value, STICK_AXIS_MIN, STICK_AXIS_MAX, -45, 45) );
 }
