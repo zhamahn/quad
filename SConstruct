@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-# scons script for the Arduino sketch
+# arscons: scons script for the Arduino sketch
 # http://github.com/suapapa/arscons
 #
-# Copyright (C) 2010-2012 by Homin Lee <homin.lee@suapapa.net>
+# Copyright (C) 2010-2013 by Homin Lee <homin.lee@suapapa.net>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,26 +39,45 @@
 
 from glob import glob
 from itertools import ifilter, imap
-from subprocess import check_call, CalledProcessError
-import sys
-import re
-import os
 from os import path
-from pprint import pprint
+from subprocess import check_call, CalledProcessError
+import json
+import os
+import re
+import sys
+
+# arscons version
+__version__ = "1.0.0"
 
 env = Environment()
 platform = env['PLATFORM']
 
 VARTAB = {}
 
+try:
+    config = json.load(open('arscons.json'))
+except IOError:
+    config = None
+
+def config_get(varname, returns):
+    if config:
+        result = config.get(varname, returns)
+    else:
+        result = returns
+
+    return result
+
 def resolve_var(varname, default_value):
     global VARTAB
-    # precedence: scons argument -> environment variable -> default value
+    # precedence: scons argument -> env. variable -> json config -> default value
     ret = ARGUMENTS.get(varname, None)
     VARTAB[varname] = ('arg', ret)
     if ret == None:
         ret = os.environ.get(varname, None)
         VARTAB[varname] = ('env', ret)
+    if ret == None:
+        ret = config_get(varname, None)
+        VARTAB[varname] = ('cnf', ret)
     if ret == None:
         ret = default_value
         VARTAB[varname] = ('dfl', ret)
@@ -84,7 +103,8 @@ elif platform == 'win32':
     ARDUINO_HOME        = resolve_var('ARDUINO_HOME', None)
     ARDUINO_PORT        = resolve_var('ARDUINO_PORT', '')
     SKETCHBOOK_HOME     = resolve_var('SKETCHBOOK_HOME', '')
-    AVR_HOME            = resolve_var('AVR_HOME',
+    if ARDUINO_HOME:
+        AVR_HOME        = resolve_var('AVR_HOME',
                                       path.join(ARDUINO_HOME, 'hardware/tools/avr/bin'))
 else:
     # For Ubuntu Linux (9.10 or higher)
@@ -99,9 +119,6 @@ ARDUINO_BOARD   = resolve_var('ARDUINO_BOARD', 'atmega328')
 ARDUINO_VER     = resolve_var('ARDUINO_VER', 0) # Default to 0 if nothing is specified
 RST_TRIGGER     = resolve_var('RST_TRIGGER', None) # use built-in pulseDTR() by default
 EXTRA_LIB       = resolve_var('EXTRA_LIB', None) # handy for adding another arduino-lib dir
-DEBUG            = resolve_var('DEBUG', '')
-
-pprint(VARTAB, indent = 4)
 
 if not ARDUINO_HOME:
     print 'ARDUINO_HOME must be defined.'
@@ -149,12 +166,12 @@ ARDUINO_SKEL = path.join(ARDUINO_CORE, 'main.cpp')
 
 if ARDUINO_VER == 0:
     arduinoHeader = path.join(ARDUINO_CORE, 'Arduino.h')
-    print "No Arduino version specified. Discovered version",
+    #print "No Arduino version specified. Discovered version",
     if path.exists(arduinoHeader):
-        print "100 or above"
+        #print "100 or above"
         ARDUINO_VER = 100
     else:
-        print "0023 or below"
+        #print "0023 or below"
         ARDUINO_VER = 23
 else:
     print "Arduino version " + ARDUINO_VER + " specified"
@@ -178,13 +195,33 @@ F_CPU = ARGUMENTS.get('F_CPU', getBoardConf('build.f_cpu'))
 
 # There should be a file with the same name as the folder and
 # with the extension .pde or .ino
-TARGET = path.basename(path.realpath(os.curdir))
+# Or, one can specify it via the ARSCONS_TARGET environment
+# variable..
+
+TARGET = resolve_var('ARSCONS_TARGET', None)
+if TARGET is None:
+    TARGET = path.basename(path.realpath(os.curdir))
+
 assert(path.exists(TARGET + '.ino') or path.exists(TARGET + '.pde'))
 sketchExt = '.ino' if path.exists(TARGET + '.ino') else '.pde'
 
 cFlags = ['-ffunction-sections', '-fdata-sections', '-fno-exceptions',
           '-funsigned-char', '-funsigned-bitfields', '-fpack-struct',
           '-fshort-enums', '-Os', '-Wall', '-mmcu=%s' % MCU]
+
+# Add some missing paths to CFLAGS
+# Workaround for /usr/libexec/gcc/avr/ld: cannot open linker script file ldscripts/avr5.x: No such file or directory
+# Workaround for /usr/libexec/gcc/avr/ld: crtm168.o: No such file: No such file or directory
+extra_cflags = [
+    '-L/usr/x86_64-pc-linux-gnu/avr/lib/',
+    '-B/usr/avr/lib/avr5/',
+    ]
+cFlags += extra_cflags
+
+if ARDUINO_BOARD == "leonardo":
+    cFlags += ["-DUSB_VID="+getBoardConf('build.vid')]
+    cFlags += ["-DUSB_PID="+getBoardConf('build.pid')]
+
 envArduino = Environment(CC = AVR_BIN_PREFIX + 'gcc',
                          CXX = AVR_BIN_PREFIX + 'g++',
                          AS = AVR_BIN_PREFIX + 'gcc',
@@ -200,13 +237,16 @@ hwVariant = path.join(ARDUINO_HOME, 'hardware/arduino/variants',
 if hwVariant:
     envArduino.Append(CPPPATH = hwVariant)
 
-if DEBUG:
-    envArduino.Append(CPPDEFINES={'DEBUG' : '1'})
-    envArduino.Append(CDEFINES={'DEBUG' : '1'})
+# Show version
+def printVersion(target, source, env):
+    print "arscons v%s"%__version__
+
+version = envArduino.Alias('version', None, [printVersion])
+AlwaysBuild(version)
 
 def run(cmd):
     """Run a command and decipher the return code. Exit by default."""
-    print ' '.join(cmd)
+    # print ' '.join(cmd)
     try:
         check_call(cmd)
     except CalledProcessError as cpe:
@@ -268,16 +308,28 @@ def fnCompressCore(target, source, env):
     for file in core_files:
         run([AVR_BIN_PREFIX + 'ar', 'rcs', str(target[0]), file])
 
+def fnPrintInfo(target, source, env):
+    for k in VARTAB:
+        cameFrom, value = VARTAB[k]
+        print "* %s: %s (%s)"%(k, value, cameFrom)
+    print "* avr-size:"
+    run([AVR_BIN_PREFIX + 'size', '--target=ihex', str(source[0])])
+    # TODO: check binary size
+    print "* maximum size for hex file: %s bytes" % getBoardConf('upload.maximum_size')
+
+
 bldProcessing = Builder(action = fnProcessing) #, suffix = '.cpp', src_suffix = sketchExt)
 bldCompressCore = Builder(action = fnCompressCore)
 bldELF = Builder(action = AVR_BIN_PREFIX + 'gcc -mmcu=%s ' % MCU +
-                          '-Os -Wl,--gc-sections -lm -o $TARGET $SOURCES -lc')
+                          '-Os -Wl,--gc-sections -lm %s -o $TARGET $SOURCES -lc' % ' '.join(extra_cflags))
 bldHEX = Builder(action = AVR_BIN_PREFIX + 'objcopy -O ihex -R .eeprom $SOURCES $TARGET')
+bldInfo = Builder(action = fnPrintInfo)
 
 envArduino.Append(BUILDERS = {'Processing' : bldProcessing})
 envArduino.Append(BUILDERS = {'CompressCore': bldCompressCore})
 envArduino.Append(BUILDERS = {'Elf' : bldELF})
 envArduino.Append(BUILDERS = {'Hex' : bldHEX})
+envArduino.Append(BUILDERS = {'BuildInfo' : bldInfo})
 
 ptnSource = re.compile(r'\.(?:c(?:pp)?|S)$')
 def gatherSources(srcpath):
@@ -349,12 +401,7 @@ objs = envArduino.Object(sources) #, LIBS=libs, LIBPATH='.')
 objs = objs + envArduino.CompressCore('build/core.a', core_objs)
 envArduino.Elf(TARGET + '.elf', objs)
 envArduino.Hex(TARGET + '.hex', TARGET + '.elf')
-
-# Print Size
-# TODO: check binary size
-MAX_SIZE = getBoardConf('upload.maximum_size')
-print "maximum size for hex file: %s bytes" % MAX_SIZE
-envArduino.Command(None, TARGET + '.hex', AVR_BIN_PREFIX + 'size --target=ihex $SOURCE')
+envArduino.BuildInfo(None, TARGET + '.hex')
 
 # Reset
 def pulseDTR(target, source, env):
