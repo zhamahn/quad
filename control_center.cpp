@@ -20,9 +20,9 @@ void ControlCenter::setOutputs(void) {
   int i;
 
   for (i=0; i<escs_count; i++) {
-    escs[i]->changePitch(pitchOutput);
-    escs[i]->changeRoll(rollOutput);
-    escs[i]->changeYaw(yawOutput);
+    escs[i]->changePitch(   pitchOutput);
+    escs[i]->changeRoll(    rollOutput);
+    escs[i]->changeYaw(     yawOutput);
     escs[i]->changeAltitude(altitudeOutput);
   }
 
