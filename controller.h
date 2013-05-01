@@ -15,6 +15,9 @@
 #define FRAME_COMPLETE 1
 #define FRAME_DISCARDED 2
 
+#define STICK_AXIS_MAX 127
+#define STICK_AXIS_MIN -128
+
 class Controller {
   public:
     SoftwareSerial *mySerial;
