@@ -55,11 +55,6 @@ class AHRS {
     int earthAccelX(void);
     int earthAccelY(void);
     int earthAccelZ(void);
-#ifdef DEBUG
-    void print(void);
-    void printForGraph(void);
-#endif
-
   private:
     unsigned long lastUpdate; // sample period in milliseconds
 

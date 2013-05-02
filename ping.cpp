@@ -34,11 +34,3 @@ void Ping::measure(void) {
   if (distance > PING_MAX_RANGE)
     distance = PING_MAX_RANGE+1;
 }
-
-#ifdef DEBUG
-void Ping::print(void) {
-  Serial.print("Altitude: ");
-  Serial.print(distance, DEC);
-  Serial.println("");
-}
-#endif

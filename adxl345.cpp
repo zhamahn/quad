@@ -35,18 +35,3 @@ void ADXL345::update(void) {
 float ADXL345::valueToG(int value) {
   return (float)value * ADXL_SCALE_FACTOR;
 }
-
-#ifdef DEBUG
-void ADXL345::print(void) {
-  Serial.print("Acc: ");
-  Serial.print("X: "); Serial.print(x, DEC);
-  Serial.print(", Y: "); Serial.print(y, DEC);
-  Serial.print(", Z: "); Serial.print(z, DEC);
-  Serial.println("");
-}
-void ADXL345::printForGraph(void) {
-  Serial.print(x, DEC); Serial.print('\t');
-  Serial.print(y, DEC); Serial.print('\t');
-  Serial.print(z, DEC);
-}
-#endif

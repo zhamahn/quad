@@ -11,10 +11,6 @@ class ADXL345 {
     void begin(void);
     void update(void);
     float valueToG(int);
-#ifdef DEBUG
-    void print(void);
-    void printForGraph(void);
-#endif
 
   private:
     int rawX, rawY, rawZ;

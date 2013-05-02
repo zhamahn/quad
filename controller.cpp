@@ -33,34 +33,6 @@ void Controller::updateFromDataArray(unsigned char data[]) {
   updateDpad(data[7]);
 }
 
-#ifdef DEBUG
-void Controller::print(void) {
-  Serial.print("rt: "); Serial.print(right_trigger, DEC); Serial.print(", ");
-  Serial.print("lt: "); Serial.print(left_trigger, DEC); Serial.print(", ");
-
-  Serial.print("rsx: "); Serial.print(right_stick_x, DEC); Serial.print(", ");
-  Serial.print("rsy: "); Serial.print(right_stick_y, DEC); Serial.print(", ");
-
-  Serial.print("lsx: "); Serial.print(left_stick_x, DEC); Serial.print(", ");
-  Serial.print("lsy: "); Serial.print(left_stick_y, DEC); Serial.print(", ");
-
-  /*Serial.print("w: "); Serial.print(white, DEC); Serial.print(", ");*/
-  /*Serial.print("b: "); Serial.print(black, DEC); Serial.print(", ");*/
-  /*Serial.print("s: "); Serial.print(start, DEC); Serial.print(", ");*/
-  /*Serial.print("b: "); Serial.print(back, DEC); Serial.print(", ");*/
-  /*Serial.print("l: "); Serial.print(left_stick, DEC); Serial.print(", ");*/
-  /*Serial.print("r: "); Serial.print(right_stick, DEC); Serial.print(", ");*/
-
-  /*Serial.print("dpad (ulrd): ");*/
-    /*Serial.print(up, DEC);*/
-    /*Serial.print(left, DEC);*/
-    /*Serial.print(right, DEC);*/
-    /*Serial.print(down, DEC);*/
-
-  Serial.println("");
-}
-#endif
-
 void Controller::reset(void) {
   right_trigger = 10;
   left_trigger = 10;

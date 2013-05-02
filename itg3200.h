@@ -16,10 +16,6 @@ class ITG3200 {
 
     void begin(void);
     void update(void);
-#ifdef DEBUG
-    void print(void);
-    void printForGraph(void);
-#endif
 
   private:
     int rawX, rawY, rawZ;

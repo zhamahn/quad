@@ -9,9 +9,6 @@ class Ping {
     Ping(unsigned char);
     void start(void);
     void measure(void);
-#ifdef DEBUG
-    void print(void);
-#endif
   
   private:
     volatile unsigned long started_at;

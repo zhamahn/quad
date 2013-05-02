@@ -164,28 +164,3 @@ float AHRS::yaw(void) {
   //earthAccel[AHRS_YAXIS] = acc->y / sin_pitch / sin_roll;
   //earthAccel[AHRS_ZAXIS] = acc->z / sin_pitch / sin_roll;
 //}
-
-#ifdef DEBUG
-void AHRS::print(void) {
-  Serial.print("Quaternions: ");
-  Serial.print("q0: "); Serial.print(q0, DEC);
-  Serial.print(", q1: "); Serial.print(q1, DEC);
-  Serial.print(", q2: "); Serial.print(q2, DEC);
-  Serial.print(", q3: "); Serial.print(q3, DEC);
-  Serial.print("Euler angles: ");
-  Serial.print("pitch: "); Serial.print(pitch, DEC);
-  Serial.print("roll: "); Serial.print(roll, DEC);
-  Serial.print("yaw: "); Serial.print(yaw, DEC);
-  Serial.println("");
-}
-
-void AHRS::printForGraph(void) {
-  Serial.print(q0, DEC); Serial.print('\t');
-  Serial.print(q1, DEC); Serial.print('\t');
-  Serial.print(q2, DEC); Serial.print('\t');
-  Serial.print(q3, DEC); Serial.print('\t');
-  Serial.print(pitch, DEC); Serial.print('\t');
-  Serial.print(roll, DEC); Serial.print('\t');
-  Serial.print(yaw, DEC);
-}
-#endif

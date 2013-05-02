@@ -50,9 +50,6 @@ class Controller {
 
     void update();
     void reset(void);
-    #ifdef DEBUG
-    void print();
-    #endif
 
   private:
     unsigned long lastUpdateAt;

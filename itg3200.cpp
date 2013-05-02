@@ -43,18 +43,3 @@ void ITG3200::update(void) {
   y = (float)smoothY * ITG_SCALE_FACTOR;
   z = (float)smoothZ * ITG_SCALE_FACTOR;
 }
-
-#ifdef DEBUG
-void ITG3200::print(void) {
-  Serial.print("Rotation: ");
-  Serial.print("X: "); Serial.print(x, DEC);
-  Serial.print(", Y: "); Serial.print(y, DEC);
-  Serial.print(", Z: "); Serial.print(z, DEC);
-  Serial.println("");
-}
-void ITG3200::printForGraph(void) {
-  Serial.print(x, DEC); Serial.print('\t');
-  Serial.print(y, DEC); Serial.print('\t');
-  Serial.print(z, DEC);
-}
-#endif
