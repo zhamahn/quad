@@ -31,15 +31,15 @@ void Quat::normalize(void) {
 }
 
 float Quat::pitch(void) {
-  return asin(2 * (w*j - i*k));
+  return asin(2*(w*j - i*k));
 }
 
 float Quat::roll(void) {
-  return atan2(2 * (w*i + j*k), 1 - 2 * (i*i + j*j));
+  return atan2(2*(w*i + j*k), 1 - 2*(i*i + j*j));
 }
 
 float Quat::yaw(void) {
-  return atan2(2 * (w*k + i*j), 1 - 2 * (j*j + k*k));
+  return atan2(2*(w*k + i*j), 1 - 2*(j*j + k*k));
 }
 
 void q_product(Quat *product, Quat *quat0, Quat *quat1) {
