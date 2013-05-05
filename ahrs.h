@@ -26,6 +26,7 @@
 #include "adxl345.h"
 #include "hmc5883l.h"
 #include "utils.h"
+#include "quat.h"
 
 #define AHRS_XAXIS 0
 #define AHRS_YAXIS 1
@@ -38,9 +39,7 @@
 
 class AHRS {
   public:
-    float q0, q1, q2, q3; // Quaternion elements representing the estimated orientation
-    //float earthAccel[3];  // Accelerations in earth coordinates
-
+    Quat *quat;
     ITG3200 *gyro;
     ADXL345 *acc;
     HMC5883L *mag;
@@ -60,8 +59,7 @@ class AHRS {
 
     float exInt, eyInt, ezInt; // scaled integral error
 
-    void updateQuaternions(void);
-    //void updateEulerAngles(void);
+    void updateQuat(void);
     //void updateEarthAccels(void);
 };
 

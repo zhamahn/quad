@@ -20,12 +20,10 @@
 // code in this library is largery based on Kinematics_MARG found in AeroQuad
 
 #include "ahrs.h"
+#include "quat.h"
 
 void AHRS::begin(void) {
-  q0 = 1.0;
-  q1 = 0.0;
-  q2 = 0.0;
-  q3 = 0.0;
+  quat = new Quat;
   exInt = 0.0;
   eyInt = 0.0;
   ezInt = 0.0;
@@ -33,20 +31,24 @@ void AHRS::begin(void) {
 }
 
 void AHRS::update(void) {
-  updateQuaternions();
+  updateQuat();
   //updateEulerAngles();
   //updateEarthAccels();
   lastUpdate = micros();
 }
 
-void AHRS::updateQuaternions(void) {
+void AHRS::updateQuat(void) {
   float norm;
   float bx, by, bz;
   float vx, vy, vz;
   float wx, wy, wz;
-  float q0i, q1i, q2i, q3i;
   float exAcc, eyAcc, ezAcc;
   float exMag, eyMag, ezMag;
+
+  float q0 = quat->w;
+  float q1 = quat->i;
+  float q2 = quat->j;
+  float q3 = quat->k;
 
   float ax = acc->x;
   float ay = acc->y;
@@ -122,33 +124,24 @@ void AHRS::updateQuaternions(void) {
   gz += ezAcc*AHRS_ACC_KP + ezMag*AHRS_MAG_KP + ezInt;
 
   // integrate quaternion rate
-  q0i = (-q1*gx - q2*gy - q3*gz) * halfT;
-  q1i = ( q0*gx + q2*gz - q3*gy) * halfT;
-  q2i = ( q0*gy - q1*gz + q3*gx) * halfT;
-  q3i = ( q0*gz + q1*gy - q2*gx) * halfT;
-  q0 += q0i;
-  q1 += q1i;
-  q2 += q2i;
-  q3 += q3i;
-  
-  // Normalise quaternion
-  norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
-  q0 = q0 / norm;
-  q1 = q1 / norm;
-  q2 = q2 / norm;
-  q3 = q3 / norm;
+  quat->w += (-q1*gx - q2*gy - q3*gz) * halfT;
+  quat->i += ( q0*gx + q2*gz - q3*gy) * halfT;
+  quat->j += ( q0*gy - q1*gz + q3*gx) * halfT;
+  quat->k += ( q0*gz + q1*gy - q2*gx) * halfT;
+
+  quat->normalize();
 }
 
 float AHRS::pitch(void) {
-  return asin(2 * (q0*q2 - q1*q3));
+  return quat->pitch();
 }
 
 float AHRS::roll(void) {
-  return atan2(2 * (q0*q1 + q2*q3), 1 - 2 * (q1*q1 + q2*q2));
+  return quat->roll();
 }
 
 float AHRS::yaw(void) {
-  return atan2(2 * (q0*q3 + q1*q2), 1 - 2 * (q2*q2 + q3*q3));
+  return quat->yaw();
 }
 
 //void AHRS::updateEulerAngles(void) {
