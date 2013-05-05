@@ -77,10 +77,10 @@ float ControlCenter::pd(float error, float rate, float Kp, float Kd) {
 }
 
 void ControlCenter::updateOutputs(void) {
-  pitchOutput    = PITCH_OUTPUT_SCALE * pd(pitchError, gyro->y, PITCH_KP, PITCH_KD);
-  rollOutput     = ROLL_OUTPUT_SCALE  * pd(rollError,  gyro->x, ROLL_KP, ROLL_KD);
-  yawOutput      = YAW_OUTPUT_SCALE   * pd(yawError,   gyro->z, YAW_KP, YAW_KD);
-  altitudeOutput = ALT_OUTPUT_SCALE   * (controller->right_trigger - controller->left_trigger);
+  pitchOutput    = PITCH_OUTPUT_SCALE      * pd(pitchError, gyro->y, PITCH_KP, PITCH_KD);
+  rollOutput     = ROLL_OUTPUT_SCALE       * pd(rollError,  gyro->x, ROLL_KP, ROLL_KD);
+  yawOutput      = YAW_OUTPUT_SCALE        * pd(yawError,   gyro->z, YAW_KP, YAW_KD);
+  altitudeOutput = ALTITUDE_OUTPUT_SCALE   * (controller->right_trigger - controller->left_trigger);
 }
 
 float ControlCenter::controllerAxis(int value) {

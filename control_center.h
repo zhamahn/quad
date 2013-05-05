@@ -26,8 +26,8 @@
 
 #define PITCH_OUTPUT_SCALE 1
 #define ROLL_OUTPUT_SCALE 1
-#define ALT_OUTPUT_SCALE 1
 #define YAW_OUTPUT_SCALE 1
+#define ALTITUDE_OUTPUT_SCALE 0.02
 
 class ControlCenter {
   public:
