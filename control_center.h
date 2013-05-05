@@ -7,6 +7,7 @@
 #include "adxl345.h"
 #include "itg3200.h"
 #include "hmc5883l.h"
+#include "quat.h"
 
 #define PITCH_KP 2.0
 #define PITCH_KI 5.0
@@ -38,25 +39,16 @@ class ControlCenter {
     ADXL345 *acc;
     HMC5883L *mag;
 
+    Quat *target_quat;
+    Quat *error_quat;
+
     ESC **escs;
     int escs_count;
-
-    float pitchError, rollError, yawError;
 
     // functions
     ControlCenter(ESC *[], int);
 
     void update(void);
-
-    float target_q0;
-    float target_q1;
-    float target_q2;
-    float target_q3;
-
-    float error_q0;
-    float error_q1;
-    float error_q2;
-    float error_q3;
 
   private:
     int pitchOutput;
@@ -64,9 +56,8 @@ class ControlCenter {
     int altitudeOutput;
     int yawOutput;
 
-    void updateTargetQuaternions(void);
-    void updateErrorQuaternions(void);
-    void updateErrorEulerAngles(void);
+    void updateTargetQuat(void);
+    void updateErrorQuat(void);
     void updateOutputs();
     void setOutputs(void);
 
