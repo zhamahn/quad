@@ -38,17 +38,17 @@ void ControlCenter::updateTargetQuat(void) {
   float roll  = controllerAxis(controller->left_stick_x);
   float yaw   = ahrs->yaw() + controllerAxis(controller->right_stick_x);
 
-  float sinPitch = sin(pitch/2);
-  float cosPitch = cos(pitch/2);
-  float sinRoll  = sin(roll/2);
-  float cosRoll  = cos(roll/2);
-  float sinYaw   = sin(yaw/2);
-  float cosYaw   = cos(yaw/2);
+  float sin_pitch = sin(pitch/2);
+  float cos_pitch = cos(pitch/2);
+  float sin_roll  = sin(roll/2);
+  float cos_roll  = cos(roll/2);
+  float sin_yaw   = sin(yaw/2);
+  float cos_yaw   = cos(yaw/2);
 
-  target_quat->w = cosRoll*cosPitch*cosYaw + sinRoll*sinPitch*sinYaw;
-  target_quat->i = sinRoll*cosPitch*cosYaw - cosRoll*sinPitch*sinYaw;
-  target_quat->j = cosRoll*sinPitch*cosYaw + sinRoll*cosPitch*sinYaw;
-  target_quat->k = cosRoll*cosPitch*sinYaw - sinRoll*sinPitch*cosYaw;
+  target_quat->w = cos_roll*cos_pitch*cos_yaw + sin_roll*sin_pitch*sin_yaw;
+  target_quat->i = sin_roll*cos_pitch*cos_yaw - cos_roll*sin_pitch*sin_yaw;
+  target_quat->j = cos_roll*sin_pitch*cos_yaw + sin_roll*cos_pitch*sin_yaw;
+  target_quat->k = cos_roll*cos_pitch*sin_yaw - sin_roll*sin_pitch*cos_yaw;
 }
 
 void ControlCenter::updateErrorQuat(void) {
