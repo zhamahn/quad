@@ -56,6 +56,7 @@ void ControlCenter::updateErrorQuat(void) {
   inverted_quat.invert();
 
   q_product(error_quat, &inverted_quat, target_quat);
+  error_quat->normalize();
 }
 
 //void ControlCenter::updateErrorEulerAngles(void) {
