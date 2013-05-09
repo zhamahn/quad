@@ -35,10 +35,22 @@ float Quat::pitch(void) {
 }
 
 float Quat::roll(void) {
-  return atan2(2*(w*i + j*k), 1 - 2*(i*i + j*j));
+  return rotX();
 }
 
 float Quat::yaw(void) {
+  return rotZ();
+}
+
+float Quat::rotY(void) {
+  return atan2(2*(w*j + i*k), 1 - 2*(i*i + j*j));
+}
+
+float Quat::rotX(void) {
+  return atan2(2*(w*i + j*k), 1 - 2*(i*i + j*j));
+}
+
+float Quat::rotZ(void) {
   return atan2(2*(w*k + i*j), 1 - 2*(j*j + k*k));
 }
 

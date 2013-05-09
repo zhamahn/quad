@@ -11,6 +11,10 @@ class Quat {
     float roll(void);
     float yaw(void);
 
+    float rotX(void);
+    float rotY(void);
+    float rotZ(void);
+
     void normalize(void);
     void invert(void);
 };
