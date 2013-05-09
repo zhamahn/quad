@@ -49,6 +49,7 @@ class ControlCenter {
     ControlCenter(ESC *[], int);
 
     void update(void);
+    float altitudeError(void);
 
   private:
     int pitchOutput;
@@ -56,12 +57,11 @@ class ControlCenter {
     int altitudeOutput;
     int yawOutput;
 
+
     void updateTargetQuat(void);
     void updateErrorQuat(void);
     void updateOutputs();
     void setOutputs(void);
-
-    float controllerAxis(int);
 
     float pd(float, float, float, float);
 
