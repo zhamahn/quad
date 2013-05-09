@@ -22,8 +22,7 @@ void Quat::invert(void) {
 }
 
 void Quat::normalize(void) {
-  float norm;
-  norm = sqrt(w*w + i*i + j*j + k*k);
+  float norm = sqrt(w*w + i*i + j*j + k*k);
   w /= norm;
   i /= norm;
   j /= norm;
