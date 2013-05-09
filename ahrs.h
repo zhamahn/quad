@@ -51,16 +51,15 @@ class AHRS {
     float roll(void);
     float yaw(void);
 
-    int earthAccelX(void);
-    int earthAccelY(void);
-    int earthAccelZ(void);
+    float globAccZ(void);
+    float globAccY(void);
+    float globAccX(void);
   private:
     unsigned long lastUpdate; // sample period in milliseconds
 
     float exInt, eyInt, ezInt; // scaled integral error
 
     void updateQuat(void);
-    //void updateEarthAccels(void);
 };
 
 #endif
