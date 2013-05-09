@@ -34,9 +34,9 @@ void ControlCenter::setOutputs(void) {
 }
 
 void ControlCenter::updateTargetQuat(void) {
-  float pitch = -1 * controllerAxis(controller->left_stick_y);
-  float roll  = controllerAxis(controller->left_stick_x);
-  float yaw   = ahrs->yaw() + controllerAxis(controller->right_stick_x);
+  float pitch = CONTROLLER_AXIS_TO_RAD(controller->stick_left_y);
+  float roll  = CONTROLLER_AXIS_TO_RAD(controller->stick_left_x);
+  float yaw   = ahrs->yaw() + CONTROLLER_AXIS_TO_RAD(controller->stick_right_x);
 
   float sin_pitch = sin(pitch/2);
   float cos_pitch = cos(pitch/2);
@@ -59,23 +59,20 @@ void ControlCenter::updateErrorQuat(void) {
   error_quat->normalize();
 }
 
-//void ControlCenter::updateErrorEulerAngles(void) {
-  //pitchError = -asin(2 * (error_q0*error_q2 - error_q1*error_q3));
-  //rollError  = -atan2(2 * (error_q0*error_q1 + error_q2*error_q3), 1 - 2 * (error_q1*error_q1 + error_q2*error_q2));
-  //yawError   = -atan2(2 * (error_q0*error_q3 + error_q1*error_q2), 1 - 2 * (error_q2*error_q2 + error_q3*error_q3));
-//}
+float ControlCenter::altitudeError(void) {
+  float zAccDelta;
+
+  zAccDelta = 1/STICK_AXIS_MAX*(controller->trigger_right - controller->trigger_left);
+  return ahrs->globAccZ()*ADXL_SCALE_FACTOR + zAccDelta;
+}
 
 float ControlCenter::pd(float error, float rate, float Kp, float Kd) {
   return (Kp * error) + (Kd * rate);
 }
 
 void ControlCenter::updateOutputs(void) {
-  pitchOutput    = PITCH_OUTPUT_SCALE      * pd(error_quat->rotY(), gyro->y, PITCH_KP, PITCH_KD);
-  rollOutput     = ROLL_OUTPUT_SCALE       * pd(error_quat->rotX(), gyro->x, ROLL_KP, ROLL_KD);
-  yawOutput      = YAW_OUTPUT_SCALE        * pd(error_quat->rotZ(), gyro->z, YAW_KP, YAW_KD);
-  altitudeOutput = ALTITUDE_OUTPUT_SCALE   * (controller->right_trigger - controller->left_trigger);
-}
-
-float ControlCenter::controllerAxis(int value) {
-  return RADS( map(value, STICK_AXIS_MIN, STICK_AXIS_MAX, -45, 45) );
+  pitchOutput    = PITCH_OUTPUT_SCALE    * pd(error_quat->rotY(), gyro->y, PITCH_KP, PITCH_KD);
+  rollOutput     = ROLL_OUTPUT_SCALE     * pd(error_quat->rotX(), gyro->x, ROLL_KP, ROLL_KD);
+  yawOutput      = YAW_OUTPUT_SCALE      * pd(error_quat->rotZ(), gyro->z, YAW_KP, YAW_KD);
+  altitudeOutput = ALTITUDE_OUTPUT_SCALE * altitudeError();
 }

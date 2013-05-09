@@ -6,7 +6,9 @@
 #define STICK_ZERO 128
 
 // Communication protocol
-#define BYTE_IS_FRAME_HEADER(byte) (byte == 0xFF)
+#define FRAME_HEADER1 0xFF
+#define FRAME_HEADER2 0xFF
+#define FRAME_HEADER_COUNT 2
 #define BYTE_IS_FRAME_FOOTER(byte) (byte >= 0xCC)
 #define PARITY_BIT(byte) (byte & 0x03)
 #define FRAME_DATA_LENGTH 8
@@ -18,48 +20,50 @@
 #define STICK_AXIS_MAX 127
 #define STICK_AXIS_MIN -128
 
+#define CONTROLLER_DATA_ARRAY_LENGTH 14
+#define CONTROLLER_AXIS_TO_RAD(value) (value * 0.002) // Limits to ~ +-45°
+
 class Controller {
   public:
     SoftwareSerial *mySerial;
 
-    signed char left_stick_x;
-    signed char left_stick_y;
+    int stick_left_x;
+    int stick_left_y;
 
-    signed char right_stick_x;
-    signed char right_stick_y;
+    int stick_right_x;
+    int stick_right_y;
 
-    unsigned char right_trigger;
-    unsigned char left_trigger;
+    int trigger_left;
+    int trigger_right;
 
-    int white;
-    int black;
+    int btn_white;
+    int btn_black;
 
-    bool up;
-    bool down;
-    bool left;
-    bool right;
+    bool btn_up;
+    bool btn_down;
+    bool btn_left;
+    bool btn_right;
 
-    bool left_stick;
-    bool right_stick;
-    bool back;
-    bool start;
-    bool a;
-    bool b;
-    bool x;
-    bool y;
+    bool btn_stick_left;
+    bool btn_stick_right;
+    bool btn_back;
+    bool btn_start;
+    bool btn_a;
+    bool btn_b;
+    bool btn_x;
+    bool btn_y;
 
     void update();
     void reset(void);
 
   private:
+    unsigned char data[CONTROLLER_DATA_ARRAY_LENGTH];
     unsigned long lastUpdateAt;
 
     int countOnes(unsigned char);
-    int readFrame(unsigned char *);
-    void updateButtons(unsigned char);
-    void updateDpad(unsigned char);
-    void updateFromDataArray(unsigned char *);
-
+    int readFrame(void);
+    void updateFromDataArray(void);
+    void updateButtons(void);
 };
 
 #endif
