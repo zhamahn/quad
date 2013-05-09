@@ -20,21 +20,21 @@ int ESC::change(int amount) {
   return output += amount;
 }
 
-int ESC::changePitch(int amount)    {
+int ESC::changePitch(int amount) {
   amount *= pitch_factor;
   if (amount > 0)
     amount = 0;
   return output += amount;
 }
 
-int ESC::changeRoll(int amount)     {
+int ESC::changeRoll(int amount) {
   amount *= roll_factor;
   if (amount > 0)
     amount = 0;
   return output += amount;
 }
 
-int ESC::changeYaw(int amount)      {
+int ESC::changeYaw(int amount) {
   return output += amount*yaw_factor;
 }
 
