@@ -70,9 +70,9 @@ float ControlCenter::pd(float error, float rate, float Kp, float Kd) {
 }
 
 void ControlCenter::updateOutputs(void) {
-  pitchOutput    = PITCH_OUTPUT_SCALE      * pd(error_quat->pitch(), gyro->y, PITCH_KP, PITCH_KD);
-  rollOutput     = ROLL_OUTPUT_SCALE       * pd(error_quat->roll(),  gyro->x, ROLL_KP, ROLL_KD);
-  yawOutput      = YAW_OUTPUT_SCALE        * pd(error_quat->yaw(),   gyro->z, YAW_KP, YAW_KD);
+  pitchOutput    = PITCH_OUTPUT_SCALE      * pd(error_quat->rotY(), gyro->y, PITCH_KP, PITCH_KD);
+  rollOutput     = ROLL_OUTPUT_SCALE       * pd(error_quat->rotX(), gyro->x, ROLL_KP, ROLL_KD);
+  yawOutput      = YAW_OUTPUT_SCALE        * pd(error_quat->rotZ(), gyro->z, YAW_KP, YAW_KD);
   altitudeOutput = ALTITUDE_OUTPUT_SCALE   * (controller->right_trigger - controller->left_trigger);
 }
 
