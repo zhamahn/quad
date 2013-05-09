@@ -2,7 +2,7 @@
 #define adxl345_h
 
 #define ADXL_SMOOTH_FACTOR 0.1
-#define ADXL_SCALE_FACTOR 0.0078
+#define ADXL_SCALE_FACTOR 0.0039
 
 class ADXL345 {
   public:
@@ -10,8 +10,6 @@ class ADXL345 {
 
     void begin(void);
     void update(void);
-    float valueToG(int);
-
   private:
     int rawX, rawY, rawZ;
 

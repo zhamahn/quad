@@ -31,7 +31,3 @@ void ADXL345::update(void) {
   y = smooth(rawY*-1, y, ADXL_SMOOTH_FACTOR);
   z = smooth(rawZ*-1, z, ADXL_SMOOTH_FACTOR);
 }
-
-float ADXL345::valueToG(int value) {
-  return (float)value * ADXL_SCALE_FACTOR;
-}
