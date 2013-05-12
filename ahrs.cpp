@@ -153,9 +153,3 @@ float AHRS::globAccZ(void) {
 
   return accX*acc->x + accY*acc->y + accZ*acc->z;
 }
-
-float AHRS::globAccY(void) {
-}
-
-float AHRS::globAccX(void) {
-}

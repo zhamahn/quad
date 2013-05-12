@@ -52,8 +52,6 @@ class AHRS {
     float yaw(void);
 
     float globAccZ(void);
-    float globAccY(void);
-    float globAccX(void);
   private:
     unsigned long lastUpdate; // sample period in milliseconds
 
