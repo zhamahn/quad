@@ -39,7 +39,7 @@
 
 class AHRS {
   public:
-    Quat *quat;
+    Quat quat;
     ITG3200 *gyro;
     ADXL345 *acc;
     HMC5883L *mag;

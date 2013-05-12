@@ -39,8 +39,8 @@ class ControlCenter {
     ADXL345 *acc;
     HMC5883L *mag;
 
-    Quat *target_quat;
-    Quat *error_quat;
+    Quat target_quat;
+    Quat error_quat;
 
     ESC **escs;
     int escs_count;

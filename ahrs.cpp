@@ -23,7 +23,6 @@
 #include "quat.h"
 
 void AHRS::begin(void) {
-  quat = new Quat;
   exInt = 0.0;
   eyInt = 0.0;
   ezInt = 0.0;
@@ -43,10 +42,10 @@ void AHRS::updateQuat(void) {
   float exAcc, eyAcc, ezAcc;
   float exMag, eyMag, ezMag;
 
-  float q0 = quat->w;
-  float q1 = quat->i;
-  float q2 = quat->j;
-  float q3 = quat->k;
+  float q0 = quat.w;
+  float q1 = quat.i;
+  float q2 = quat.j;
+  float q3 = quat.k;
 
   float ax = acc->x;
   float ay = acc->y;
@@ -122,24 +121,24 @@ void AHRS::updateQuat(void) {
   gz += ezAcc*AHRS_ACC_KP + ezMag*AHRS_MAG_KP + ezInt;
 
   // integrate quaternion rate
-  quat->w += (-q1*gx - q2*gy - q3*gz) * halfT;
-  quat->i += ( q0*gx + q2*gz - q3*gy) * halfT;
-  quat->j += ( q0*gy - q1*gz + q3*gx) * halfT;
-  quat->k += ( q0*gz + q1*gy - q2*gx) * halfT;
+  quat.w += (-q1*gx - q2*gy - q3*gz) * halfT;
+  quat.i += ( q0*gx + q2*gz - q3*gy) * halfT;
+  quat.j += ( q0*gy - q1*gz + q3*gx) * halfT;
+  quat.k += ( q0*gz + q1*gy - q2*gx) * halfT;
 
-  quat->normalize();
+  quat.normalize();
 }
 
 float AHRS::pitch(void) {
-  return quat->pitch();
+  return quat.pitch();
 }
 
 float AHRS::roll(void) {
-  return quat->roll();
+  return quat.roll();
 }
 
 float AHRS::yaw(void) {
-  return quat->yaw();
+  return quat.yaw();
 }
 
 float AHRS::globAccZ(void) {
@@ -148,9 +147,9 @@ float AHRS::globAccZ(void) {
   float accZ;
 
   // Estimated direction of gravity
-  accX = 2*(quat->i*quat->k - quat->w*quat->j);
-  accY = 2*(quat->w*quat->i + quat->j*quat->k);
-  accZ = quat->w*quat->w - quat->i*quat->i - quat->j*quat->j + quat->k*quat->k;
+  accX = 2*(quat.i*quat.k - quat.w*quat.j);
+  accY = 2*(quat.w*quat.i + quat.j*quat.k);
+  accZ = quat.w*quat.w - quat.i*quat.i - quat.j*quat.j + quat.k*quat.k;
 
   return accX*acc->x + accY*acc->y + accZ*acc->z;
 }
