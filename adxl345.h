@@ -3,6 +3,7 @@
 
 #define ADXL_SMOOTH_FACTOR 0.1
 #define ADXL_SCALE_FACTOR 0.0039
+#define ADXL_1G 256
 
 class ADXL345 {
   public:

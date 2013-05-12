@@ -57,11 +57,10 @@ void ControlCenter::updateErrorQuat(void) {
   error_quat.normalize();
 }
 
-float ControlCenter::altitudeError(void) {
-  float zAccDelta;
-
-  zAccDelta = 1/STICK_AXIS_MAX*(controller->trigger_right - controller->trigger_left);
-  return ahrs->globAccZ()*ADXL_SCALE_FACTOR + zAccDelta;
+// positive value is upward
+int ControlCenter::altitudeError(void) {
+  int currentZAcc = ahrs->globAccZ() + ADXL_1G; // Should be ~0 in stable hover
+  return currentZAcc + controller->trigger_right - controller->trigger_left;
 }
 
 float ControlCenter::pd(float error, float rate, float Kp, float Kd) {
