@@ -64,7 +64,7 @@ int ControlCenter::altitudeError(void) {
 }
 
 float ControlCenter::pd(float error, float rate, float Kp, float Kd) {
-  return (Kp * error) + (Kd * rate);
+  return (Kp * error) + (Kd * -rate);
 }
 
 void ControlCenter::updateOutputs(void) {
