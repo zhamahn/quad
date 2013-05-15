@@ -4,6 +4,11 @@
 #define OUTPUT_MIN 10
 #define OUTPUT_MAX 255
 
+#define PITCH_SCALE 10
+#define ROLL_SCALE 10
+#define YAW_SCALE 7
+#define ALTITUDE_SCALE 0.01
+
 class ESC {
   public:
     unsigned char pin;

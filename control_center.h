@@ -25,11 +25,6 @@
 #define YAW_KI 5.0
 #define YAW_KD 0.5
 
-#define PITCH_OUTPUT_SCALE 10
-#define ROLL_OUTPUT_SCALE 10
-#define YAW_OUTPUT_SCALE 7
-#define ALTITUDE_OUTPUT_SCALE 0.01
-
 class ControlCenter {
   public:
     Controller *controller;
