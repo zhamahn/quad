@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SoftwareSerial.h>
+#include <Servo.h>
 
 #include "utils.h"
 #include "esc.h"

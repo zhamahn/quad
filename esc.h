@@ -1,8 +1,11 @@
 #ifndef esc_h
 #define esc_h
 
-#define OUTPUT_MIN 10
-#define OUTPUT_MAX 255
+#include <Servo.h>
+
+#define ESC_MIN 544
+#define ESC_MAX 2400
+#define ESC_OFF 520
 
 #define PITCH_SCALE 10
 #define ROLL_SCALE 10
@@ -18,8 +21,13 @@ class ESC {
     float roll_factor;
     float yaw_factor;
     float altitude_factor;
+    bool armed;
 
     ESC(unsigned char, float, float, float, float);
+    void begin(void);
+
+    bool arm(void);
+    bool unarm(void);
 
     int write(void);
     int change(int);
@@ -27,6 +35,8 @@ class ESC {
     int changeRoll(int);
     int changeYaw(int);
     int changeAltitude(int);
+  private:
+    Servo servo;
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Servo.h>
 
 #include "esc.h"
 
@@ -8,11 +9,17 @@ ESC::ESC(unsigned char _pin, float _pitch, float _roll, float _yaw, float _altit
   roll_factor     = _roll;
   yaw_factor      = _yaw;
   altitude_factor = _altitude;
+  armed           = false;
+}
+
+void ESC::begin(void) {
+  servo.attach(pin, ESC_OFF, ESC_MAX);
 }
 
 int ESC::write(void) {
-  output = constrain(output, OUTPUT_MIN, OUTPUT_MAX);
-  analogWrite(pin, output);
+  output = constrain(output, ESC_MIN, ESC_MAX);
+  if (armed)
+    servo.writeMicroseconds(output);
   return output;
 }
 
@@ -40,4 +47,26 @@ int ESC::changeYaw(int amount) {
 
 int ESC::changeAltitude(int amount) {
   return output += amount*altitude_factor*ALTITUDE_SCALE;
+}
+
+bool ESC::arm(void) {
+  if (armed) {
+    return false;
+  } else {
+    output = ESC_MIN;
+    servo.writeMicroseconds(output);
+    armed = true;
+    return true;
+  }
+}
+
+bool ESC::unarm(void) {
+  if (armed) {
+    output = ESC_OFF;
+    servo.writeMicroseconds(output);
+    armed = false;
+    return true;
+  } else {
+    return false;
+  }
 }
