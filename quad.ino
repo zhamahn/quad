@@ -25,23 +25,23 @@
 #define PIN_SERIAL_TX 2
 
 // Motor configuration
-#define ESC_X_PITCH 0
-#define ESC_X_ROLL 1
+#define ESC_X_PITCH -1
+#define ESC_X_ROLL 0
 #define ESC_X_YAW 0.5
 #define ESC_X_ALTITUDE 1
 
-#define ESC_NX_PITCH 0
-#define ESC_NX_ROLL -1
+#define ESC_NX_PITCH 1
+#define ESC_NX_ROLL 0
 #define ESC_NX_YAW -0.5
 #define ESC_NX_ALTITUDE 1
 
-#define ESC_Y_ROLL 0
-#define ESC_Y_PITCH 1
+#define ESC_Y_PITCH 0
+#define ESC_Y_ROLL -1
 #define ESC_Y_YAW 0.5
 #define ESC_Y_ALTITUDE 1
 
-#define ESC_NY_PITCH -1
-#define ESC_NY_ROLL 0
+#define ESC_NY_PITCH 0
+#define ESC_NY_ROLL 1
 #define ESC_NY_YAW -0.5
 #define ESC_NY_ALTITUDE 1
 
